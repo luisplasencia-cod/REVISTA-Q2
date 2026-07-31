@@ -1,0 +1,3 @@
+# Claude Code — configuración y skills locales (no compartidos con el equipo)
+.claude/settings.local.json
+.claude/skills/
