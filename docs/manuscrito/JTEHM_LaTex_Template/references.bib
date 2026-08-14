@@ -1,0 +1,343 @@
+% ============================================================
+% references.bib — Manuscrito IEEE JTEHM
+% Simulador de marcha 3-DOF para evaluacion de protesis transtibiales
+%
+% Actualizado: 11-ago-2026
+%
+% ESTADO DE CADA ENTRADA:
+%   [OK]      verificada contra la fuente, lista para enviar
+%   [PARCIAL] falta un dato bibliografico (marcado dentro de la entrada)
+%   [REVISAR] tomada de conocimiento general, NO verificada contra fuente
+%
+% El detalle completo de la verificacion, con advertencias de uso y
+% acciones pendientes, esta en ../referencias_verificadas.md
+% NO agregar entradas nuevas sin verificarlas: en la ronda del 05-ago-2026,
+% 3 de 5 citas "identificadas por busqueda" tenian errores reales
+% (un titulo equivocado, un resumen de congreso confundido con articulo,
+% un paper de congreso confundido con articulo de revista).
+% ============================================================
+
+
+% ------------------------------------------------------------
+% SIMULADORES DE MARCHA Y BANCOS DE PRUEBA DE PROTESIS
+% ------------------------------------------------------------
+
+% [OK] Verificada en PMC8936071 (05-ago-2026).
+% NOTA DE USO: este banco fue disenado a partir del analisis de marcha de
+% UN SOLO participante amputado — es evidencia concreta de que programar
+% desde un sujeto unico es la practica habitual del campo. Citar
+% explicitamente en la frase que cuestiona esa suposicion.
+@article{Etoundi2022RoboticTestRig,
+  author  = {Etoundi, Appolinaire C. and Dobner, Alexander and Agrawal, Subham
+             and Semasinghe, Chathura L. and Georgilas, Ioannis and Jafari, Aghil},
+  title   = {A Robotic Test Rig for Performance Assessment of Prosthetic Joints},
+  journal = {Frontiers in Robotics and AI},
+  volume  = {8},
+  year    = {2022},
+  doi     = {10.3389/frobt.2021.613579}
+}
+
+% [OK] COMPLETADA Y VERIFICADA el 11-ago-2026 contra dos fuentes
+% independientes (Europe PMC y PubMed, PMID 39672657). El PII que se
+% tenia anotado, S1350453324001553, corresponde a S1350-4533(24)00155-3
+% y es consistente con este DOI — no habia discrepancia.
+%
+% REFERENCIA MAS CRITICA DEL MANUSCRITO, por dos motivos:
+%  (1) Concluye que SOLO los movimientos del plano sagital
+%      (flexion-extension, traslacion vertical, traslacion horizontal)
+%      bastan para ensayar rodillas proteticas — justifica de forma
+%      independiente la arquitectura de 3 DOF de este simulador.
+%      Frase textual del resumen: "sagittal plane movements, namely
+%      flexion-extension, vertical translation, and horizontal
+%      translation, are sufficient to test prosthetic knees".
+%      USAR TAMBIEN EN 5.1, no solo en la Introduccion.
+%  (2) Es el competidor mas cercano. El resumen verificado dice que
+%      valido con "hardware-in-loop simulations" y simulacion numerica
+%      de la fase de balanceo a partir de datos de marcha 3D, sobre una
+%      rodilla protesica (IITM polycentric knee) — NO reporta validacion
+%      multi-sujeto de fidelidad de reproduccion. La frase de novedad de
+%      la Introduccion se sostiene a nivel de resumen; conviene igual
+%      leer el texto completo antes del envio para confirmarlo.
+@article{Sudeesh2024CompactGaitSimulator,
+  author  = {Sudeesh, S. and Shunmugam, M. S. and Sujatha, S.},
+  title   = {A compact and cost-effective gait simulator to advance prosthesis
+             development with reduced reliance on human subject testing:
+             Development, validation and application},
+  journal = {Medical Engineering \& Physics},
+  volume  = {134},
+  pages   = {104254},
+  year    = {2024},
+  doi     = {10.1016/j.medengphy.2024.104254}
+}
+
+% [NO USAR EN ESTE ARTICULO] Verificada 11-ago-2026 leyendo el texto
+% completo en PMC12964165 — y la lectura invalida el uso que se le habia
+% planeado el 05-ago.
+%
+% ERROR DE CATEGORIA: "prosthesis simulator" aqui NO significa banco
+% robotico de pruebas. Significa dispositivo que VISTE una persona sana
+% para imitar el uso de una protesis. Cita textual de la introduccion:
+% "Prosthesis simulators, also called able-bodied adapters, bypass
+% adapters, or bypass orthoses, are designed to mimic prosthesis use with
+% anatomically intact individuals." Y del resumen: "designed for mimicking
+% prosthesis use with able-bodied individuals". Los 18 estudios
+% "transtibiales" son botas/ortesis que inmovilizan el tobillo a ~90
+% grados en sujetos sanos.
+%
+% Es decir: es otra literatura que comparte el nombre. Citarla como "la
+% revision mas reciente del campo" de este articulo seria un error que un
+% revisor de JTEHM detecta de inmediato. NO condensa la Introduccion y NO
+% sustituye a DeRaeve2014AlignmentTool.
+% Se conserva la entrada, comentada, para no volver a identificarla como
+% hallazgo nuevo en una sesion futura.
+%
+% @article{Neelen2026SimulatorReview,
+%   author  = {Neelen, Imke and van der Windt, Bob and Major, Matthew Justin
+%              and Smit, Gerwin},
+%   title   = {State of the art of lower limb prosthesis simulators:
+%              A literature review},
+%   journal = {Wearable Technologies},
+%   volume  = {7},
+%   pages   = {e2},
+%   year    = {2026},
+%   doi     = {10.1017/wtc.2026.10038}
+% }
+
+% [OK] COMPLETADA Y VERIFICADA el 11-ago-2026 via Crossref. Se confirma
+% que es paper de congreso (proceedings-article), no articulo de revista.
+% El congreso es REM 2015 (Research and Education in Mechatronics), no un
+% congreso de la EMBS ni de biomecanica — dato a tener en cuenta si se
+% quiere una cita de mas peso para ese punto de la Introduccion.
+@inproceedings{Marinelli2015ConceptualDesign,
+  author    = {Marinelli, Cristiano and Giberti, Hermes and Resta, Ferruccio},
+  title     = {Conceptual design of a gait simulator for testing lower-limb
+               active prostheses},
+  booktitle = {2015 16th International Conference on Research and Education
+               in Mechatronics (REM)},
+  pages     = {314--320},
+  year      = {2015},
+  doi       = {10.1109/REM.2015.7380413}
+}
+
+% [OK] Verificada como resumen de congreso en suplemento (05-ago-2026).
+% ADVERTENCIA: 7(Suppl 1):A15 = resumen de una pagina, NO articulo
+% completo revisado por pares. Cita debil para una revista IEEE.
+% RESUELTO 13-ago-2026 (DISCUSION_Q2.md P-11): busqueda exhaustiva no
+% encontro un articulo completo del grupo De Raeve/Muraru/Peeraer para
+% este sistema -- solo publicaron el resumen de congreso de una pagina,
+% confirmado por multiples busquedas independientes. No se elimino la
+% cita (describe correctamente lo que es) ni se forzo un reemplazo
+% tangencial; se cita junto a Etoundi2022RoboticTestRig en el .tex para
+% reforzar la mitad de "joint performance assessment" de la afirmacion.
+@article{DeRaeve2014AlignmentTool,
+  author  = {De Raeve, Eveline and Saey, Tom and Muraru, Luiza and Peeraer, Louis},
+  title   = {The use of a robotic gait simulator for the development of an
+             alignment tool for lower limb prostheses},
+  journal = {Journal of Foot and Ankle Research},
+  volume  = {7},
+  number  = {Suppl 1},
+  pages   = {A15},
+  year    = {2014},
+  doi     = {10.1186/1757-1146-7-S1-A15}
+}
+
+
+% ------------------------------------------------------------
+% VALIDACION DE INSTRUMENTACION INERCIAL
+% ------------------------------------------------------------
+
+% [OK] COMPLETADA Y VERIFICADA el 11-ago-2026 sobre el texto completo en
+% PMC9920655 (PMID 36772783). Autores obtenidos via Crossref.
+%
+% RESUELTA LA ADVERTENCIA QUE ESTABA ABIERTA — y el resultado obliga a
+% redactar con cuidado: el sistema validado NO es STT-IWS/iSen.
+% Cita textual de Metodos: "The IMU system was the Noraxon MyoMotion
+% Research Pro system (Noraxon USA, Scottsdale, AZ) with a sampling rate
+% of 200 Hz. Seven IMUs were attached using Velcro straps at the feet,
+% legs, thighs, and pelvis." Referencia optica: 8 camaras Raptor
+% (Motion Analysis Corporation), tambien a 200 Hz. 30 usuarios de
+% protesis transtibial.
+%
+% => En 5.2 debe decir "sistemas inerciales de este tipo" / "inertial
+% systems of this class", NUNCA "el sistema empleado en este estudio fue
+% validado". Ya corregido en manuscrito_JTEHM.tex el 11-ago-2026.
+%
+% DATO A VIGILAR: el acuerdo no es uniformemente excelente. ICC de
+% flexo-extension de rodilla 0.99 (lado amputado) / 0.98 (lado sano) y de
+% cadera 0.90 / 0.84, pero dorsiflexion-plantarflexion de tobillo baja a
+% 0.60 en el lado amputado — solo moderado. Si se cita como respaldo
+% general de validez, un revisor puede senalar ese 0.60. Conviene acotar
+% la afirmacion a los segmentos/angulos que este articulo realmente usa
+% (inclinacion de plataforma y de segmento), no al tobillo.
+@article{Rattanakoch2023TranstibialIMU,
+  author  = {Rattanakoch, Jutima and Samala, Manunchaya and
+             Limroongreungrat, Weerawat and Guerra, Gary and
+             Tharawadeepimuk, Kittichai and Nanbancha, Ampika and
+             Niamsang, Wisavaporn and Kerdsomnuek, Pichitpol and
+             Suwanmana, Sarit},
+  title   = {Validity and Reliability of Inertial Measurement Unit
+             (IMU)-Derived 3D Joint Kinematics in Persons Wearing
+             Transtibial Prosthesis},
+  journal = {Sensors},
+  volume  = {23},
+  number  = {3},
+  pages   = {1738},
+  year    = {2023},
+  doi     = {10.3390/s23031738}
+}
+
+
+% [OK] VERIFICADA SOBRE EL PDF COMPLETO (11-ago-2026). Copia local en
+% ../../literatura/pdfs/Piche2022_iSen_STT-IWS_validacion_OptiTrack_Measurement198_111442.pdf
+%
+% ES LA CITA MAS IMPORTANTE DE INSTRUMENTACION DEL ARTICULO: valida
+% EXACTAMENTE el sistema que usa este proyecto. Confirmado textualmente:
+% "a new inertial measurement system, iSen STT-IWS sensors, with
+% reference to the optoelectronic motion capture system OptiTrack" y
+% "(iSen, STT Systems Inc., San Sebastian, Spain)".
+%
+% Y dice algo aun mejor para Metodos 5.2: "Previous studies have
+% previously validated similar systems [4,7,8] while no study have
+% validated this specific ISEN system". Es decir, es LA validacion del
+% sistema, no una de varias. Sostiene por si sola la decision de no
+% re-validar el instrumento en este ciclo.
+%
+% CIFRAS UTILIZABLES (22 sanos jovenes, cinta, 0.8 / 1.2 / 1.6 m/s,
+% 11 IMU a 100 Hz vs. 9 camaras OptiTrack; ICC(2,1) test-retest a 2 sem):
+%   - RMSD forma de onda completa: rodilla 3.3 deg, tobillo 5.6, cadera 7.3
+%   - RMSD rodilla por velocidad: 3.3 / 3.9 / 5.4 deg
+%   - LCC > 0.75 en todas las articulaciones MENOS tobillo
+%     (0.72 / 0.60 / 0.56) — no citar el tobillo como respaldo
+%   - ICC test-retest: rodilla 0.93, cadera 0.89, tobillo 0.80
+%   - Deriva PEQUENA: error relativo max 1.1 deg entre los primeros y los
+%     ultimos 30 s de 3 min de captura; RMSD < 2 deg. Dato directo contra
+%     la objecion clasica de deriva de IMU.
+%
+% TRES CAVEATS QUE HAY QUE SABER SOSTENER (no invalidan la cita, pero un
+% revisor puede levantarlos y conviene no quedar descolocado):
+%  (1) Su propia hipotesis era error < 3 deg y NO se cumplio: el RMSD
+%      quedo entre 3.3 y 8.4 deg. El resumen lo llama "good to tolerable".
+%  (2) Poblacion: 22 sanos jovenes (media 26 anos), NO usuarios de
+%      protesis — pese a que su resumen concluye utilidad "on older
+%      adults", que es un salto propio de ellos. La cobertura de la
+%      poblacion transtibial la aporta Rattanakoch2023TranstibialIMU, con
+%      OTRO instrumento. Las dos citas son complementarias y conviene
+%      presentarlas asi, explicitamente: una cubre el instrumento, la
+%      otra la poblacion. Ninguna cubre las dos cosas.
+%  (3) La fiabilidad DECRECE al aumentar la velocidad (LCC 0.88 -> 0.85;
+%      sesgo de tobillo -4.15 -> -8.35 -> -11.73 deg de 0.8 a 1.6 m/s).
+%      Rango validado: 0.8-1.6 m/s. El simulador opera ~30x MAS LENTO que
+%      la marcha humana (28.5 s de apoyo vs. 0.9459 s reales, ver
+%      ../../literatura/literatura_GRF_protesica.md), o sea por DEBAJO
+%      del rango validado — extremo favorable a la exactitud segun esta
+%      tendencia, pero extrapolacion al fin y al cabo. Declararlo asi en
+%      Discussion es honesto y ademas juega a favor.
+@article{Piche2022iSenValidity,
+  author  = {Piche, Elodie and Guilbot, Marine and Chorin, Fr\'ed\'eric and
+             Guerin, Olivier and Zory, Rapha\"el and Gerus, Pauline},
+  title   = {Validity and repeatability of a new inertial measurement unit
+             system for gait analysis on kinematic parameters: Comparison
+             with an optoelectronic system},
+  journal = {Measurement},
+  volume  = {198},
+  pages   = {111442},
+  year    = {2022},
+  doi     = {10.1016/j.measurement.2022.111442}
+}
+
+
+% ------------------------------------------------------------
+% METODOS ESTADISTICOS
+% ------------------------------------------------------------
+
+% [OK] VERIFICADA el 13-ago-2026 (busqueda web, multiples fuentes
+% independientes incluido PubMed). Titulo, revista, volumen, paginas y
+% DOI coinciden exactamente con lo ya anotado. Es la referencia del
+% modelo ICC.
+@article{KooLi2016,
+  author  = {Koo, Terry K. and Li, Mae Y.},
+  title   = {A Guideline of Selecting and Reporting Intraclass Correlation
+             Coefficients for Reliability Research},
+  journal = {Journal of Chiropractic Medicine},
+  volume  = {15},
+  number  = {2},
+  pages   = {155--163},
+  year    = {2016},
+  doi     = {10.1016/j.jcm.2016.02.012}
+}
+
+% [OK] VERIFICADA el 13-ago-2026 (busqueda web, incluido Wiley Online
+% Library). Titulo, revista, volumen, paginas y DOI coinciden
+% exactamente. Es la referencia del metodo de permutacion de SPM1D_Core.m.
+@article{NicholsHolmes2002,
+  author  = {Nichols, Thomas E. and Holmes, Andrew P.},
+  title   = {Nonparametric permutation tests for functional neuroimaging:
+             A primer with examples},
+  journal = {Human Brain Mapping},
+  volume  = {15},
+  number  = {1},
+  pages   = {1--25},
+  year    = {2002},
+  doi     = {10.1002/hbm.1058}
+}
+
+% [OK] VERIFICADA el 13-ago-2026 (busqueda web, incluido PubMed y
+% ScienceDirect). Titulo, revista, volumen, paginas y DOI coinciden
+% exactamente. Sostiene la eleccion de SPM no parametrico para muestra
+% pequena.
+@article{Pataky2015,
+  author  = {Pataky, Todd C. and Vanrenterghem, Jos and Robinson, Mark A.},
+  title   = {Zero- vs. one-dimensional, parametric vs. non-parametric, and
+             confidence interval vs. hypothesis testing procedures in
+             one-dimensional biomechanical trajectory analysis},
+  journal = {Journal of Biomechanics},
+  volume  = {48},
+  number  = {7},
+  pages   = {1277--1285},
+  year    = {2015},
+  doi     = {10.1016/j.jbiomech.2015.02.051}
+}
+
+% [OK] VERIFICADA el 13-ago-2026 contra iso.org (standard 11833). Parte 1
+% es correcta (principios generales y definiciones de trueness/precision).
+% Ver ../../literatura/normas_ISO_relevantes.md
+% ADVERTENCIA NUEVA: esta edicion (1994) figura como RETIRADA en iso.org
+% -- la vigente es ISO 5725-1:2023. No se cambia de oficio: la 1994 es la
+% que de hecho se uso para tomar el vocabulario de trueness/precision, y
+% muchos articulos de biomecanica siguen citando esta edicion, pero un
+% revisor puede notar que no es la version vigente. Decidir si se cita la
+% edicion 2023 en su lugar -- ver DISCUSION_Q2.md.
+@misc{ISO5725,
+  author       = {{International Organization for Standardization}},
+  title        = {{ISO} 5725-1:1994 Accuracy (trueness and precision) of
+                  measurement methods and results --- Part 1: General
+                  principles and definitions},
+  year         = {1994},
+  howpublished = {Standard},
+  organization = {ISO}
+}
+
+
+% ------------------------------------------------------------
+% ENTRADAS DE EJEMPLO DE LA PLANTILLA IEEE
+% Se conservan solo para que "JERM Demo.tex" siga compilando como
+% referencia de formato. NO se citan en el manuscrito real.
+% ------------------------------------------------------------
+
+@book{Clinical_electrocardiography,
+  title={Clinical electrocardiography: a simplified approach e-book},
+  author={Goldberger, Ary L and Goldberger, Zachary D and Shvilkin, Alexei},
+  year={2017},
+  publisher={Elsevier Health Sciences}
+}
+
+@article{clustering,
+  title={Spike sorting based on automatic template reconstruction with a partial solution to the overlapping problem},
+  author={Zhang, Pu-Ming and Wu, Jin-Yong and Zhou, Yi and Liang, Pei-Ji and Yuan, Jing-Qi},
+  journal={Journal of neuroscience methods},
+  volume={135},
+  number={1-2},
+  pages={55--65},
+  year={2004},
+  publisher={Elsevier}
+}

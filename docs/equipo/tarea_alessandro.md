@@ -1,5 +1,7 @@
 # Tarea para Alessandro — revisión bibliográfica
 
+> ⚠️ **CERRADA para el artículo Q2, 13-ago-2026.** Alessandro terminó su parte, pero tras el pivote a instrumentación única (03-ago-2026) ya no se usa la comparación Kinovea/STT-IWS/su sensor que justificaba los temas 2 y 3 — el usuario confirmó explícitamente que ya no sirve para este artículo ("ya hay que olvidarlo"). Se conserva el contenido de abajo por trazabilidad y porque puede seguir teniendo valor para el segundo artículo/informe de práctica de Alessandro, pero **no se vuelve a citar ni a esperar nada de esto en este ciclo.**
+
 **Asunto: Tarea de revisión bibliográfica — sirve para el artículo Q2 y para tu informe de práctica**
 
 Hola Alessandro,

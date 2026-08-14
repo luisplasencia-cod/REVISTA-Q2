@@ -1,0 +1,276 @@
+% ============================================================
+% ESQUELETO DE MANUSCRITO — Prosthesis (MDPI)
+% Creado: 03-ago-2026 — DECISION FINAL de revista, tercera vuelta
+% (reemplaza Bioengineering, que reemplazo a POI/SAGE, todo en la misma sesion)
+%
+% COMO USAR ESTE ARCHIVO (importante, leer antes de pegar en Overleaf):
+%
+% 1. Este archivo NO es autocontenido -- no trae la clase mdpi.cls ni la
+%    carpeta Definitions/ (logos, estilos, macros de cada revista MDPI).
+%    Esos archivos NO se pudieron descargar aqui. El flujo correcto es:
+%      a) Abrir la plantilla oficial verificada en Overleaf:
+%         https://www.overleaf.com/latex/templates/mdpi-article-template/fcpwsspfzsph
+%         (click "Open as Template" -- crea un proyecto nuevo con
+%         template.tex + carpeta Definitions/ ya completa)
+%      b) Reemplazar el contenido de "template.tex" de ese proyecto con
+%         el contenido de este archivo (de \documentclass en adelante)
+%      c) MDPI actualiza su plantilla varias veces al ano y la version
+%         de Overleaf casi siempre esta un poco atras de mdpi.com/authors/latex
+%         -- si algo no compila, revisar ahi antes de asumir que es un
+%         error de este archivo.
+%
+% 2. Overleaf tiene envio directo a revistas MDPI: boton "Submit" en el
+%    proyecto -> "Submit to an MDPI journal" -- empaqueta y redirige al
+%    sistema de envio de MDPI. Util para cuando el manuscrito este listo.
+%
+% 3. Los comandos de front-matter (\Title, \Author, \abstract, \keyword,
+%    \authorcontributions, etc.) SI estan verificados contra la
+%    plantilla oficial de Overleaf -- no son una suposicion.
+%
+% 4. APC confirmado: CHF 1600 (Prosthesis, 2025) -- dentro del tope de
+%    USD 2500 dado por la universidad (confirmar si la cobertura del VRI
+%    es total o parcial, ver docs/planificacion/revistas_candidatas_Q2.md
+%    seccion "Convenio institucional PUCP").
+%
+% 5. Ajuste tematico verificado con precedente real (03-ago-2026): se
+%    confirmo que "validar el instrumento/simulador de evaluacion" (no
+%    la protesis en si) SI tiene cabida en esta revista -- ver
+%    "Development and Comprehensive Evaluation of 3D-Printed Prosthetic
+%    Feet: Modeling, Testing and a Pilot Gait Study", publicado en esta
+%    misma revista (ISSN 2673-1592), que combina banco de pruebas +
+%    estudio piloto de marcha igual que este proyecto. Confirmar de
+%    todas formas la pagina de "Aims & Scope" (bloqueada para acceso
+%    automatizado, no se pudo leer completa) antes de enviar.
+%
+% 6. Contenido: mismo que en los dos intentos anteriores (Bioengineering,
+%    POI/SAGE -- quedan como referencia, no se borran), tomado de
+%    docs/manuscrito/metodos_introduccion_borrador.md, ya sin
+%    Kinovea/IMU de Alessandro/cita al paper de conferencia.
+%
+% 7. Estilo de referencias de MDPI: no se confirmo el comando exacto de
+%    \bibliography en este ciclo -- revisar el template.tex real
+%    descargado de Overleaf, que ya trae la configuracion correcta.
+% ============================================================
+
+\documentclass[prosthesis,article,submit,moreauthors]{Definitions/mdpi}
+
+% ------------------------------------------------------------
+% TITULO
+% ------------------------------------------------------------
+\Title{Multi-Subject Functional Validation of a 3-DOF Gait Simulator for
+Transtibial Prosthesis Testing Using Inertial Motion Capture}
+
+% [PENDIENTE: nombres, afiliaciones y orden de autoria -- decidir con CRediT statement]
+\Author{Autor Uno $^{1}$, Autor Dos $^{1}$, Autor Tres $^{2}$, Autor Cuatro $^{3,}$*}
+
+\AuthorNames{Autor Uno, Autor Dos, Autor Tres, Autor Cuatro}
+
+\address{%
+$^{1}$ Departamento de Ingenier\'ia, Pontificia Universidad Cat\'olica del Per\'u (PUCP), Lima, Per\'u\\
+$^{2}$ [PENDIENTE: afiliaci\'on]\\
+$^{3}$ [PENDIENTE: afiliaci\'on]}
+
+\corres{Correspondence: [PENDIENTE: correo]; Tel.: [PENDIENTE]}
+
+% ------------------------------------------------------------
+% ABSTRACT -- MDPI pide estructura Background/Methods/Results/Conclusions, maximo 200 palabras
+% ------------------------------------------------------------
+\abstract{Background: [PENDIENTE]. Methods: [PENDIENTE]. Results: [PENDIENTE --
+depende de datos de sujetos nuevos y del piloto del IMU en la plataforma,
+ver CLAUDE.md]. Conclusions: [PENDIENTE].}
+
+\keyword{gait simulator; transtibial prosthesis; inertial motion capture; multi-subject validation; prosthetics testing}
+% MDPI: separar keywords con punto y coma, no coma -- confirmar limite maximo
+
+\begin{document}
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+% [PENDIENTE: cuerpo completo -- necesidad clinica con literatura
+% externa, sin autocita al paper de conferencia. Ver nota en
+% metodos_introduccion_borrador.md sobre por que no se cita.]
+
+Transtibial prosthesis testing increasingly relies on gait simulators to
+provide controlled, repeatable loading conditions for functional and
+mechanical evaluation without requiring continuous human-subject
+involvement. A central open question for any such simulator is whether
+trajectories programmed from a single reference subject generalize to
+the gait patterns of individuals who did not contribute to that
+programming --- a question that is rarely addressed with quantified,
+multi-subject evidence in the literature on prosthesis gait simulators.
+The present study addresses this gap directly: we assess whether a
+3-degree-of-freedom (horizontal, vertical, sagittal) motor-driven gait
+simulator reproduces gait kinematics captured from multiple subjects
+independent of its calibration trajectory, using an inertial motion
+capture system whose validity for lower-limb kinematics --- including
+specifically in transtibial prosthesis users --- is already established
+in the literature \cite{PENDIENTE_iSen_transtibial}, and we quantify ---
+rather than narrate --- the sources of vertical force overestimation
+inherent to a motor-driven platform.
+
+% ============================================================
+\section{Materials and Methods}
+% ============================================================
+
+\subsection{System Description}
+% Condensado, autocontenido -- no remite al paper de conferencia (no citado en este articulo)
+
+The gait simulator reproduces a pre-recorded gait trajectory across
+three independent degrees of freedom --- horizontal displacement,
+vertical displacement, and sagittal rotation --- each driven by its own
+motor and transmission (chain-and-sprocket or direct drive, depending on
+the axis). Trajectories are stored as CSV files, uploaded via a
+Raspberry Pi, and executed open-loop by an ESP32 microcontroller; the
+present study does not modify this operating principle --- no
+closed-loop control or algorithmic trajectory generation was introduced
+in this cycle (see Discussion, Future Work). % [PENDIENTE: calibracion del actuador vertical, bloqueada por integracion Raspberry Pi-ESP32]
+
+\subsection{Instrumentation}
+% Un solo instrumento en todo el protocolo (revisado 03-ago-2026)
+
+Kinematic and kinetic data were collected using two instruments:
+
+\begin{itemize}
+\item \textit{Inertial motion capture (STT-IWS/iSen).} Used throughout
+the protocol to (i) capture new subjects' natural gait, (ii) re-capture
+the original reference subject to regenerate the simulator's default
+trajectory, and (iii) measure the simulator's own platform output
+(sensor mounted directly on the platform). Segment/platform inclination
+angles are derived from the sensor's onboard orientation estimate
+relative to gravity, positive above horizontal and negative below, the
+same sign convention used throughout this project. No in-house
+cross-instrument validation was performed in this cycle; instrument
+validity for lower-limb gait kinematics --- including specifically in
+transtibial prosthesis users --- is supported by previously published
+validation studies rather than re-derived \cite{PENDIENTE_iSen_transtibial}.
+% [PENDIENTE: confirmar que el sensor exporta orientacion cruda respecto
+% a la gravedad y no solo el angulo articular calibrado del protocolo de
+% marcha por defecto -- resultado del piloto en curso. Ver tambien
+% docs/literatura/postprocesado_datos_crudos_IMU.md sobre el corte de
+% filtro que hay que recalibrar para la velocidad real del simulador.]
+\item \textit{Force platform (AMTI).} Used to record the vertical
+ground reaction force (Fz) exerted by the simulator against a fixed
+load cell, sampled at 1000 Hz.
+% [PENDIENTE: confirmar si se reportan las 6 columnas completas (Fx,Fy,Fz,Mx,My,Mz) o solo Fz]
+\end{itemize}
+
+\subsubsection{Vertical Force Overestimation: A Three-Stage, Decoupled Explanation}
+
+Because the moving assembly is not a single rigid body --- a stationary
+electronic control board is mounted on one side of the frame, while
+three independently actuated axes (horizontal, vertical, sagittal) each
+carry their own kinematic chain on the other --- vertical force
+overestimation is decomposed into three independent, sequentially
+corrected sources rather than a single inertial term:
+
+\begin{enumerate}
+\item A fixed \textit{vertical datum offset}, calibrated once against
+an independent static load reference (not against any subject
+trajectory reported in Results) and held constant across all trials.
+\item \textit{Command-to-encoder tracking fidelity} per axis, isolating
+mechanical/control error (chain or sprocket backlash, insufficient
+motor holding torque under reaction load) from the remaining sources.
+\item An \textit{axis-wise inertial correction}, using the mass that
+actually accelerates with each motor according to the real mounting
+order of the kinematic chain --- not the total assembly mass ---
+benchmarked against published prosthetic gait GRF data.
+% [PENDIENTE: fuente de m_eje sin resolver -- CAD vs. renunciar al termino y declararlo limitacion]
+\end{enumerate}
+
+\subsection{Experimental Protocol}
+% [PENDIENTE: depende de si llego la aprobacion de etica y del numero final de sujetos]
+
+\subsection{Statistical Analysis}
+% [PENDIENTE: prosa -- formulas listas en
+% docs/planificacion/plan_trabajo_5_semanas_articulo_Q2.md. Incluir:
+% RMSEnorm, Pearson r (con nota de cautela en curvas monotonas), %
+% puntos dentro de +-1 SD, ICC(3,1) [Koo & Li 2016] especificando el
+% modelo exacto, SPM1D no parametrico por permutacion [Nichols & Holmes
+% 2002; Pataky et al. 2015]. NO mencionar Bland-Altman (sin uso este
+% ciclo). Encuadrar exactitud citando ISO 5725 -- ver
+% docs/literatura/normas_ISO_relevantes.md.]
+
+% ============================================================
+\section{Results}
+% ============================================================
+% Orden -- ver docs/planificacion/propuesta_articulo_Q2.md secc. 5
+
+\subsection{Tracking Fidelity per Subject}
+% [PENDIENTE: depende de datos de sujetos nuevos]
+
+\subsection{Representativeness of the Default Trajectory}
+% [PENDIENTE: depende de datos de sujetos nuevos]
+
+\subsection{Repeatability and Between-Subject Variability}
+% [PENDIENTE: depende de datos de sujetos nuevos]
+
+\subsection{Vertical Force: Raw, Corrected, and Literature Benchmark}
+% [PENDIENTE: depende de la calibracion del offset vertical, bloqueada por integracion Raspberry Pi-ESP32]
+
+% ============================================================
+\section{Discussion}
+% ============================================================
+% [PENDIENTE: interpretacion, limitaciones explicitas (tamano de
+% muestra), subseccion "Sources of error, decoupled", trabajo futuro
+% (lazo cerrado, generacion algoritmica de trayectorias, IMU de
+% Alessandro y celda de carga para el segundo articulo)]
+
+% ============================================================
+\section{Conclusions}
+% ============================================================
+% [PENDIENTE]
+
+% ------------------------------------------------------------
+% DECLARACIONES -- comandos verificados contra la plantilla oficial de Overleaf
+% ------------------------------------------------------------
+\authorcontributions{% [PENDIENTE: taxonomia CRediT -- decidir quien hizo que]
+For research articles with several authors, a short paragraph specifying
+their individual contributions must be provided using the CREDIT taxonomy.}
+
+\funding{% [PENDIENTE -- confirmar con VRI si el apoyo de "Apoyos para la
+Publicacion de Articulos de Alto Impacto en Acceso Abierto - Edicion
+2026" cubre el 100% del APC de CHF 1600 o solo una parte]
+This research received no external funding. / [PENDIENTE si aplica financiamiento real]}
+
+\institutionalreview{% [PENDIENTE: depende de aprobacion del comite de etica]
+Ethical review and approval [PENDIENTE] by the [PENDIENTE: nombre del comite], protocol code [PENDIENTE], date of approval [PENDIENTE].}
+
+\informedconsent{Informed consent was obtained from all subjects involved in the study.} % [PENDIENTE: confirmar]
+
+\dataavailability{% [PENDIENTE: decidir alcance -- repo completo publico vs. solo scripts de analisis con datos de ejemplo, ver propuesta_articulo_Q2.md secc. 7]
+}
+
+\conflictsofinterest{The authors declare no conflict of interest.} % [PENDIENTE: confirmar]
+
+\acknowledgments{[PENDIENTE]}
+
+\abbreviations{Abbreviations}{% [PENDIENTE: completar segun se usen en el texto]
+The following abbreviations are used in this manuscript:\\
+\noindent
+\begin{tabular}{@{}ll}
+GRF & Ground Reaction Force\\
+IMU & Inertial Measurement Unit\\
+RMSE & Root Mean Square Error\\
+ICC & Intraclass Correlation Coefficient\\
+SPM & Statistical Parametric Mapping\\
+\end{tabular}}
+
+% Referencias ya identificadas para incluir (ver docs/literatura/):
+%   - validacion_instrumentos_IMU.md: validez iSen/STT-IWS (confirmar cita exacta antes de usar)
+%   - validacion_instrumentos_IMU.md: IMU en usuarios de protesis transtibial (Sensors 2023, DOI 10.3390/s23031738)
+%   - literatura_GRF_protesica.md: benchmark de vGRF en marcha protesica
+%   - normas_ISO_relevantes.md: ISO 5725; Wu et al. 2002 (convencion ISB)
+%   - postprocesado_datos_crudos_IMU.md: filtrado/calibracion de IMU
+%   - Koo & Li (2016) -- ICC(3,1)
+%   - Nichols & Holmes (2002); Pataky et al. (2015) -- SPM1D no parametrico
+%   - Kadaba et al. (1989) -- CMC
+%   - "Development and Comprehensive Evaluation of 3D-Printed Prosthetic
+%     Feet: Modeling, Testing and a Pilot Gait Study" (Prosthesis, MDPI)
+%     -- precedente directo de ajuste tematico, citar en Introduccion/Discusion
+% [PENDIENTE: el comando exacto de bibliografia de MDPI no se confirmo
+% en este ciclo -- usar el que ya trae el template.tex real descargado
+% de Overleaf, normalmente algo como \bibliography{references} o
+% \reftitle{References} seguido de \bibliography]
+
+\end{document}

@@ -3,7 +3,9 @@
 
 **Objetivo del ciclo:** artículo enviado antes de la quincena de setiembre, con manuscrito prácticamente cerrado para la sesión de aceptación del 27-28 de agosto.
 
-**Regla de oro de todo el plan:** ningún cambio de instrumento o de metodología reemplaza lo que ya existe hasta que se pruebe que funciona. Kinovea sigue activo como respaldo hasta que el video-vs-inercial demuestre concordancia. Nada se ejecuta con sujetos (ni el original ni nuevos) hasta que el comité de ética apruebe el protocolo.
+**Regla de oro de todo el plan:** ningún cambio de instrumento o de metodología reemplaza lo que ya existe hasta que se pruebe que funciona. Nada se ejecuta con sujetos (ni el original ni nuevos) hasta que el comité de ética apruebe el protocolo.
+
+**Actualización 03-ago-2026 — pivote a instrumentación única:** Kinovea queda fuera de este artículo (ya no "respaldo hasta demostrar concordancia" — se decidió no usarlo ni compararlo, ver `../../CLAUDE.md`, decisión "Cambio de foco"). Todo el ciclo captura con un solo sistema, STT-IWS/iSen, condicionado a confirmar en el piloto en curso que un solo IMU en la plataforma da el ángulo de inclinación directamente (ver nota técnica en `CLAUDE.md`).
 
 ---
 
@@ -62,7 +64,7 @@
 | Redactar Introducción y Métodos (borrador) | Diseño condensado (remite al paper de conferencia) + protocolo de validación con las métricas ya definidas. |
 | Armar tabla comparativa contra simuladores previos | Con la revisión de Alessandro de semana 1. |
 | Preparar protocolo de la sesión de recaptura oficial | Checklist de calibración iSen, número de sensores, ubicación anatómica, cuántos ciclos por fase — dejar todo listo para ejecutar apenas llegue la aprobación de ética. |
-| Sesión conjunta: IMU de Alessandro vs. STT-IWS | Montar ambos sensores en la plataforma del simulador al mismo tiempo, capturar el mismo movimiento, comparar. No requiere sujetos humanos, se puede hacer esta semana sin depender de ética. |
+| ~~Sesión conjunta: IMU de Alessandro vs. STT-IWS~~ | **Fuera de alcance de este artículo (revisado 03-ago-2026)** — el pivote a instrumentación única (solo STT-IWS/iSen) saca al IMU de Alessandro de este ciclo por completo, no solo como comparación secundaria. Sigue siendo válida para el segundo artículo de Alessandro si él quiere hacerla por su cuenta, pero ya no es una entrega de esta semana. |
 
 **Cierre de la semana:** explicación cuantificada de la sobreestimación de Fz lista, Métodos redactado, protocolo de recaptura listo para ejecutar, concordancia Alessandro-vs-STT calculada.
 
@@ -74,14 +76,16 @@
 
 ### Si SÍ llegó:
 
+**Revisado 03-ago-2026:** con el pivote a instrumentación única, la recaptura del sujeto original ya no necesita doble instrumentación simultánea — se simplifica a una sola sesión con STT-IWS/iSen. Esta recaptura **reemplaza** la base de referencia derivada de Kinovea (`PERSONA SANA/`, `REFERENCIAS/*.mat`) como fuente de la trayectoria fija del simulador para este artículo — no se compara contra Kinovea, no se cita el paper de conferencia (ver `../../CLAUDE.md`).
+
 | Sesión | Quién | Qué capturar | Parámetros |
 |---|---|---|---|
-| Recaptura del sujeto original (86 kg / 1.74 m) | Con doble instrumentación: Kinovea + STT-IWS simultáneos | Ángulo tibial y posición X,Y, apoyo y balanceo | **10 ciclos por fase**, igual que en la Fase 0 original — mantiene comparabilidad con el RMSE intra-sujeto ya reportado (1.41° apoyo, 2.53° balanceo) |
-| Sujetos nuevos (2-3 personas) | Solo STT-IWS | Marcha natural, sin reprogramar el simulador todavía | **Mínimo 5 ciclos por fase, ideal 10** si el tiempo alcanza — si se reduce a 5, dejarlo declarado como limitación menor en Métodos |
+| Recaptura del sujeto original (86 kg / 1.74 m) | Solo STT-IWS/iSen (un único instrumento, montado en la plataforma para medir su salida y sobre el sujeto para su captura natural — ver nota técnica de un solo IMU en `../../CLAUDE.md`) | Ángulo tibial (inclinación absoluta respecto a la gravedad, no ángulo articular calibrado a T-pose), apoyo y balanceo | **10 ciclos por fase**, igual que en la Fase 0 original — mantiene comparabilidad de diseño, aunque el RMSE intra-sujeto ya reportado (1.41° apoyo, 2.53° balanceo) es de la conferencia y no se cita como referencia numérica en este artículo |
+| Sujetos nuevos (objetivo 15-20 personas, ver `CODIGOS/MULTISUJETO/`) | Solo STT-IWS/iSen | Marcha natural, sin reprogramar el simulador todavía | **Mínimo 5 ciclos por fase, ideal 10** si el tiempo alcanza — si se reduce a 5, dejarlo declarado como limitación menor en Métodos |
 
 **Con los datos del sujeto original recapturado:**
-- Calcular concordancia Kinovea vs. STT-IWS (Bland-Altman, ICC) → resultado de validación cruzada de instrumentos.
-- Regenerar el CSV con los datos del STT-IWS, reprogramar el simulador, ejecutar, capturar la salida del simulador (con STT-IWS montado en la plataforma, no Kinovea) → repite el mismo tipo de validación de fidelidad de seguimiento que ya tenían, ahora con mejor instrumento.
+- Regenerar el CSV con los datos del STT-IWS/iSen, reprogramar el simulador, ejecutar, capturar la salida del simulador (STT-IWS/iSen montado en la plataforma) → establece la nueva trayectoria fija de referencia para todas las comparaciones de este artículo, reemplazando la base derivada de Kinovea.
+- `GENERAR CURVS DE REFERENCIA/` (`Angulo_Control_Plataforma.m`, `Desplazamientos.m`, `Base_Datos_GRF.m`) está construido para parsear CSV de marcadores de Kinovea, no orientación de iSen — va a necesitar adaptarse o un script equivalente nuevo para este formato de datos antes de poder regenerar `REFERENCIAS/*.mat` con la nueva fuente.
 
 **Con los datos de cada sujeto nuevo:**
 - **Comparación A (representatividad):** su captura natural vs. la salida **ya existente y fija** del simulador (la que corre con la trayectoria del sujeto original) — sin gastar nada adicional, es el mismo dato que usarían para programar su propio CSV, comparado una segunda vez.
@@ -133,13 +137,13 @@ Margen de seguridad para imprevistos y firmas de coautores.
 
 ## Estructura estándar del manuscrito (IMRaD)
 
-1. **Title** — evitar "Experimental Validation" a secas; algo como *"Development, Multi-Instrument Validation, and Multi-Subject Kinematic Assessment of a 3-DOF Gait Simulator for Transtibial Prosthesis Testing"*.
+1. **Title** — evitar "Experimental Validation" a secas. Título de trabajo (revisado 03-ago-2026 tras el pivote a instrumentación única): *"Multi-Subject Functional Validation of a 3-DOF Gait Simulator for Transtibial Prosthesis Testing Using Inertial Motion Capture"* (detalle y alternativas en `propuesta_articulo_Q2.md`, sección 2).
 2. **Abstract** (estructurado o no, según la revista elegida)
 3. **Keywords**
 4. **Introduction** — motivación clínica, estado del arte, brecha respecto al paper de conferencia
 5. **Methods**
-   - 5.1 System description (condensado, remite a la conferencia)
-   - 5.2 Instrumentation (Kinovea, AMTI, STT-IWS, IMU de Alessandro)
+   - 5.1 System description (condensado, autocontenido — ya no cita el paper de conferencia, ver `../../CLAUDE.md`)
+   - 5.2 Instrumentation (STT-IWS/iSen, AMTI — revisado 03-ago-2026, ya no incluye Kinovea ni el IMU de Alessandro)
    - 5.3 Experimental protocol (sujeto original, sujetos nuevos, número de ciclos, calibración)
    - 5.4 Statistical analysis (fórmulas de la sección siguiente)
 6. **Results** — un subapartado por cada fila de la matriz de comparaciones (sección 10)
@@ -167,7 +171,7 @@ S = señal del simulador, E = señal de referencia, σ = desviación estándar d
 
 **Statistical Parametric Mapping (SPM1D)** — nuevo. Se aplica sobre las curvas completas del ciclo (no solo el resumen numérico), identifica en qué porcentaje del ciclo hay diferencia estadísticamente significativa entre dos curvas. **Implementado y validado (02-ago-2026):** versión no paramétrica por permutación (sign-flip para diseño pareado, shuffle de etiquetas para independiente) en vez del SPM paramétrico clásico de random field theory — el propio paquete `spm1d` recomienda permutación para el tamaño de muestra esperado aquí (5-10 ensayos, 2-3 sujetos nuevos). Herramienta: `CODIGOS/ESTADISTICA/SPM1D_Core.m`, validada con datos sintéticos en `Test_SPM1D_BlandAltman.m` (7/7 pruebas OK). Guía de interpretación con literatura de respaldo: `CODIGOS/ESTADISTICA/GUIA_INTERPRETACION.md`.
 
-**Bland-Altman** — nuevo. Diferencia media ± 1.96 × SD de las diferencias, para cada par de mediciones comparadas (Kinovea vs. STT-IWS, Alessandro-IMU vs. STT-IWS). **Implementado y validado (02-ago-2026):** `CODIGOS/ESTADISTICA/BlandAltman_Core.m`, con IC95% de bias y límites de acuerdo (Bland & Altman, 1999) y chequeo de sesgo proporcional; validado con datos sintéticos. **Hallazgo importante:** no se puede aplicar todavía a ninguna curva existente del proyecto — los `.mat` de referencia (Kinovea, AMTI) solo tienen media±SD, no ensayos individuales, así que no hay pares reales que comparar. Queda lista para el primer caso real: IMU de Alessandro vs. STT-IWS (semana 2, no depende de ética). Detalle completo en `CODIGOS/ESTADISTICA/GUIA_INTERPRETACION.md` sección 3.
+**Bland-Altman** — implementado (02-ago-2026): `CODIGOS/ESTADISTICA/BlandAltman_Core.m`, con IC95% de bias y límites de acuerdo (Bland & Altman, 1999) y chequeo de sesgo proporcional; validado con datos sintéticos. **Sin uso en este artículo (revisado 03-ago-2026):** estaba pensado para comparar pares de mediciones entre dos instrumentos (Kinovea vs. STT-IWS, Alessandro-IMU vs. STT-IWS) — ambas comparaciones quedaron fuera de alcance tras el pivote a instrumentación única (ver `../../CLAUDE.md`, decisión "Cambio de foco"). La herramienta queda construida y probada, disponible si el equipo retoma esa validación cruzada más adelante (segundo artículo). Detalle completo en `CODIGOS/ESTADISTICA/GUIA_INTERPRETACION.md` sección 3.
 
 **Explicación de la sobreestimación de Fz** — nuevo, revisado en sesión del 31-jul-2026: tres fuentes de error desacopladas, no un solo término de corrección. El simulador no es un sólido rígido único (tablero electrónico fijo en un lado, tres motores independientes — horizontal, vertical, sagital — cada uno con su propia cadena cinemática en el otro), así que `m_plataforma × a(t)` sobre la masa total no es representativo.
 
@@ -180,7 +184,7 @@ F_inercial,eje(t) = m_eje · a_eje(t)
 Fz_corregida(t) = Fz_medida(t) − Σ F_inercial,eje(t)
 ```
    `m_eje` es la masa que efectivamente acelera con cada motor (horizontal, vertical, sagital) según el orden real de montaje de la cadena cinemática (ejes anidados: el motor de más aguas arriba mueve todo lo que está montado sobre él) — no la masa total del ensamblaje, y excluyendo componentes fijos al bastidor (p. ej. el tablero electrónico) que no aceleran. Para el eje sagital, si es rotacional y desplaza verticalmente el punto de contacto, usar cinemática rotacional del punto (`a = α×r + ω×(ω×r)`) en vez de tratarlo como aceleración lineal de una trayectoria.
-   **Abierto (31-jul-2026):** el equipo decidió no pesar el ensamblaje móvil por considerarlo poco preciso — `m_eje` queda sin fuente de dato confirmada. Opciones no resueltas: estimarla desde el modelo CAD (si el de Mecatrónica tiene propiedades de masa asignadas por pieza), o renunciar a este término y sostener la explicación de Fz solo con (1) y (2) más el benchmark de literatura, declarándolo limitación adicional en Discusión.
+   **Resuelto (13-ago-2026, ver `DISCUSION_Q2.md` P-5):** el equipo descarta CAD y pesaje por una razón más sólida que "poco preciso" — la fuerza y el peso del ensamblaje móvil no se distribuyen de forma uniforme, así que un número único de masa no lo resuelve. `m_eje` deja de calcularse a priori (CAD/balanza) y pasa a **inferirse indirectamente del mismo barrido de alturas de offset del punto (1)**: se corre la prueba de calibración de offset en varios puntos de altura de arranque, y de la curva altura→Fz resultante (contra la plataforma real) se infiere qué parte del residuo, más allá de lo que explica la compresión de offset, es atribuible a efecto inercial — en vez de un `m_eje` fijo multiplicado por `a_eje(t)` conocido de antemano. Los puntos (1) y (3) pasan a ser **un solo ensayo empírico**, no dos independientes: la misma prueba de calibración del offset vertical (`CODIGOS/CALIBRACION/`, bloqueada por la integración RPi-ESP32) alimenta ambos. El aislamiento exacto de cuánto del residuo es inercia vs. offset residual queda como parte del análisis a definir cuando haya datos reales — se declara la limitación de que no es una separación perfecta, pero es una fuente cuantificada, no narrada.
 
 ### Protocolo detallado de la prueba de calibración del offset vertical (punto 1)
 
@@ -210,8 +214,8 @@ Informado por el formato real de exportación del AMTI (visto en `SIMULADOR/FUER
 
 | # | Comparación | Qué demuestra | Depende de |
 |---|---|---|---|
-| 1 | Kinovea vs. STT-IWS (mismo sujeto, misma sesión) | Concordancia entre instrumentos | Ética (recaptura del sujeto original) |
-| 2 | IMU de Alessandro vs. STT-IWS (montados juntos en la plataforma) | Confiabilidad del sensor de bajo costo | Nada — se puede hacer en semana 2 |
+| 1 | ~~Kinovea vs. STT-IWS (mismo sujeto, misma sesión)~~ | ~~Concordancia entre instrumentos~~ | **Fuera de alcance de este artículo (03-ago-2026)** — instrumentación única, ver `../../CLAUDE.md`. Herramienta (`BlandAltman_Core.m`) construida y disponible si se retoma más adelante. |
+| 2 | ~~IMU de Alessandro vs. STT-IWS (montados juntos en la plataforma)~~ | ~~Confiabilidad del sensor de bajo costo~~ | **Fuera de alcance de este artículo (03-ago-2026)** — el IMU de Alessandro no forma parte de este ciclo. Queda para su segundo artículo. |
 | 3 | Simulador reprogramado por sujeto vs. captura propia de ese sujeto | Robustez de la fidelidad de seguimiento (no es un golpe de suerte de una sola curva) | Ética (sujetos nuevos) |
 | 4 | Salida fija del simulador (trayectoria original) vs. variabilidad natural de sujetos nuevos | Representatividad de la trayectoria por defecto | Ética (sujetos nuevos) — mismo dato que la comparación 3, sin costo adicional |
 | 5 | Fz cruda vs. Fz corregida (offset + seguimiento + inercia por eje) vs. literatura protésica real | Explicación cuantificada del error, desacoplada en sus tres fuentes, no solo narrada | Calibración del offset vertical (pendiente, sin datos aún) — el resto se puede hacer en semana 2 |

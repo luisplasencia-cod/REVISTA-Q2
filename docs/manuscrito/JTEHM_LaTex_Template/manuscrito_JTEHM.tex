@@ -1,0 +1,566 @@
+% ============================================================
+% MANUSCRITO — IEEE JTEHM (Journal of Translational Engineering in
+% Health and Medicine)
+% Revisado 03-ago-2026 CONTRA LA PLANTILLA OFICIAL REAL que el usuario
+% descargó de IEEE (docs/manuscrito/JTEHM_LaTex_Template/JERM Demo.tex +
+% IEEEJERM.cls) — reemplaza la versión anterior de este archivo, que
+% usaba IEEEtran genérico sin poder verificar la plantilla real.
+%
+% ============================================================
+% ESTE ES EL ARCHIVO FINAL — el espejo de lo que está en Overleaf.
+% Reubicado aquí el 05-ago-2026 (antes: docs/manuscrito/
+% plantilla_overleaf_JTEHM.tex) para que viva junto al .cls y al .bib
+% que necesita para compilar. Ver README_ESTRUCTURA.md en esta carpeta.
+%
+% Los BORRADORES en prosa siguen en ../metodos_introduccion_borrador.md
+% — se redacta allá primero, y solo lo que ya está resuelto pasa a este
+% archivo. Si los dos difieren, ESTE archivo manda (es lo que se envía).
+% ============================================================
+%
+% CÓMO USAR ESTE ARCHIVO EN TU OVERLEAF:
+% 1. En tu proyecto de Overleaf (el que ya creaste con el ZIP de IEEE),
+%    reemplaza el contenido de "JERM Demo.tex" por el contenido de este
+%    archivo completo (desde \documentclass hasta \end{document}).
+% 2. NO borres del proyecto: IEEEJERM.cls, references.bib — sin el
+%    primero no compila nada (\documentclass falla), sin el segundo
+%    fallan las citas. Subir el references.bib DE ESTA CARPETA, que ya
+%    tiene las referencias reales del manuscrito (el original del ZIP
+%    solo traía dos entradas de ejemplo).
+% 2-bis. Claves de cita actualizadas el 05-ago-2026: las
+%    \cite{PENDIENTE_*} se reemplazaron por las claves reales.
+% 2-ter. ACTUALIZADO 11-ago-2026: las tres entradas que estaban
+%    incompletas ya están verificadas y completas, y por eso CAMBIARON
+%    DE CLAVE (ahora Autor+Año, como el resto):
+%      CompactGaitSimulator2024    -> Sudeesh2024CompactGaitSimulator
+%      ConceptualDesignSimulator2015 -> Marinelli2015ConceptualDesign
+%      IMU2023TranstibialValidity  -> Rattanakoch2023TranstibialIMU
+%    Si pegaste una versión anterior en Overleaf, reemplaza también el
+%    references.bib o las citas quedarán en [?].
+%    Las 5 referencias de simuladores/instrumentación están [OK]; las 4
+%    de métodos estadísticos siguen [REVISAR]. Ver ../referencias_verificadas.md
+% 3. Cambios reales encontrados al comparar con la plantilla oficial
+%    (correcciones respecto a la versión anterior de este archivo):
+%    - Clase real: IEEEJERM (NO "IEEEtran" genérico), con opciones
+%      [journal,twocolumn,letterpaper].
+%    - El abstract tiene un campo QUE NO SABÍAMOS: "Clinical impact:"
+%      además de Objective/Methods and procedures/Results/Conclusion.
+%    - El "Clinical and Translational Impact Statement" (≤30 palabras,
+%      obligatorio) además debe indicar una categoría del espectro
+%      clínico del NIH: Early/Pre-Clinical Research, Clinical Research,
+%      Clinical Implementation, o Public Health — esto NO estaba en el
+%      resumen de la página pública de instrucciones, solo aparece en
+%      la plantilla real.
+%    - SÍ HAY sección "Discussion" separada de "Conclusion" — la
+%      página pública de instrucciones decía que no la había para
+%      "Papers"; la plantilla real la trae explícita, así que manda
+%      esta. Se corrigió la estructura respecto a la versión anterior.
+%    - Bibliografía: \bibliographystyle{ieeetr} (no "IEEEtran" a secas)
+%      + \bibliography{references}.
+%    - Subsecciones de Metodología en el demo usan \subsection*{...}
+%      (sin numerar) — se mantiene esa convención aquí.
+% 4. Sigue pendiente sin verificar: el límite exacto de páginas (8,
+%    verificado en la página pública, no contradicho por la plantilla)
+%    y el orden alfabético de keywords (tampoco contradicho).
+% ============================================================
+
+\documentclass[journal,twocolumn,letterpaper]{IEEEJERM}
+
+\usepackage{times,amsmath,epsfig}
+\usepackage{fancyhdr}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{subfigure}
+\usepackage{bm}
+\usepackage{breqn}
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage[breaklinks=true]{hyperref}
+\usepackage{breakcites}
+
+\begin{document}
+
+\vspace{1 cm}
+
+\title{Multi-Subject Functional Validation of a 3-DOF Gait Simulator for
+Transtibial Prosthesis Testing Using Inertial Motion Capture}
+
+% [PENDIENTE: nombres, afiliaciones y orden de autoria. Borrador de
+% roles CRediT ya armado en docs/manuscrito/creditos_autoria_borrador.md
+% (13-ago-2026) -- confirmar primero si JTEHM pide CRediT en el .tex o
+% en el portal de envio antes de agregar una seccion nueva aqui.]
+\author{Autor~Uno$^1$,
+        Autor~Dos$^1$,
+        Autor~Tres$^2$,
+        Autor~Cuatro$^{3}$
+}
+
+\markboth{IEEE Journal of Translational Engineering in Health and Medicine}
+{Autor Uno \MakeLowercase{\textit{et al.}}: Multi-Subject Functional Validation of a 3-DOF Gait Simulator}
+
+\twocolumn[
+\begin{@twocolumnfalse}
+
+\maketitle
+
+\begin{abstract}
+
+Objective: \textnormal{[PENDIENTE].}
+Methods and procedures: \textnormal{[PENDIENTE].}
+Results: \textnormal{[PENDIENTE -- depende de datos de sujetos nuevos y
+del piloto del IMU en la plataforma; ver CLAUDE.md. Depende tambien de
+que la integracion Raspberry Pi-ESP32 se resuelva -- sin eso no hay
+salida del simulador que medir, ni cinematica ni cinetica.]}
+Conclusion: \textnormal{[PENDIENTE].}
+
+Clinical impact: \textnormal{[PENDIENTE -- una o dos frases sobre la
+relevancia clinica practica, distinto del Impact Statement de abajo. NO
+enmarcar como "medimos angulos con precision" -- JTEHM prioriza TRL 5-9
+(tecnologia validada/demostrada en entorno relevante) y rechaza
+explicitamente "lab validation without clinical context" (TRL 1-4).
+Enmarcar como: esta herramienta reduce el tiempo/costo/riesgo de pruebas
+continuas con sujetos humanos durante el desarrollo de protesis,
+acelerando la iteracion de diseno antes de que un paciente real la use
+-- calza con el alcance oficial "Technological relevance to healthcare
+cost reduction" y "Technology affecting healthcare management". Ver
+docs/manuscrito/guia_autor_JTEHM.md seccion 1-ter para el detalle
+completo de este hallazgo.]}
+
+% [RESUELTO 13-ago-2026: Impact Statement aprobado por el usuario en
+% DISCUSION_Q2.md T-1, con una correccion -- se quito la mencion a
+% "knee" (el simulador es transtibial, nunca cruza la rodilla). 25
+% palabras, bajo el limite de 30. Categoria NIH: Early/Pre-Clinical
+% Research, ya confirmada como una de las 4 categorias oficiales de la
+% plantilla real de JTEHM.]
+Clinical and Translational Impact Statement:
+\textnormal{Early/Pre-Clinical Research. A validated bench simulator
+lets transtibial prosthetic components be iterated and evaluated
+without the repeated, fatiguing human-subject sessions that gait-lab
+testing otherwise requires.}
+\end{abstract}
+
+\begin{IEEEkeywords}
+gait simulator, inertial motion capture, multi-subject validation, prosthetics testing, transtibial prosthesis
+\end{IEEEkeywords}
+% [PENDIENTE: confirmar limite maximo de keywords y si deben ir en
+% orden alfabetico -- la pagina publica de instrucciones decia hasta 5
+% en orden alfabetico; la plantilla real no lo contradice ni lo confirma
+% explicitamente, ya estan en ese orden arriba por las dudas]
+
+\end{@twocolumnfalse}]
+
+% Pie de pagina con afiliaciones -- ajustar segun autores reales
+{
+  \renewcommand{\thefootnote}{}%
+  % [RESUELTO 13-ago-2026: correo de correspondencia confirmado en DISCUSION_Q2.md P-8 -- Luis Marcos Plasencia Janampa, autor de correspondencia]
+  \footnotetext[1]{Departamento de Ingenier\'ia, Pontificia Universidad Cat\'olica del Per\'u (PUCP), Lima, Per\'u. Corresponding author: L. M. Plasencia Janampa (e-mail: luis.plasencia@pucp.edu.pe).}
+  \footnotetext[2]{[PENDIENTE: afiliaci\'on]}
+  \footnotetext[3]{[PENDIENTE: afiliaci\'on]}
+}
+
+\IEEEpeerreviewmaketitle
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+% [RESUELTO 11-ago-2026: las 4 citas de este primer parrafo ya estan
+% verificadas contra la fuente y completas en references.bib.
+% Queda un pendiente menor: DeRaeve2014AlignmentTool es un resumen de
+% congreso de una pagina (cita debil para IEEE) y sigue sin reemplazo
+% identificado -- ver nota en references.bib.]
+% [PENDIENTE: RECORDAR limite de 8 paginas totales (verificado en la
+% pagina publica de instrucciones) -- esta Introduccion es la primera
+% candidata a recortar si el manuscrito se pasa de longitud.]
+
+Robotic and mechanical gait simulators are an established approach for
+prosthetic device development and testing, offering repeatable dynamic
+loading conditions that are difficult to achieve through human-subject
+trials alone, while reducing the logistical and ethical burden of
+continuous human involvement and improving repeatability across
+prototype comparisons \cite{Etoundi2022RoboticTestRig}. Cost-effective
+gait simulators in particular have been proposed specifically to reduce
+dependency on user trials during prosthesis development
+\cite{Sudeesh2024CompactGaitSimulator}. Existing simulators for
+lower-limb prostheses range from simplified sagittal-plane rigs
+reproducing hip-to-foot vertical displacement and knee flexion-extension
+\cite{Marinelli2015ConceptualDesign} to robotic platforms used for
+prosthetic alignment and joint performance assessment
+\cite{DeRaeve2014AlignmentTool,Etoundi2022RoboticTestRig}.
+% [RESUELTO 13-ago-2026, ver DISCUSION_Q2.md P-11: busqueda exhaustiva no
+% encontro reemplazo de articulo completo para DeRaeve2014AlignmentTool --
+% el grupo De Raeve/Muraru/Peeraer solo publico el resumen de congreso de
+% una pagina para este sistema exacto, confirmado por multiples busquedas
+% independientes. Se decidio NO inventar ni forzar una cita tangencial;
+% en su lugar se cito junto a Etoundi2022RoboticTestRig (ya citado arriba
+% en el mismo parrafo, articulo completo revisado por pares en Frontiers
+% in Robotics and AI) para reforzar la mitad de la afirmacion que cubre
+% "joint performance assessment". DeRaeve sigue siendo la unica fuente
+% real para la mitad de "alignment" -- se mantiene porque describe
+% correctamente lo que es, no se elimina la clausula.]
+
+However, the validity of any such simulator rests on a largely untested
+assumption: that a trajectory programmed from a single reference
+subject's gait is representative of the broader population it is
+intended to serve. This question is rarely addressed with quantified,
+multi-subject evidence in the prosthesis gait simulator literature. The
+present study addresses this gap directly: we assess whether a
+3-degree-of-freedom (horizontal, vertical, sagittal) motor-driven gait
+simulator reproduces gait kinematics captured from multiple subjects
+independent of its calibration trajectory, using an inertial motion
+capture system previously validated against an optoelectronic reference
+for sagittal-plane lower-limb kinematics
+\cite{Piche2022iSenValidity,Rattanakoch2023TranstibialIMU}, and we quantify ---
+rather than narrate --- the sources of vertical force overestimation
+inherent to a motor-driven platform. By replicating gait kinematics
+captured from human subjects who did not participate in its
+programming, the simulator functions as a pre-clinical evaluation
+bench at TRL 5--6, positioned to accelerate prosthetic component
+iteration ahead of, and in support of, in-clinic assessment.
+% [RESUELTO 13-ago-2026: frase de posicionamiento TRL aprobada por el
+% usuario en DISCUSION_Q2.md T-1, sin cambios sobre el borrador.]
+
+% ============================================================
+\section{Methodology}
+% ============================================================
+
+\subsection*{System Description}
+% Condensado, autocontenido -- no remite al paper de conferencia (no citado en este articulo)
+
+The gait simulator reproduces a pre-recorded gait trajectory across
+three independent degrees of freedom --- horizontal displacement,
+vertical displacement, and sagittal rotation --- each driven by its own
+motor and transmission (chain-and-sprocket or direct drive, depending on
+the axis). This sagittal-plane architecture is consistent with an
+independent analysis of the minimum degrees of freedom required for
+prosthetic testing, which concluded that flexion-extension together with
+vertical and horizontal translation are sufficient
+\cite{Sudeesh2024CompactGaitSimulator}. Trajectories are stored as CSV files, uploaded via a
+Raspberry Pi, and executed open-loop by an ESP32 microcontroller; the
+present study does not modify this operating principle --- no
+closed-loop control or algorithmic trajectory generation was introduced
+in this cycle (see Discussion, Future Work). % [PENDIENTE: calibracion del actuador vertical, bloqueada por integracion Raspberry Pi-ESP32]
+
+\subsection*{Instrumentation}
+% Un solo instrumento en todo el protocolo (revisado 03-ago-2026)
+
+Kinematic and kinetic data were collected using two instruments: an
+inertial motion capture system (STT-IWS/iSen) and a force platform
+(AMTI). The inertial system was used throughout the protocol to (i)
+capture new subjects' natural gait, (ii) re-capture the original
+reference subject to regenerate the simulator's default trajectory, and
+(iii) measure the simulator's own platform output (sensor mounted
+directly on the platform). Segment/platform inclination angles are
+derived from the sensor's onboard orientation estimate relative to
+gravity, positive above horizontal and negative below, the same sign
+convention used throughout this project. No in-house cross-instrument
+validation was performed in this cycle; instrument validity was taken
+from published evidence rather than re-derived. The specific system used
+here has been validated against an optoelectronic reference (OptiTrack)
+for sagittal-plane lower-limb kinematics, reporting waveform RMSD of
+3.3$^\circ$ for the knee and 7.3$^\circ$ for the hip, Lin's concordance
+correlation above 0.75 for all joints except the ankle, and excellent
+test-retest repeatability (ICC 0.93 knee, 0.89 hip)
+\cite{Piche2022iSenValidity}. Sensor drift over a three-minute
+acquisition was negligible in that study (maximum relative error
+1.1$^\circ$; RMSD below 2$^\circ$ between the first and last 30\,s).
+Validity of inertial motion capture in the population of interest is
+supported separately, in transtibial prosthesis users, by
+\cite{Rattanakoch2023TranstibialIMU}.
+% NOTA 11-ago-2026 -- POR QUE ESTAN LAS DOS CITAS Y NO UNA:
+% Piche2022 valida EL INSTRUMENTO de este proyecto (iSen STT-IWS), pero
+% en 22 sanos jovenes. Rattanakoch2023 cubre la POBLACION transtibial,
+% pero con OTRO instrumento (Noraxon MyoMotion). Ninguna cubre las dos
+% cosas; por eso se presentan como complementarias y de forma explicita.
+% NO fusionarlas ni escribir que una valido el instrumento en poblacion
+% transtibial -- seria falso y trivialmente verificable.
+% No se cita el LCC de tobillo (0.72/0.60/0.56, cae con la velocidad)
+% porque este estudio no mide angulo de tobillo. Es defendible, pero hay
+% que saber sostenerlo si un revisor pregunta.
+The
+force platform recorded vertical ground reaction force (Fz) exerted by
+the simulator against a fixed load cell, sampled at 1000\,Hz.
+% [PENDIENTE: confirmar orientacion cruda vs. angulo articular calibrado
+% -- resultado del piloto en curso. Ver docs/literatura/postprocesado_datos_crudos_IMU.md.]
+
+\subsection*{Vertical Force Overestimation: A Three-Stage, Decoupled Explanation}
+
+Because the moving assembly is not a single rigid body --- a stationary
+electronic control board is mounted on one side of the frame, while
+three independently actuated axes (horizontal, vertical, sagittal) each
+carry their own kinematic chain on the other --- vertical force
+overestimation is decomposed into three independent, sequentially
+corrected sources rather than a single inertial term: (1) a fixed
+vertical datum offset, calibrated once against an independent static
+load reference and held constant across all trials; (2) command-to-encoder
+tracking fidelity per axis, isolating mechanical/control error from the
+remaining sources; (3) an axis-wise inertial correction, using the mass
+that actually accelerates with each motor according to the real
+mounting order of the kinematic chain, benchmarked against published
+prosthetic gait GRF data.
+% [PENDIENTE: fuente de m_eje sin resolver -- CAD vs. renunciar al termino y declararlo limitacion]
+
+\subsection*{Experimental Protocol}
+% [PENDIENTE: depende de si llego la aprobacion de etica y del numero final de sujetos]
+Please insert text here.
+
+\subsection*{Statistical Analysis}
+
+Kinematic and kinetic curves were compared using the normalized
+root-mean-square error (RMSEnorm), computed from the point-wise
+difference between simulator and reference signals normalized by the
+reference's point-wise standard deviation. Pearson's correlation
+coefficient ($r$) was reported alongside RMSEnorm but interpreted with
+caution during monotonic phases of the gait cycle, where $r$ is known to
+be insensitive to offset and scaling errors. The percentage of points
+falling within $\pm$1 SD of the reference curve was reported as an
+intuitive tolerance envelope. Trial-to-trial repeatability was
+quantified using the intraclass correlation coefficient ICC(3,1)
+(two-way mixed-effects model, absolute agreement, single measurement)
+\cite{KooLi2016}. To localize differences across the gait cycle rather
+than relying solely on scalar summaries, non-parametric Statistical
+Parametric Mapping (SPM1D) was applied via permutation (sign-flip for
+paired designs, label-shuffling for independent-group designs), with the
+family-wise error rate controlled through the maximum-statistic
+threshold \cite{NicholsHolmes2002}. The non-parametric variant was
+preferred over classical random-field-theory SPM given the limited
+trial counts expected in this study (5--10 trials per subject, up to
+15--20 subjects), consistent with recommendations for small-sample
+biomechanical datasets \cite{Pataky2015}. This trueness/precision
+framework follows ISO 5725 terminology \cite{ISO5725}, with RMSEnorm and
+CMC representing trueness (closeness to a reference value) and
+ICC(3,1)/between-subject coefficient of variation representing precision
+(repeatability).
+% [PENDIENTE: revisar longitud contra el limite de 8 paginas una vez
+% que el resto del manuscrito este redactado -- recortar si hace falta.
+% Confirmar claves de cita exactas (KooLi2016, NicholsHolmes2002,
+% Pataky2015, ISO5725) contra references.bib cuando se arme.]
+
+% ============================================================
+\section{Results}
+% ============================================================
+% [PENDIENTE: depende de datos de sujetos nuevos y de que se resuelva
+% la integracion Raspberry Pi-ESP32 -- sin eso no hay salida del
+% simulador que medir (ni cinematica ni cinetica), ver CLAUDE.md]
+
+\subsection*{Tracking Fidelity per Subject}
+% [RESUELTO 13-ago-2026, esqueleto: tabla y figura listas, sin valores
+% -- columnas tomadas directamente de resultado.por_sujeto en
+% CODIGOS/MULTISUJETO/Procesar_Multisujeto_Core.m (ver
+% GUIA_INTERPRETACION.md de esa carpeta), mas una columna de TOST que
+% se agrega cuando CODIGOS/POTENCIA_EQUIVALENCIA/TOST_Core.m se corra
+% sobre los datos reales. NO llenar con numeros inventados.]
+Please insert text here.
+
+\begin{table}[!t]
+\caption{Tracking fidelity per subject (Comparison 3): commanded CSV
+trajectory reproduced by the simulator vs. each subject's own natural
+gait capture.}
+\label{tab:comparacion3}
+\centering
+\begin{tabular}{lccccc}
+\hline
+Subject & RMSEnorm & $r$ & ICC(3,1) & SPM1D \% & TOST \\
+\hline
+[PENDIENTE] & & & & & \\
+\hline
+\end{tabular}
+\end{table}
+
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=\columnwidth]{figuras/spm1d_comparacion3_subjectN.png}
+% \caption{SPM\{t\} curve, subject N: commanded vs. own capture (see
+% CODIGOS/ESTADISTICA/SPM1D_Core.m output, spm1d\_curva.png).}
+% \label{fig:spm_comparacion3}
+% \end{figure}
+
+\subsection*{Representativeness of the Default Trajectory}
+% [RESUELTO 13-ago-2026, esqueleto: valores de
+% resultado.spm_comparacion4 (SPM1D_Core.m, diseno independiente,
+% pooled trials vs. trayectoria fija) mas TOST_Core.m sobre pico/ROM.]
+Please insert text here.
+
+\begin{table}[!t]
+\caption{Representativeness of the default trajectory (Comparison 4):
+pooled new-subject trials vs. the simulator's fixed default trajectory.}
+\label{tab:comparacion4}
+\centering
+\begin{tabular}{lcc}
+\hline
+Metric & SPM1D (\% cycle significant) & TOST \\
+\hline
+Platform angle (support) & [PENDIENTE] & [PENDIENTE] \\
+Platform angle (swing) & [PENDIENTE] & [PENDIENTE] \\
+Vertical force & [PENDIENTE] & [PENDIENTE] \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection*{Repeatability and Between-Subject Variability}
+% [RESUELTO 13-ago-2026, esqueleto: ICC(3,1) por condicion +
+% resultado.variabilidad_grupo (pico_CV_pct, ROM_CV_pct) de
+% Procesar_Multisujeto_Core.m.]
+Please insert text here.
+
+\begin{table}[!t]
+\caption{Between-repetition ICC(3,1) per condition and between-subject
+coefficient of variation (Comparison 6).}
+\label{tab:comparacion6}
+\centering
+\begin{tabular}{lcc}
+\hline
+Condition & ICC(3,1) & CV (\%) \\
+\hline
+[PENDIENTE] & & \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection*{Vertical Force: Raw, Corrected, and Literature Benchmark}
+% [RESUELTO 13-ago-2026, esqueleto: fila de referencia real ya
+% disponible hoy (157.3 %BW simulador vs. 98.83/104.88 %BW referencia
+% del proyecto, RMSEnorm=21.1 -- ver CLAUDE.md sesion 03-ago-2026), las
+% demas filas (corregida, literatura) dependen de la calibracion de
+% offset, bloqueada por la integracion Raspberry Pi-ESP32.]
+Please insert text here.
+
+\begin{table}[!t]
+\caption{Peak vertical force (\%BW): raw simulator output, corrected
+output, and published prosthetic gait benchmarks
+(see docs/literatura/literatura\_GRF\_protesica.md).}
+\label{tab:fuerza}
+\centering
+\begin{tabular}{lcc}
+\hline
+Source & Peak Fz (\%BW) & RMSEnorm vs. reference \\
+\hline
+Simulator (raw) & 157.3 (SD 5.8) & 21.1 \\
+Simulator (corrected) & [PENDIENTE] & [PENDIENTE] \\
+Project reference (AMTI) & 98.83 / 104.88 & --- \\
+Literature benchmark & [PENDIENTE] & --- \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Discussion}
+% ============================================================
+% [PENDIENTE: interpretacion de los resultados -- depende de los datos
+% de sujetos nuevos (Comparaciones 3/4/6), no se redacta con supuestos.
+% INCLUIR AQUI: parrafo de traduccion clinica/TRL -- JTEHM prioriza TRL
+% 5-9 y rechaza "lab validation without clinical context". Explicar la
+% ruta de adopcion: quien usaria esta herramienta (protesistas,
+% laboratorios de ingenieria clinica), como reduce tiempo/costo/riesgo
+% de pruebas continuas con sujetos humanos durante el desarrollo de
+% protesis. Ver docs/manuscrito/guia_autor_JTEHM.md seccion 1-ter para
+% el hallazgo completo y precedentes publicados. La frase de
+% posicionamiento TRL ya aplicada al cierre de la Introduccion (ver
+% arriba) puede repetirse/ampliarse aqui si el espacio de 8 paginas lo
+% permite -- medir antes de decidir (P-6, pospuesta a proposito).]
+Please insert text here.
+
+\subsection*{Limitations}
+% [RESUELTO 13-ago-2026, borrador -- ver DISCUSION_Q2.md tarea de
+% Discussion/Limitaciones. Redactado con lo que ya se sabe HOY, sin
+% depender de datos de sujetos nuevos. Revisar y ajustar cuando lleguen
+% los resultados reales -- ninguna cifra de esta subseccion se inventa,
+% son las limitaciones estructurales ya declaradas en CLAUDE.md/
+% DISCUSION_Q2.md, puestas en prosa por primera vez.]
+
+Several limitations of the present design should be stated explicitly.
+First, the vertical force correction combines the initial offset
+calibration and the actuator tracking-fidelity check into empirically
+quantified sources of error, but does not include a separately
+measured per-axis inertial correction term. The moving assembly's
+weight and force are not uniformly distributed across the platform, so
+a single measured or CAD-derived mass value would not represent it
+correctly; instead, the inertial contribution is inferred indirectly
+from the same height-sweep offset calibration, which does not fully
+isolate inertial from offset-related residuals. This is reported as a
+limitation, not a missing term concealed as resolved.
+
+Second, the inertial motion capture system used throughout this study
+has been validated against an optoelectronic reference over an
+operating range of approximately 0.8--1.6~m/s
+\cite{Piche2022iSenValidity}. The simulator's own operating speed, at
+approximately 30 times slower than natural human gait, falls below
+this validated range; while the reported trend in that validation
+favors lower speeds, applying the same accuracy figures outside the
+directly tested range remains an extrapolation.
+
+Third, cross-instrument validation --- comparing the inertial system
+against an independent optoelectronic or IMU-based reference collected
+in parallel on the same subjects --- was outside the scope of this
+study cycle. Instrument trustworthiness instead relies on external
+validation reported in the literature rather than an internal
+cross-check performed by this study.
+
+Fourth, the target sample size for the multi-subject comparisons is
+supported by an a priori power analysis using the same permutation-based
+statistical procedure applied in Results. That analysis approximates
+between-subject variability from the trial-to-trial variability of a
+single reference subject, which likely underestimates the true
+variability across a population of new subjects; the analysis is
+revisited once early multi-subject data become available.
+
+Fifth, the premise motivating this study --- that the representativeness
+of a single-subject-programmed trajectory across a broader population
+is rarely tested with quantified, multi-subject evidence --- rests on a
+limited body of directly comparable robotic gait simulator literature
+rather than a systematic review confirming the gap.
+
+\subsection*{Future Work}
+% [RESUELTO 13-ago-2026, borrador -- contenido ya decidido en
+% CLAUDE.md, puesto en prosa. No depende de datos.]
+
+The present study does not modify the simulator's operating principle:
+trajectories remain pre-recorded CSV files executed open-loop by the
+onboard controller. Closed-loop control and algorithmic trajectory
+generation, which would allow the platform to synthesize new gait
+trajectories rather than replay captured ones, are reserved for a
+separate, subsequent study. Likewise, an independently developed
+inertial sensor and load cell built by another team member, and their
+cross-validation against the instrumentation used here, were excluded
+from the present scope and are planned as part of that same follow-on
+work.
+
+% ============================================================
+\section{Conclusion}
+% ============================================================
+% [PENDIENTE: cierre breve, distinto de Discussion -- que se logro, no
+% por que ni las limitaciones (eso ya va en Discussion)]
+
+\vspace*{0.5 cm}
+
+\section*{Acknowledgment}
+% [PENDIENTE. JTEHM exige declarar fuentes de financiamiento y
+% conflictos de interes aqui, y declaracion de aprobacion etica para
+% investigacion con sujetos humanos.]
+Please insert text here.
+
+% Referencias ya identificadas para incluir (ver docs/literatura/):
+%   - validacion_instrumentos_IMU.md: validez iSen/STT-IWS (confirmar cita exacta antes de usar)
+%   - validacion_instrumentos_IMU.md: IMU en usuarios de protesis transtibial (Sensors 2023, DOI 10.3390/s23031738)
+%   - literatura_GRF_protesica.md: benchmark de vGRF en marcha protesica
+%   - normas_ISO_relevantes.md: ISO 5725; Wu et al. 2002 (convencion ISB)
+%   - postprocesado_datos_crudos_IMU.md: filtrado/calibracion de IMU
+%   - Koo & Li (2016) -- ICC(3,1)
+%   - Nichols & Holmes (2002); Pataky et al. (2015) -- SPM1D no parametrico
+%   - Kadaba et al. (1989) -- CMC
+%   - Introduccion (nuevo 03-ago-2026, sin verificacion de texto completo
+%     todavia -- ver metodos_introduccion_borrador.md):
+%     "A Robotic Test Rig for Performance Assessment of Prosthetic Joints" (PMC8936071)
+%     "A compact and cost-effective gait simulator to advance prosthesis
+%       development with reduced reliance on human subject testing" (ScienceDirect)
+%     "Conceptual design of a gait simulator for testing lower-limb active prostheses" (ResearchGate)
+%     "The use of a robotic gait simulator for the development of an
+%       alignment tool for lower limb prostheses" (PMC4101690)
+
+\vspace*{1 cm}
+
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\end{document}
