@@ -71,7 +71,7 @@
 
 **O2 · Bibliografía — 90 %**
 
-9 de 10 entradas verificadas `[OK]`. **13-ago:** las 4 de métodos estadísticos (Koo & Li, Nichols & Holmes, Pataky, ISO 5725) también verificadas — coinciden exactamente con lo ya anotado. Único hallazgo nuevo: **ISO 5725-1:1994 figura como retirada** en iso.org, la vigente es la edición 2023 — decisión pendiente en P-14.
+9 de 10 entradas verificadas `[OK]`. **13-ago:** las 4 de métodos estadísticos (Koo & Li, Nichols & Holmes, Pataky, ISO 5725) también verificadas — coinciden exactamente con lo ya anotado. **15-ago:** decisión de edición de ISO 5725 cerrada (P-14) — se cita 2023, no la 1994 retirada.
 
 Única deuda que queda: **falta leer R4 completo**. (De Raeve, resumen de congreso débil, se cerró el 13-ago — sin reemplazo de artículo completo disponible en el campo, se refuerza citándola junto a Etoundi2022 en la misma cláusula.)
 
@@ -460,7 +460,7 @@ la ultima vez que lo corri si decia 7/7 , si haras modifaciones me avisas para v
 
 ✅ **CERRADA 13-ago-2026.** 7/7 PASS confirmado. Si el código de `CODIGOS/MULTISUJETO/` se modifica, se avisa y se vuelve a correr antes de usarlo con datos reales.
 
-### P-14 · ISO 5725-1:1994 está retirada — ¿citamos la 1994 o la 2023? ⬜
+### P-14 · ISO 5725-1:1994 está retirada — ¿citamos la 1994 o la 2023? ✅ CERRADA
 
 Verificando las 4 citas de métodos estadísticos (13-ago), salió un hallazgo que no estaba en el radar: la edición de la norma ISO 5725 que se venía citando, **1994**, figura en iso.org como **retirada** — la vigente es **ISO 5725-1:2023**. El contenido que se usa (vocabulario de trueness/precision, Parte 1) sigue siendo válido en ambas ediciones; el riesgo no es de fondo, es de forma: un revisor puede notar que se cita una norma retirada.
 
@@ -472,8 +472,10 @@ Verificando las 4 citas de métodos estadísticos (13-ago), salió un hallazgo q
 
 ```
 ✍️ TU RESPUESTA
-
+Si confirmo cierra el 2023
 ```
+
+✅ **CERRADA 15-ago-2026.** Se cita **ISO 5725-1:2023**. Antes de decidir se confirmó que las dos ediciones hablan del mismo tema (mismo marco de trueness/precision; la 2023 es una revisión técnica de la 1994 — algunas definiciones retiradas, encuadre nuevo sobre condiciones/recursos para estudios de precisión, no un cambio de alcance), y que la 1994 está formalmente retirada en iso.org. Aplicado en `references.bib` (título, año y comentario de verificación actualizados; la clave de cita `ISO5725` no cambia, así que no hace falta tocar `manuscrito_JTEHM.tex`), `referencias_verificadas.md` y `literatura/normas_ISO_relevantes.md`.
 
 ---
 
@@ -525,6 +527,10 @@ Confirmado por el usuario. Re-correr si el código cambia.
 
 Búsqueda exhaustiva no encontró artículo completo de reemplazo — el campo es genuinamente angosto aquí. Se mantiene De Raeve, citada junto a Etoundi2022 para reforzar la mitad de la afirmación que sí tiene respaldo fuerte. Aplicado en `manuscrito_JTEHM.tex`, `references.bib`, `referencias_verificadas.md`.
 
+### P-14 — ISO 5725: se cita la edición 2023 (15-ago-2026)
+
+Confirmado que 1994 y 2023 hablan del mismo tema (revisión técnica, no cambio de alcance); la 1994 está retirada en iso.org. `references.bib` actualizado a la edición 2023.
+
 El historial de las decisiones anteriores a esta sesión está en `../CLAUDE.md` y en `ESTADO_Y_RUMBO.md`.
 
 ---
@@ -554,6 +560,7 @@ Cada decisión cerrada aquí, con **dónde** se volcó. Esta tabla es el puente 
 | 13-ago | **Cita débil De Raeve 2014 (P-11): sin reemplazo, se refuerza con Etoundi2022 en la misma cláusula** | `manuscrito_JTEHM.tex` · `references.bib` · `referencias_verificadas.md` · `../CLAUDE.md` |
 | 13-ago | **4 citas de métodos estadísticos verificadas** (Koo & Li, Nichols & Holmes, Pataky, ISO 5725) — todas coinciden exactamente | `references.bib` · `referencias_verificadas.md` |
 | 13-ago | **Hallazgo nuevo: ISO 5725-1:1994 está retirada** (vigente: 2023) — decisión de qué edición citar sin cerrar | `references.bib` (advertencia anotada) — **pendiente en P-14** |
+| 15-ago | **P-14 cerrada: se cita ISO 5725-1:2023, no 1994** — mismo tema en ambas ediciones (revisión técnica, no cambio de alcance) | `references.bib` · `referencias_verificadas.md` · `literatura/normas_ISO_relevantes.md` |
 | 13-ago | **Código de candidatos A y B construido** — `PotenciaApriori_Core.m`, `TOST_Core.m`, test sintético (9 pruebas), guía de interpretación | `CODIGOS/POTENCIA_EQUIVALENCIA/` (nueva carpeta) · `docs/codigos/INDICE_CODIGOS.md` · `ESTADO_Y_RUMBO.md` §6 — **sin correr todavía en MATLAB/Octave** |
 | 13-ago | **Borrador de preregistro OSF (candidato F)** — hipótesis confirmatorias/exploratorias, plan de muestreo y análisis, con N y margen TOST en `[PENDIENTE]` hasta correr el código de A/B | `docs/planificacion/preregistro_OSF_borrador.md` (nuevo) — **borrador, no publicado en OSF** |
 | 13-ago | **Discussion: subsecciones Limitations y Future Work redactadas** — 5 limitaciones que no dependen de datos (offset+seguimiento combinados, extrapolación de velocidad de iSen, sin validación cruzada este ciclo, potencia con proxy de variabilidad, vacío de literatura acotado) + trabajo futuro (lazo cerrado, IMU de Alessandro) | `manuscrito_JTEHM.tex` §Discussion — **borrador, falta la interpretación de resultados (depende de datos)** |

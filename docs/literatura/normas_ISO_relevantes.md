@@ -8,6 +8,8 @@
 
 ## 1. ISO 5725 — Accuracy (trueness and precision) of measurement methods and results
 
+**Edición citada en este proyecto: ISO 5725-1:2023** (decisión cerrada 15-ago-2026, `DISCUSION_Q2.md` P-14). La 1994 figura como retirada en iso.org; la 2023 cubre el mismo marco de trueness/precision (revisión técnica, no cambio de alcance).
+
 **Qué es:** serie de normas vigente (parte 1: 2023, parte 2: 2019, entre otras) que define el marco general de exactitud de un método de medición como la combinación de dos componentes distintos:
 - **Trueness** (veracidad): cercanía entre el promedio de muchas mediciones y el valor de referencia aceptado — se expresa como sesgo (bias).
 - **Precision** (precisión): cercanía entre mediciones independientes repetidas entre sí — se expresa como desviación estándar (repetibilidad/reproducibilidad).

@@ -1,16 +1,20 @@
 # Referencias verificadas para el manuscrito JTEHM
 
-**Creado:** 05-ago-2026 · **Actualizado:** 13-ago-2026
+**Creado:** 05-ago-2026 · **Actualizado:** 15-ago-2026
 **Para qué sirve:** `metodos_introduccion_borrador.md` y `JTEHM_LaTex_Template/manuscrito_JTEHM.tex` arrastraban claves `\cite{PENDIENTE_*}` con citas identificadas por búsqueda pero **sin verificar** — marcadas dos veces en la documentación como "no usar en un envío real sin confirmar". Este archivo cierra esa deuda: lo verificado va con entrada BibTeX lista para pegar; lo que sigue incompleto está marcado con exactamente qué falta.
 
-**Estado al 13-ago-2026: las 9 de 10 entradas están verificadas y completas.** Solo falta leer R4 texto completo para confirmar la frase de novedad (el resumen ya se leyó y se sostiene).
+**Estado al 15-ago-2026: las 10 de 10 entradas están verificadas y completas.** Solo falta leer R4 texto completo para confirmar la frase de novedad (el resumen ya se leyó y se sostiene).
+
+**Cambio de esta ronda (15-ago-2026):**
+
+1. **ISO5725 — decisión cerrada (P-14):** se cita la edición **2023**, no la 1994. La 1994 figura como retirada en iso.org; la 2023 es una revisión técnica del mismo marco de trueness/precision (mismo tema, algunas definiciones retiradas, encuadre nuevo sobre condiciones/recursos para estudios de precisión), no un cambio de alcance. `references.bib` ya actualizado.
 
 **Cambios de esta ronda (13-ago-2026) — las 4 de métodos estadísticos, ya no `[REVISAR]`:**
 
 1. **KooLi2016 (ICC) verificada** — título, revista, volumen, páginas y DOI coinciden exactamente con lo ya anotado (búsqueda web, PubMed incluido).
 2. **NicholsHolmes2002 (permutación SPM) verificada** — coincide exactamente (Wiley Online Library).
 3. **Pataky2015 (SPM biomecánica) verificada** — coincide exactamente (PubMed, ScienceDirect).
-4. **ISO5725 verificada, con una advertencia nueva:** la Parte 1 es correcta (principios generales, trueness/precision), pero **la edición 1994 figura como retirada en iso.org** — la vigente es ISO 5725-1:2023. No se cambió de oficio porque la 1994 es la que de hecho se usó para tomar el vocabulario y sigue siendo de uso común en biomecánica, pero es una decisión pendiente: **¿se cita 1994 (la usada) o 2023 (la vigente)?** Ver `DISCUSION_Q2.md`.
+4. **ISO5725 verificada, con una advertencia nueva:** la Parte 1 es correcta (principios generales, trueness/precision), pero **la edición 1994 figura como retirada en iso.org** — la vigente es ISO 5725-1:2023. No se cambió de oficio porque la 1994 es la que de hecho se usó para tomar el vocabulario y sigue siendo de uso común en biomecánica, pero era una decisión pendiente: **¿se cita 1994 (la usada) o 2023 (la vigente)?** ✅ Cerrada 15-ago, se cita 2023 — ver arriba.
 
 **Cambios de esta ronda (11-ago-2026):**
 
@@ -249,7 +253,7 @@ Es decir: **es LA validación del sistema, no una de varias.** Sostiene por sí 
 | 5 | **Confirmar que R7 evalúa iSen/STT-IWS** (+ su volumen) | PDF completo | ✅ **Hecho 11-ago** — confirmado; es LA validación del sistema |
 | 5-bis | **Leer R4 texto completo** y confirmar la frase de novedad | ScienceDirect vía universidad | ⏳ **Intentado 13-ago, sigue pendiente** — ScienceDirect devuelve 403 sin acceso institucional; requiere que el usuario lo abra con su acceso PUCP y comparta el texto (o confirme la pregunta puntual: ¿el paper reporta validación con múltiples sujetos, o solo con el IPK y un sujeto/trayectoria de referencia?) |
 | 6 | Buscar reemplazo de R2, o eliminar la frase | — | ✅ **Hecho 13-ago** — sin reemplazo de artículo completo disponible en el campo; se citó junto a Etoundi2022 en vez de reemplazar |
-| 7 | Verificar las 4 referencias de métodos estadísticos, todavía `[REVISAR]` | — | ✅ **Hecho 13-ago** — las 4 coinciden exactamente. Queda una decisión nueva: ISO 5725-1:1994 está retirada, ¿se cita la 2023? |
+| 7 | Verificar las 4 referencias de métodos estadísticos, todavía `[REVISAR]` | — | ✅ **Hecho 13-ago** — las 4 coinciden exactamente. Decisión de edición ISO 5725 cerrada 15-ago: se cita 2023, no 1994. |
 | 8 | Búsqueda deliberada de revisiones de bancos robóticos de marcha | — | ⏳ Pendiente, decide si el vacío se puede afirmar |
 
 **Nota de método, reforzada por esta ronda:** ninguna cita debe fijarse con los datos "por búsqueda". En dos rondas de verificación, **6 de 6 referencias identificadas por búsqueda tenían algún error**: un título equivocado, un resumen de suplemento confundido con artículo, un paper de congreso confundido con artículo de revista, un sistema IMU distinto del que se suponía, un DOI inventado por un buscador a partir del patrón de la URL, y una revisión entera que era de otro tema. La verificación no es un trámite.
