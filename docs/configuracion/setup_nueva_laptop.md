@@ -55,8 +55,22 @@ Deberían aparecer los 7 plugins con estado activo, igual que en la laptop princ
 
 Si algún comando de arriba falla por un cambio de sintaxis entre versiones de Claude Code, usar el menú interactivo `/plugin` → "Browse marketplaces" para buscar cada uno por nombre e instalarlo a mano.
 
+## 5. Datos que NO vienen en el repo — hay que descargarlos aparte
+
+Por diseño, algunos archivos quedan fuera de git a propósito (ver `.gitignore`) — normalmente por licencia, no porque falte subirlos. Si en la otra laptop se va a trabajar en el generador de trayectoria (candidato Yun 2014), hace falta este paso manual:
+
+**KIST Human Gait Pattern Data (toolbox de Yun et al. 2014)** — el repo es público y esta base de datos tiene copyright reservado del KIST, con licencia que prohíbe redistribuirla fuera del propio toolbox (ver `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` §4.5 para el detalle completo). Por eso el código del toolbox sí está en el repo pero los archivos de datos no.
+
+1. Descargar el `.zip` completo (gratis, sin necesitar acceso PUCP) desde:
+   `https://sourceforge.net/projects/gaitkinematicsprediction/files/Gait_Kinematics_Prediction_V1.01_Release.zip/download`
+2. Extraerlo.
+3. Copiar únicamente `database/Data_x.mat` y `database/Data_y.mat` dentro de `docs/literatura/pdfs/yun2014_toolbox/database/` del repo local (esa carpeta ya existe con el resto del toolbox — código, hiperparámetros, demos — solo faltan estos dos archivos).
+
+Sin este paso, `Gait_Pred.m`/`demo_Gait_Pred.m` no van a poder cargar la base y el toolbox no corre.
+
 ## Notas
 
 - Los pasos 2-4 son instalación **global de usuario** (`~/.claude`), no tocan el repo — no hace falta commitear ni pushear nada por esto.
 - `.claude/settings.local.json` (permisos locales) **no** se sincroniza por diseño — cada laptop arma su propio historial de permisos allow/deny a medida que se usa. No es necesario copiarlo.
 - Si se agrega un plugin nuevo en una laptop, conviene volver a este archivo y sumarlo a la lista para que la otra laptop no se quede desactualizada.
+- **Nunca** subir `docs/literatura/pdfs/yun2014_toolbox/database/*.mat` a git, aunque git no se queje — está en `.gitignore` a propósito.
