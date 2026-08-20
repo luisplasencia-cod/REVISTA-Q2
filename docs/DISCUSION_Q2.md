@@ -43,6 +43,8 @@
 >
 > ✅ **P-23 cerrada (§4-sexies, 20-ago-2026):** ni adoptar sin tocar nada, ni entrenar una IA — se investiga y combina trabajo ya publicado, usando siempre coeficientes ya publicados (sin ajustar ninguno con datos propios), para construir la reducción de ángulos articulares (rodilla+tobillo) a trayectoria del segmento tibial, que es el aporte técnico central. Límite explícito: el día que se ajuste un coeficiente con datos propios, vuelve el requisito de LOSO/muestra grande — hasta entonces, régimen liviano.
 >
+> ✅ **P-24 cerrada — convergencia operativa:** algoritmo = **Koopman 2014 + Zhao 2026** en paralelo, sin reentrenar · base de datos de validación = **Camargo et al. 2021** (P-21 se cierra en consecuencia). Yun 2014 en espera como posible tercer modelo — su texto completo sigue bloqueado, pendiente de que el usuario lo consiga con acceso PUCP (mismo link que R4). **No bloquea el siguiente paso: construir el código de la reducción + comparación**, todavía sin empezar.
+>
 > 📍 **Dónde contestar ahora mismo (20-ago-2026):** todo lo pendiente vive en **§4-sexies**, un poco más abajo en este mismo archivo — busca "4-sexies" (Ctrl+F). Ahí están: (1) las 2 preguntas de P-22, (2) las 6 secciones de candidato de algoritmo, cada una con su propio bloque `✍️`. No hace falta responder todo de una vez — cada bloque es independiente. **Dónde está el avance hacia Q1/Q2:** `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md`, sección **§13 "Tablero cuantificado"** — tiene el puntaje (29/100 al 05-ago) y qué falta para subir. Ese puntaje se recalcula apenas cierre P-22 (ver nota en §4-sexies).
 
 ## 1 · Tablero de avance
@@ -661,7 +663,7 @@ Primera búsqueda tras P-20. Detalle completo en `planificacion/analisis_escalam
 
 **Base de datos de validación — resultado honesto, no lo que se esperaba:** **no existe ninguna base de datos pública de marcha peruana o sudamericana** con antropometría, verificada. Búsqueda amplia en español e inglés, sin resultado. Alternativas reales: GaitRec (solo GRF, no sirve para trayectoria), Camargo/Georgia Tech (22 sanos, cinemática completa), y **Hood/Ishmael et al. 2020** (18 amputados transfemorales reales, cinemática/cinética completa) — este último es el más valioso porque es población protésica real, no sana, aunque no sea transtibial exacto ni regional.
 
-### P-21 · Qué hacer con el vacío de base de datos regional ⬜
+### P-21 · Qué hacer con el vacío de base de datos regional ✅ CERRADA (20-ago-2026, en P-24)
 
 Tres caminos, y no los elijo por cuenta propia porque cambian qué tan fuerte queda el argumento de independencia regional del artículo:
 
@@ -847,6 +849,20 @@ Claro precedeciir GRF tmb tengo que incluirlo ya que con esto puedo dar una mejo
 
 **Mi orden de preferencia, si tuviera que recomendar uno hoy:** 1 (Koopman) por adopción y simplicidad, luego 6 (Zhao) por integración directa con el código ya construido y por cubrir Fz también, luego 2 (Yun/GPR) por la incertidumbre explícita. Pero es tu decisión y la del equipo — por eso están separados, para que cada uno se pueda aceptar, descartar o dejar en duda de forma independiente.
 
+### P-24 · Convergencia — combinación de algoritmo + base de datos, confirmada ✅ CERRADA (20-ago-2026)
+
+```
+✍️ TU RESPUESTA
+si vamos a la combinacion
+```
+
+✅ **CERRADA 20-ago-2026.** Decisión operativa que desbloquea empezar a construir código:
+
+- **Algoritmo: Koopman 2014 (Candidato 1) + Zhao 2026 (Candidato 6), corridos en paralelo con la misma entrada antropométrica, sin reentrenar ninguno** (coeficientes ya publicados de cada uno, respeta el límite fijado en P-23). Coincide con la "jugada" ya propuesta en agosto (`analisis_escalamiento_Q1_generador_trayectorias.md` §6: "no adoptar uno, adoptar dos o tres y compararlos") — no es un plan nuevo, es instanciar el que ya existía con candidatos concretos y verificados.
+- **Base de datos de validación: Camargo et al. 2021** — el más adoptado de los tres (329 citas), cinemática completa. Hood 2020 (amputados) queda como complemento posible más adelante, no descartado.
+- **Yun 2014 (Candidato 2) queda en espera**, no descartado — si su texto completo confirma parámetros de alta influencia, podría sumarse como tercer modelo del contraste (la "jugada" de §6 sugiere 2 **o 3**). No bloquea empezar con los dos ya confirmados.
+- **Siguiente paso real:** diseñar/construir el código que (1) corre Koopman y Zhao con la misma entrada, (2) aplica la reducción rodilla+tobillo→segmento tibial (respaldada en §5-bis, Winter/OpenSim), (3) compara contra Camargo 2021 — reutilizando `SPM1D_Core.m`/`MULTISUJETO/` donde aplique. Sin empezar todavía, es la tarea que sigue.
+
 ---
 
 ## 5 · Preguntas cerradas
@@ -961,6 +977,7 @@ Cada decisión cerrada aquí, con **dónde** se volcó. Esta tabla es el puente 
 | 19-ago | **P-21 interpretada (no cerrada): se descarta capturar base propia (necesita ética), se sigue buscando entre estudios publicados.** Verificación de confiabilidad/adopción de los 9 candidatos (algoritmo + base de datos) contra Semantic Scholar y Crossref — **un error real encontrado y corregido: el DOI de GaitRec apuntaba a otro dataset**; los DOIs de J Biomech 2013/2014 resultaron correctos pese a que una primera pasada los marcó como erróneos (verificado dos veces antes de tocar el archivo). Candidatos con adopción más sólida: Koopman 2014 (algoritmo) y Camargo 2021 (base de datos, 329 citas) | `analisis_escalamiento_Q1_generador_trayectorias.md` §4.4 (DOI corregido) y §4.5 (nuevo, tabla de confiabilidad) |
 | 20-ago | **P-22 parcial: cero mediciones de personas confirmado; demostración física del banco (sin persona) diferida, no descartada** — fase activa es 100% computacional. **P-23 cerrada: ni adoptar sin tocar nada, ni entrenar una IA** — se investiga y combina trabajo ya publicado (coeficientes ya publicados, sin ajustar ninguno con datos propios), construyendo la reducción rodilla+tobillo → trayectoria del segmento tibial como aporte técnico central. Límite fijado: ajustar un coeficiente propio reabre LOSO/muestra grande | `DISCUSION_Q2.md` §4-sexies |
 | 20-ago | **Búsqueda ampliada (post P-23) — hallazgo importante: la reducción "ángulos articulares → segmento tibial" YA es biomecánica clásica establecida** (relación ángulo relativo/absoluto, respaldo Winter + OpenSim), no hay que derivarla desde cero — refuerza la defensibilidad del aporte central. De Leva 1996 verificado como estándar de facto para estimar longitudes de segmento si no se miden todas. Importancia de parámetros de Yun 2014 sigue sin verificar (texto completo bloqueado, pendiente acceso PUCP, mismo patrón que R4); los otros 5 candidatos mayormente no reportan ranking de importancia (pocos parámetros o caja negra) | `analisis_escalamiento_Q1_generador_trayectorias.md` §5-bis (nuevo) y §4.5 (tabla de importancia agregada) |
+| 20-ago | **P-24 cerrada — convergencia confirmada: algoritmo = Koopman 2014 + Zhao 2026 en paralelo (sin reentrenar), base de datos de validación = Camargo 2021.** P-21 se cierra en consecuencia (Camargo, no Hood ni captura propia). Yun 2014 queda en espera como posible tercer modelo, no bloquea empezar. Siguiente paso: construir el código de la reducción + comparación, sin empezar todavía | `DISCUSION_Q2.md` §4-sexies (P-24, P-21 cerrada) |
 
 ---
 
