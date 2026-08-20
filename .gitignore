@@ -7,3 +7,8 @@
 # Cache de Python (skills)
 __pycache__/
 *.pyc
+
+# KIST Human Gait Pattern Data (Yun et al. 2014) — copyright reservado,
+# licencia prohibe redistribución fuera del toolbox. Se mantiene en disco
+# local para correr Gait_Pred.m, nunca en el repo (es público).
+docs/literatura/pdfs/yun2014_toolbox/database/*.mat
