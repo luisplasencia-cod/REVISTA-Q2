@@ -102,7 +102,7 @@
 | 7 | Decidir autoría, CRediT y declaraciones | Decisión de equipo | 🟡 **13-ago, parcial:** Luis Marcos Plasencia Janampa como autor de correspondencia, correo confirmado `luis.plasencia@pucp.edu.pe` y ya aplicado en el `.tex`. Resto de autores pendiente |
 | ~~0~~ | ~~Confirmar que Piche 2022 evalúa iSen/STT-IWS~~ | — | ✅ **11-ago:** confirmado sobre el PDF. Es **LA** validación del sistema (*"no study have validated this specific ISEN system"*). Métodos 5.2 ya lo afirma directamente, con cifras. PDF en `literatura/pdfs/` |
 | 8 | **Buscar reemplazo de la cita R2**, o eliminar esa frase | 1-2 h | R2 es un resumen de congreso de una página — cita débil para IEEE. Su reemplazo previsto era Neelen 2026, que ya no aplica |
-| 9 | Búsqueda deliberada de revisiones de **bancos robóticos** de marcha | 2-3 h | Dos consultas no encontraron ninguna. Si de verdad no existe, es un punto a favor — pero eso se afirma tras buscar en serio, no por ausencia de resultados |
+| ~~9~~ | ~~Búsqueda deliberada de revisiones de **bancos robóticos** de marcha~~ | — | ✅ **16-ago:** segunda ronda de búsquedas independientes (se suma a la del 11-ago), mismo resultado — no existe revisión sistemática dedicada. Refuerza (no cambia) la Limitation #5 ya redactada en `manuscrito_JTEHM.tex`. Ver `DISCUSION_Q2.md` §4-bis |
 
 ---
 
@@ -116,7 +116,7 @@ Ocho opciones consideradas. Las columnas son honestas: *desbloqueado* significa 
 | **B. Pruebas de equivalencia (TOST) además de tests de diferencia** | ✅ | ~2 sem | **Alta** | ✅ **Aprobado 11-ago, código construido 13-ago** |
 | **C. Justificar la arquitectura 3-DOF con literatura** | ✅ | ~0 | Media | ✅ **Hecho 11-ago** |
 | ~~D. Condensar Introducción con la revisión de 2026~~ | — | — | — | ❌ **Cae 11-ago** — la revisión es de otro tema |
-| E. Presupuesto formal de incertidumbre (ISO 5725/GUM) extendido a cinemática | Parcial | ~2 sem | Media-alta | Evaluar tras A y B |
+| E. Presupuesto formal de incertidumbre (ISO 5725/GUM) extendido a cinemática | ✅ | ~2 sem | Media-alta | ✅ **Aprobado 16-ago (P-19), código construido 16-ago** |
 | F. Preregistro del plan de análisis (OSF) | ✅ | ~2 días | Media | ✅ **Aprobado 11-ago, borrador redactado 13-ago** |
 | G. Material suplementario con curvas individuales | ❌ | Bajo | Baja-media | Si sobra tiempo |
 | H. Adelantar algo del generador de trayectorias | ✅ | Alto | **Negativa** | **No hacer** |
@@ -168,6 +168,16 @@ Ya incorporado en 5.1 del `.tex`, con la cita ahora verificada y completa (`Sude
 3. **La cita más débil sigue sin reemplazo** (tarea 8 de §5).
 
 Detalle completo, con las citas textuales: `manuscrito/referencias_verificadas.md`.
+
+### E — Presupuesto formal de incertidumbre (GUM/ISO 5725)
+
+**El problema que resuelve:** el argumento central promete fuentes de error *cuantificadas, no solo narradas*. Eso ya está resuelto para Fz (offset + fidelidad de seguimiento, P-5), pero del lado cinemático (ángulo de plataforma) la incertidumbre se sigue describiendo en prosa ("el instrumento tiene tal RMSD, la calibración tiene tal residuo") sin combinarlas en un número único con su propio nivel de confianza.
+
+**Qué es:** un presupuesto de incertidumbre formal siguiendo la ley de propagación de incertidumbre de la GUM (JCGM 100:2008) — la misma familia metodológica que ISO 5725, ya citada en 5.4. Combina componentes (validación del instrumento, residuo de calibración de offset, repetibilidad ensayo-a-ensayo) en una incertidumbre estándar combinada y una incertidumbre expandida al 95%, con una tabla que muestra qué % de la incertidumbre total aporta cada fuente.
+
+**Por qué es fuerte:** casi ningún artículo de bancos de prueba de marcha reporta un presupuesto de incertidumbre formal — es otro diferenciador real, en la misma línea que A y B. Y, como A y B, no necesita ni un sujeto nuevo para diseñarse (aunque sí para tener los números finales de los componentes Tipo A).
+
+**Aprobado 16-ago-2026 (`DISCUSION_Q2.md` P-19) — "no depende de nada, avanzar todo lo posible mientras los datos reales demoran".** Construido el mismo día: `CODIGOS/INCERTIDUMBRE/PresupuestoIncertidumbre_Core.m`, genérico (no hardcodea ningún número del proyecto — recibe los componentes como entrada), validado con datos sintéticos incluyendo un caso de uso realista con las cifras de Piche 2022. **Decisión pendiente antes de usarlo con datos reales:** qué cifra de Piche 2022 (rodilla 3.3°/tobillo 5.6°/cadera 7.3°) es la analogía correcta para el ángulo de plataforma medido por el simulador — no es un ángulo articular en sentido clínico, ver `GUIA_INTERPRETACION.md` §6.
 
 ### F — Preregistro: la ventana está abierta justo ahora
 

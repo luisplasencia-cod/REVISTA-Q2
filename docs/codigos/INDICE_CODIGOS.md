@@ -75,6 +75,17 @@ Ya ejecutados, generaron los `.mat` que vive en `REFERENCIAS/` (curvas media±SD
 | `TOST_Core.m` | Prueba de equivalencia (Schuirmann, two one-sided tests) sobre una métrica 0D (`Extraer_Features0D.m`): declara un margen de equivalencia antes de los datos y dice si la diferencia observada cae dentro. Protege el argumento central del artículo contra la objeción "no hubo diferencia significativa = falta de potencia, no equivalencia". | Con los datos reales de la Comparación 3/4, una vez definido el margen (ver guía, sección 5). |
 | `Test_PotenciaApriori_TOST.m` | Prueba con datos sintéticos (9 pruebas): tasa de falso positivo con efecto=0, potencia alta con efecto grande, monotonía en N, equivalencia/no-equivalencia detectada correctamente, caso límite SE=0. | Antes de usar cualquiera de los dos Core con datos reales. |
 
+## 7. `INCERTIDUMBRE/` — presupuesto formal de incertidumbre GUM/ISO 5725 *(nuevo, 16-ago-2026)*
+
+**Guía:** `CODIGOS/INCERTIDUMBRE/GUIA_INTERPRETACION.md`
+
+**Estado: construido y con test sintético, pendiente de correr en MATLAB/Octave por el usuario** — igual que el resto de carpetas de análisis. Sale del **candidato E** de `docs/ESTADO_Y_RUMBO.md` §6, aprobado en `docs/DISCUSION_Q2.md` P-19.
+
+| Script | Para qué sirve | Cuándo correrlo |
+|---|---|---|
+| `PresupuestoIncertidumbre_Core.m` | Combina componentes de incertidumbre (validación del instrumento, residuo de calibración de offset, repetibilidad ensayo-a-ensayo) siguiendo la ley de propagación de incertidumbre de la GUM (JCGM 100:2008): incertidumbre combinada por RSS, grados de libertad efectivos por Welch-Satterthwaite, factor de cobertura `k` calculado exactamente (no asumido en 2), incertidumbre expandida. Reporta qué % de la incertidumbre total aporta cada fuente — el diagnóstico más útil. Genérico, no hardcodea ningún número del proyecto. | Cuando exista una tabla de componentes real (instrumento + calibración de offset + repetibilidad) para el ángulo de plataforma. Decisión pendiente antes de usarlo así (ver guía, sección 6): qué cifra de Piche 2022 (rodilla/tobillo/cadera) usar como analogía del ángulo medido. |
+| `Test_PresupuestoIncertidumbre.m` | Prueba con datos sintéticos (7 pruebas): combinación RSS exacta, un solo componente, grados de libertad efectivos dominados por el componente con menos gl, contribución porcentual, ensanchamiento de `k` con muestras chicas, error controlado por campo faltante, y un caso de uso realista con las cifras de Piche 2022. | Antes de usar el Core con datos reales. |
+
 ---
 
 ## Qué es "tentativo" y sigue existiendo, pero no es el rumbo actual

@@ -1,3 +1,9 @@
-# Claude Code — configuración y skills locales (no compartidos con el equipo)
+# Claude Code — configuración local (no compartida con el equipo)
 .claude/settings.local.json
-.claude/skills/
+
+# Archivos sueltos sin relación con el artículo Q2
+/TESIS AGUILAR - GONZALES.pdf
+
+# Cache de Python (skills)
+__pycache__/
+*.pyc

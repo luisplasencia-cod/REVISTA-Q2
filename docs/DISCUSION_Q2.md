@@ -39,18 +39,18 @@
 
 ## 1 · Tablero de avance
 
-**Global del artículo: 50 %** · `██████████░░░░░░░░░░` *(actualizado 13-ago-2026, tras trabajo adelantado en lo no bloqueado: potencia/TOST, preregistro, Discussion, Results, CRediT)*
+**Global del artículo: 51 %** · `██████████░░░░░░░░░░` *(actualizado 17-ago-2026: candidato E construido, inconsistencia de 5.2 corregida, bloqueos sin cambio)*
 
 | # | Objetivo | Avance | |
 |---|---|---|---|
-| **O1** | **Manuscrito redactado** | `██████████░░░░░░░░░░` | **50 %** ▲ |
+| **O1** | **Manuscrito redactado** | `██████████░░░░░░░░░░` | **50 %** |
 | **O2** | **Bibliografía verificada** | `██████████████████░░` | **90 %** |
-| **O3** | **Herramientas de análisis** | `████████████████░░░░` | **80 %** ▲ |
+| **O3** | **Herramientas de análisis** | `█████████████████░░░` | **85 %** ▲ |
 | **O4** | **Datos empíricos** | `██░░░░░░░░░░░░░░░░░░` | **10 %** |
 | **O5** | **Bloqueos externos levantados** | `██████░░░░░░░░░░░░░░` | **30 %** |
-| **O6** | **Requisitos de JTEHM** | `████████░░░░░░░░░░░░` | **40 %** ▲ |
+| **O6** | **Requisitos de JTEHM** | `████████░░░░░░░░░░░░` | **40 %** |
 
-**Lo que hay que leer en este tablero:** O1, O2 y O3 subieron todos en la misma ronda (13-ago) porque son justo las tareas **desbloqueadas** — bibliografía verificada, código de potencia/TOST construido, Discussion/Results/CRediT con esqueleto. **El artículo no avanza más allá de ~60-65 % global hasta que los tres bloqueos de O5 caigan de verdad**, por mucho que se afine el resto — pero ya no son una incógnita, son una cuenta regresiva (RPi-ESP32 ~2 semanas, comité de ética 18-ago, desplazamiento X,Y de iSen en curso).
+**Lo que hay que leer en este tablero:** O3 sube (16/17-ago) por el candidato E construido (`CODIGOS/INCERTIDUMBRE/`), tercer candidato de refuerzo con código completo junto a A y B. O1 no sube pese a la corrección de 5.2 — era un arreglo de consistencia interna, no contenido nuevo (ver §4-bis). **El artículo no avanza más allá de ~60-65 % global hasta que los tres bloqueos de O5 caigan de verdad**, y siguen sin caer: RPi-ESP32 sigue sin integrarse (misma estimación ~25-ago), **el comité de ética es mañana (18-ago) y todavía no hay respuesta al momento de este chequeo (17-ago)**, desplazamiento X,Y de iSen sigue en pruebas. Ver P-15.
 
 ### Detalle por objetivo
 
@@ -75,7 +75,7 @@
 
 Única deuda que queda: **falta leer R4 completo**. (De Raeve, resumen de congreso débil, se cerró el 13-ago — sin reemplazo de artículo completo disponible en el campo, se refuerza citándola junto a Etoundi2022 en la misma cláusula.)
 
-**O3 · Herramientas — 80 %**
+**O3 · Herramientas — 85 %**
 
 | Carpeta | Estado |
 |---|---|
@@ -85,6 +85,7 @@
 | `MULTISUJETO/` | 🟢 Construido y probado — **7/7 PASS confirmado 13-ago** |
 | Pruebas de equivalencia (TOST) | 🟡 **13-ago:** `TOST_Core.m` construido y con test sintético — candidato **B** |
 | Potencia a priori por simulación | 🟡 **13-ago:** `PotenciaApriori_Core.m` construido y con test sintético — candidato **A**. Advertencia importante en su guía: usa la variabilidad de un solo sujeto como proxy de variabilidad entre sujetos, recalcular con datos reales |
+| Presupuesto de incertidumbre GUM/ISO 5725 | 🟡 **16-ago:** `PresupuestoIncertidumbre_Core.m` construido y con test sintético — candidato **E**. Genérico, listo para usar en cuanto se decida qué cifra de Piche 2022 (rodilla/tobillo/cadera) anclar como componente de instrumento (ver P-18) |
 
 **O4 · Datos — 10 %**
 
@@ -479,6 +480,110 @@ Si confirmo cierra el 2023
 
 ---
 
+## 4-bis · Auditoría 16-ago-2026 — qué encontré al verificar todo contra el disco
+
+Pediste verificar si de verdad estamos en el porcentaje que muestra el tablero, y seguir avanzando en lo no bloqueado. Hice una pasada completa: releí este archivo entero y `ESTADO_Y_RUMBO.md`, y confirmé contra el disco que lo que dicen existe de verdad (no solo en la narrativa).
+
+**Lo que se confirmó, existe tal como se describe:**
+- `CODIGOS/POTENCIA_EQUIVALENCIA/` con sus 4 archivos (`PotenciaApriori_Core.m`, `TOST_Core.m`, `Test_PotenciaApriori_TOST.m`, `GUIA_INTERPRETACION.md`).
+- `docs/planificacion/preregistro_OSF_borrador.md`, `docs/manuscrito/creditos_autoria_borrador.md`, `docs/equipo/tarea_alessandro.md`.
+- El `.tex` tiene de verdad el Impact Statement, la frase TRL, el correo de correspondencia (`luis.plasencia@pucp.edu.pe`), las 4 tablas esqueleto de Results, y Limitations/Future Work redactados.
+
+**Un hallazgo real, ya corregido — no era solo cosmético:** la subsección "Vertical Force Overestimation" de 5.2 en `manuscrito_JTEHM.tex` seguía describiendo el modelo **viejo de tres fuentes** ("axis-wise inertial correction, using the mass that actually accelerates...") con un comentario `% [PENDIENTE: fuente de m_eje sin resolver -- CAD vs. renunciar al termino]` — exactamente las dos opciones que P-5 **descartó** el 13-ago. La sección de **Limitations** (redactada el mismo 13-ago) sí tenía el modelo correcto de dos fuentes con inferencia indirecta — o sea que el `.tex` se contradecía a sí mismo entre 5.2 y Discussion. **Corregido ahora:** 5.2 reescrita al modelo de dos fuentes con inferencia indirecta (mismo lenguaje que ya usa Limitations), título de la subsección "Three-Stage" → "Two-Stage", comentario `PENDIENTE` reemplazado por uno `RESUELTO` que apunta a P-5. También estaba desactualizada la fila "Pesar el ensamblaje móvil del simulador" en `plan_trabajo_5_semanas_articulo_Q2.md` (Semana 1) — sigue diciendo "usar CAD si hay propiedades de masa asignadas", que ya no aplica; la marqué tachada como superada, sin borrarla (regla 10).
+
+**Tarea 9 de `ESTADO_Y_RUMBO.md` §5 (búsqueda deliberada de revisiones de bancos robóticos de marcha) — ejecutada.** Dos búsquedas independientes más (16-ago, se suman a las del 11-ago) no encontraron ninguna revisión sistemática dedicada a bancos robóticos de marcha para prótesis — sí aparecieron simuladores individuales ya conocidos (Sudeesh 2024, Etoundi 2022, De Raeve 2014) y una revisión de 2024 en *IEEE Trans. Medical Robotics and Bionics* sobre prótesis robóticas de miembro inferior en general (no sobre bancos de prueba). **Segunda confirmación independiente del vacío** que sostiene la Limitation #5 ya redactada ("rests on a limited body... rather than a systematic review confirming the gap") — no cambia el texto, lo refuerza. Tarea 9 puede marcarse hecha.
+
+**Conclusión honesta sobre el porcentaje:** el tablero (50% global) es razonablemente fiel a lo que hay en disco — no encontré contenido "fantasma" (nada que se reclame como construido y no exista). El único problema real era una inconsistencia interna entre dos secciones del `.tex` sobre una decisión ya cerrada, ya corregida. **O1 (Manuscrito, 5.2) sigue en 85%** — el fix es de consistencia, no agrega contenido nuevo.
+
+---
+
+## 4-ter · Preguntas nuevas (16-ago-2026)
+
+*(Numeración continúa desde P-14. Todas son "las necesarias" — cosas que quedaron al aire o que hacen falta para seguir avanzando, no relleno.)*
+
+### P-16 · Los 86 kg de la cifra 157.3%BW — ¿peso real medido, o supuesto? 🟡 ACLARADO, caveat menor se mantiene
+
+```
+✍️ TU RESPUESTA
+o sea el .txt es el real medido, el %bw se convierte normalizandolo en matlab , pero el .txt crudo podemos obtener la fuerza real.
+```
+
+🟡 **ACLARADO 17-ago-2026, no cerrado del todo — y no hace falta que lo esté.** La respuesta confirma lo que ya se sabía (fuerza cruda real medida por el AMTI, %BW se calcula después en MATLAB), pero no confirma explícitamente si los **86 kg específicos** son el peso corporal real medido de esa tanda de sujetos o un valor de trabajo. **Por qué esto deja de ser bloqueante:** como el `.txt` guarda la fuerza cruda (no normalizada), el 157.3%BW se puede **recalcular** en cuanto se confirme el peso real — no hay que volver a medir nada, solo volver a dividir. Se mantiene como caveat menor explícito en la cifra (ya está anotado así en `CLAUDE.md` y `ESTADO_Y_RUMBO.md` §O4), sin bloquear su uso hoy como cifra motivadora del problema.
+
+### P-17 · R4 (Sudeesh 2024) texto completo — link para acceso institucional ⬜
+
+```
+✍️ TU RESPUESTA
+comparteme el link para ingresar y darte el pdf 
+```
+
+**Aquí está el link (17-ago-2026):**
+
+> **DOI:** `10.1016/j.medengphy.2024.104254`
+> **ScienceDirect:** https://www.sciencedirect.com/science/article/pii/S1350453324001553
+
+**Cómo conseguir el PDF con tu acceso PUCP** (mismo patrón que ya funcionó con Piche 2022):
+1. Entra a ese link **ya logueado en la red/VPN de PUCP**, o pasa primero por el proxy de la biblioteca PUCP (normalmente algo tipo `ezproxybib.pucp.edu.pe` antepuesto a la URL, o el buscador de la biblioteca virtual) — sin eso, ScienceDirect sigue devolviendo el 403 que ya se topó el 13-ago.
+2. Una vez adentro, descarga el PDF y guárdalo en `docs/literatura/pdfs/` (ya existe esa carpeta, ahí está el de Piche 2022).
+3. Dime cuando esté ahí, o pega el texto relevante directo aquí — lo que sea más rápido para ti.
+
+**Lo que necesito confirmar puntualmente:** ¿el paper reporta validación con múltiples sujetos, o solo con el IPK y una trayectoria/sujeto de referencia? Sigue abierta hasta que llegue el PDF.
+
+### P-18 · TOST: margen de equivalencia + tamaños de efecto para la potencia a priori ⬜
+
+Candidatos A y B ya tienen código (`CODIGOS/POTENCIA_EQUIVALENCIA/`), pero no se pueden correr con sentido sobre datos reales sin dos decisiones que siguen abiertas (marcadas `[PENDIENTE]` también en `preregistro_OSF_borrador.md`):
+
+1. **Margen de equivalencia de TOST** — el candidato natural, ya mencionado en P-3, es la **variabilidad intra-sujeto** (si la discrepancia simulador-vs-sujeto no supera lo que el sujeto varía consigo mismo entre pasadas, es indistinguible de su propio ruido). ¿confirmas ese criterio, o prefieres otro (p. ej. un umbral clínico/técnico fijo en grados o %BW)?
+2. **Tamaños de efecto a simular en la potencia a priori** — ¿hay alguna diferencia mínima que el equipo considere clínicamente/técnicamente relevante detectar (en grados de ángulo, o en %BW de Fz), o prefieres que use un rango exploratorio basado en la variabilidad de las curvas que ya existen?
+
+No es urgente hoy mismo, pero si se decide **antes** de la primera captura real (como A/B/F en general), el preregistro se puede publicar completo y el análisis de potencia da un N defendible en vez de un rango genérico.
+
+```
+✍️ TU RESPUESTA
+1. O sea quiero que esa respuesta se encuentre dentro de una referencia o literatura 
+2. Lo mismo con esto , no y estoy empapado de esta informacion asi que necesito nutrirme con mas informacion y poder dar una mejor respuesta.
+```
+
+🟡 **RESPALDO DE LITERATURA ENCONTRADO 17-ago-2026 — presentado para tu confirmación, no aplicado todavía (regla 1 de §2: ninguna cita se fija sin verificar, y ninguna decisión se aplica sin tu visto bueno).**
+
+Hice dos búsquedas: una general de literatura de marcha (MDC/ICC de ángulos articulares, cualquier instrumento) y otra específica de TOST/márgenes de equivalencia en biomecánica. La general trajo valores dispersos (SEM<2.5°, MDC>5° en cadera, discrepancias de ±5-9° según la articulación y el instante del ciclo) de estudios con captura óptica convencional — no del instrumento de este proyecto, y sin verificar todavía a texto completo. **Encontré algo mejor, que ya tenemos verificado a texto completo dentro del propio proyecto:**
+
+**Piche et al. 2022** (`Piche2022iSenValidity`, ya citada en 5.2 y confirmada sobre el PDF completo, `docs/literatura/pdfs/`) — es la validación del **instrumento exacto** de este artículo (iSen/STT-IWS) contra un sistema optoelectrónico, en la población de interés (marcha con prótesis transtibial). Reporta, por articulación:
+
+| Articulación | RMSD | ICC |
+|---|---|---|
+| Rodilla | 3.3° | 0.93 |
+| Tobillo | 5.6° | — |
+| Cadera | 7.3° | 0.89 |
+
+**Por qué esto es mejor anclaje que buscar un umbral MDC genérico de otro instrumento:** un margen de equivalencia dice, en el fondo, *"diferencias más chicas que esto son indistinguibles del ruido de mi propio proceso de medición"*. El RMSD de la validación del **propio instrumento** es exactamente esa cantidad — no hace falta ir a buscar un MDC de un sistema óptico distinto cuando ya existe, verificado, el número del sistema que de verdad se usa aquí. Es más defendible ante un revisor que cualquier cifra externa: *"el margen de equivalencia se fija en el RMSD de validación reportado del instrumento contra referencia óptica (Piche et al. 2022), la misma fuente ya citada para justificar el uso del instrumento en 5.2"*.
+
+**Lo que falta para que esto sea aplicable, y es tu decisión, no la tomo por ti:** el simulador no mide un ángulo articular clínico (rodilla/tobillo/cadera entre dos segmentos) — mide la inclinación de una plataforma sobre la horizontal (convención atan2 del proyecto), geométricamente más parecido a un ángulo de segmento (shank/tibia) que a uno articular. Ninguna de las tres cifras de la tabla es una validación directa de "inclinación de plataforma". Se necesita elegir una analogía defendible y decirlo así en Métodos (p. ej. "se usa la cifra de tobillo, la articulación distal más próxima al segmento medido, con la limitación explícita de que no es una validación directa de ese ángulo específico").
+
+**Con esto, mi recomendación concreta para las dos partes de P-18:**
+1. **Margen de TOST:** usar el RMSD de Piche 2022 de la articulación que decidas (candidata natural: tobillo, 5.6°, por ser la más distal/próxima al segmento tibial) como margen simétrico `[-5.6°, +5.6°]`, en vez de (o además de) la variabilidad intra-sujeto ya calculable.
+2. **Tamaños de efecto para la potencia a priori:** usar el mismo rango 3.3°-7.3° (las tres cifras de la tabla) como los "efectos" a simular en `PotenciaApriori_Core.m` — en vez de un rango arbitrario, quedan anclados a números de literatura ya verificados.
+
+**Esta misma decisión (qué articulación de Piche 2022 usar) es la que también bloquea el uso real del candidato E recién construido** (ver P-19 en §5, y `CODIGOS/INCERTIDUMBRE/GUIA_INTERPRETACION.md` §6) — son la misma pregunta metodológica en dos lugares distintos. Conviene resolverla una sola vez.
+
+**Tu decisión pendiente:** ¿tobillo (5.6°, mi recomendación por cercanía anatómica), rodilla (3.3°, la cifra con mejor ICC), o prefieres usar las tres y reportar un rango en vez de comprometerte a una? No se aplica a ningún archivo de almacenamiento (`references.bib`, el `.tex`, `GUIA_INTERPRETACION.md` de `POTENCIA_EQUIVALENCIA/` o `INCERTIDUMBRE/`) hasta que confirmes.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+### P-19 · Candidato E (presupuesto de incertidumbre ISO 5725/GUM extendido a cinemática) — ¿evaluamos ahora? ✅ APROBADO Y CONSTRUIDO
+
+```
+✍️ TU RESPUESTA
+si , no depende de nada , me gustaria ir avanzando en todo lo posible, ya que los datos reales van a demorar entonces , si avanzamos hasta que se obtenga los datos nuevos, una vez que los datos de interes y con el comite de eticaaprobado  encontramso una falla podemos solucionarlo rapidamente 
+```
+
+✅ **CERRADA 17-ago-2026 — construido el mismo día que se aprobó.** Ver §5 para el resumen; detalle completo en `CODIGOS/INCERTIDUMBRE/GUIA_INTERPRETACION.md`.
+
+---
+
 ## 5 · Preguntas cerradas
 
 *(Se conservan con su respuesta para no volver a abrirlas. Cuando una de §4 se cierra, baja aquí.)*
@@ -531,6 +636,14 @@ Búsqueda exhaustiva no encontró artículo completo de reemplazo — el campo e
 
 Confirmado que 1994 y 2023 hablan del mismo tema (revisión técnica, no cambio de alcance); la 1994 está retirada en iso.org. `references.bib` actualizado a la edición 2023.
 
+### P-15 — Chequeo de los 3 bloqueos, sin novedades (17-ago-2026)
+
+RPi-ESP32 sigue sin integrarse (~25-ago estimado) · ética sin respuesta, comité era el 18-ago · iSen probando desplazamiento con datos crudos, sin cerrar. No cambia el rumbo (P-7 sigue vigente), pero el comité de ética pasa a vigilarse de cerca por haberse cumplido la fecha estimada sin confirmación.
+
+### P-19 — Candidato E aprobado y construido (17-ago-2026)
+
+`CODIGOS/INCERTIDUMBRE/PresupuestoIncertidumbre_Core.m` — presupuesto de incertidumbre GUM/ISO 5725 (ley de propagación de incertidumbre, Welch-Satterthwaite, factor de cobertura exacto), genérico, con `Test_PresupuestoIncertidumbre.m` (7 pruebas) y `GUIA_INTERPRETACION.md`. Sin correr todavía en MATLAB/Octave. Queda pendiente qué cifra de Piche 2022 usar como componente de instrumento — misma decisión que P-18, sin cerrar.
+
 El historial de las decisiones anteriores a esta sesión está en `../CLAUDE.md` y en `ESTADO_Y_RUMBO.md`.
 
 ---
@@ -569,6 +682,15 @@ Cada decisión cerrada aquí, con **dónde** se volcó. Esta tabla es el puente 
 | 13-ago | **R4 (Sudeesh 2024) texto completo — intentado, sigue bloqueado** por 403 de ScienceDirect sin acceso institucional | `referencias_verificadas.md` — **requiere acceso PUCP del usuario** |
 | 13-ago | **Alessandro descartado del artículo (P-12)** — terminó su tarea, ya no se usa en este ciclo | `equipo/tarea_alessandro.md` (marcada cerrada) · `../CLAUDE.md` |
 | 13-ago | **`Test_Procesar_Multisujeto.m` confirmado 7/7 PASS (P-13)** | `ESTADO_Y_RUMBO.md` §5 · `../CLAUDE.md` |
+| 16-ago | **Auditoría del proyecto contra disco (§4-bis):** inconsistencia real encontrada y corregida — 5.2 del `.tex` seguía en el modelo viejo de 3 fuentes con `PENDIENTE` de m_eje ya descartado, mientras Discussion/Limitations ya tenía el modelo correcto de 2 fuentes. `.tex` alineado; fila obsoleta de "pesar el ensamblaje" tachada en `plan_trabajo_5_semanas_articulo_Q2.md` | `manuscrito_JTEHM.tex` §5.2 (Two-Stage, ya no Three-Stage) · `plan_trabajo_5_semanas_articulo_Q2.md` (Semana 1) |
+| 16-ago | **Tarea 9 de `ESTADO_Y_RUMBO.md` §5 hecha:** segunda búsqueda independiente confirma que no existe revisión sistemática de bancos robóticos de marcha para prótesis — refuerza (sin cambiar) la Limitation #5 ya redactada | `ESTADO_Y_RUMBO.md` §5 (tarea 9 marcada hecha) |
+| 16-ago | **5 preguntas nuevas abiertas (P-15 a P-19)** — chequeo de bloqueos (5 días después de P-1, comité de ética en 2 días), caveat de los 86 kg (P-10), R4 texto completo, margen TOST + tamaños de efecto de potencia, candidato E | `DISCUSION_Q2.md` §4-ter |
+| 16-ago | **CRediT: verificado que la página oficial de "Instructions for Authors" de JTEHM no menciona ningún requisito de CRediT/Author Contributions** — no confirma el portal de envío, pero no hace falta reservar espacio en el `.tex` por ahora. Resuelto sin necesitar al usuario | `creditos_autoria_borrador.md` punto 1 |
+| 17-ago | **P-15 cerrada: chequeo de los 3 bloqueos, sin cambios** — RPi-ESP32 sin integrar (~25-ago), ética sin respuesta (comité 18-ago), iSen probando desplazamiento. Comité de ética pasa a vigilar de cerca | `DISCUSION_Q2.md` §1 (tablero O5) |
+| 17-ago | **P-16 aclarada, no cerrada del todo:** fuerza cruda confirmada real (AMTI), 86 kg no confirmado explícitamente como peso real — deja de ser bloqueante porque el `.txt` crudo permite recalcular %BW después | `../CLAUDE.md` (caveat ya anotado) · `ESTADO_Y_RUMBO.md` §O4 |
+| 17-ago | **P-17: link de acceso a Sudeesh 2024 (R4) entregado** — DOI y URL de ScienceDirect, instrucciones de acceso PUCP. Sigue esperando el PDF | `DISCUSION_Q2.md` §4-ter |
+| 17-ago | **P-18: respaldo de literatura encontrado para margen TOST y tamaños de efecto** — RMSD de Piche 2022 por articulación (rodilla 3.3°/tobillo 5.6°/cadera 7.3°), más fuerte que buscar un MDC externo porque es el instrumento exacto del proyecto. Decisión de qué articulación usar queda pendiente de tu confirmación — comparte pregunta con P-19/candidato E | `DISCUSION_Q2.md` §4-ter — **no aplicado a `references.bib` ni a las guías todavía** |
+| 17-ago | **P-19 aprobada y candidato E construido el mismo día:** `PresupuestoIncertidumbre_Core.m` (GUM/ISO 5725, ley de propagación de incertidumbre, Welch-Satterthwaite, factor de cobertura exacto), `Test_PresupuestoIncertidumbre.m` (7 pruebas), `GUIA_INTERPRETACION.md` | `CODIGOS/INCERTIDUMBRE/` (nueva carpeta) · `docs/codigos/INDICE_CODIGOS.md` §7 · `ESTADO_Y_RUMBO.md` §6 — **sin correr todavía en MATLAB/Octave** |
 
 ---
 

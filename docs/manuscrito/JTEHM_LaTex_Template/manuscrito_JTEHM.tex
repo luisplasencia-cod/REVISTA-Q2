@@ -284,22 +284,34 @@ the simulator against a fixed load cell, sampled at 1000\,Hz.
 % [PENDIENTE: confirmar orientacion cruda vs. angulo articular calibrado
 % -- resultado del piloto en curso. Ver docs/literatura/postprocesado_datos_crudos_IMU.md.]
 
-\subsection*{Vertical Force Overestimation: A Three-Stage, Decoupled Explanation}
+\subsection*{Vertical Force Overestimation: A Two-Stage, Decoupled Explanation}
 
 Because the moving assembly is not a single rigid body --- a stationary
 electronic control board is mounted on one side of the frame, while
 three independently actuated axes (horizontal, vertical, sagittal) each
 carry their own kinematic chain on the other --- vertical force
-overestimation is decomposed into three independent, sequentially
-corrected sources rather than a single inertial term: (1) a fixed
-vertical datum offset, calibrated once against an independent static
-load reference and held constant across all trials; (2) command-to-encoder
-tracking fidelity per axis, isolating mechanical/control error from the
-remaining sources; (3) an axis-wise inertial correction, using the mass
-that actually accelerates with each motor according to the real
-mounting order of the kinematic chain, benchmarked against published
-prosthetic gait GRF data.
-% [PENDIENTE: fuente de m_eje sin resolver -- CAD vs. renunciar al termino y declararlo limitacion]
+overestimation is decomposed into two sequentially corrected sources
+rather than a single inertial term: (1) a fixed vertical datum offset,
+calibrated by sweeping the trajectory's starting height against an
+independent static load reference; and (2) command-to-encoder tracking
+fidelity per axis, isolating mechanical/control error from the
+remaining source. Because the moving assembly's weight is not
+uniformly distributed across its frame, an axis-wise inertial term
+computed a priori from a measured or CAD-derived mass was judged
+unreliable; instead, the portion of the residual attributable to
+inertial effects (beyond what datum compression explains) is inferred
+directly from the same height-sweep curve used to calibrate the datum
+offset (1), rather than isolated as an independent, a-priori-known
+mass term. Both stages are benchmarked against published prosthetic
+gait GRF data.
+% [RESUELTO 13-ago-2026, ver DISCUSION_Q2.md P-5: m_eje no se mide (ni
+% CAD ni pesaje, por distribucion no uniforme del peso del ensamblaje)
+% -- se infiere indirectamente del barrido de alturas de offset (1),
+% fusionando lo que antes eran items (1) y (3) en un solo ensayo
+% empirico. El aislamiento exacto inercia-vs-offset residual queda
+% como limitacion declarada, no como separacion perfecta. Sigue
+% bloqueado por la integracion Raspberry Pi-ESP32 -- sin datos reales
+% todavia.]
 
 \subsection*{Experimental Protocol}
 % [PENDIENTE: depende de si llego la aprobacion de etica y del numero final de sujetos]

@@ -24,9 +24,9 @@
 **Lo único ya confirmado:** Luis Marcos Plasencia Janampa es el autor de correspondencia (`DISCUSION_Q2.md` P-8, 13-ago-2026), correo `luis.plasencia@pucp.edu.pe`. El resto de la lista de autores, su orden y su afiliación siguen pendientes — el usuario los dará "cuando sea indispensable".
 
 **Cómo usar esto cuando llegue el momento:**
-1. Confirmar si JTEHM pide CRediT en el manuscrito, en el portal de envío, o no lo pide — revisar la página de envío de la revista, no asumir.
+1. ~~Confirmar si JTEHM pide CRediT en el manuscrito, en el portal de envío, o no lo pide~~ — **verificado 16-ago-2026:** la página oficial "Instructions for Authors" de JTEHM (embs.org/jtehm/instructions-for-authors/) **no menciona ningún requisito de CRediT ni de "Author Contributions"** en ningún lugar del texto (se revisaron abstract estructurado, index terms, impact statement y secciones del manuscrito — nada sobre esto). **No confirma del todo** que el portal de envío (ScholarOne u otro sistema, al que no se tiene acceso) no lo pida por separado — eso solo se sabe al momento de enviar. Con esto, **no hace falta reservar espacio para una sección de CRediT en el `.tex`** salvo que el portal lo exija después.
 2. Completar la columna "Quién" con nombres reales.
-3. Si va en el `.tex`, agregar como sección `\section*{Author Contributions}` antes de Acknowledgment, formato: "X.Y. conceived the study; A.B. developed the software; ..." (formato de frase, no tabla, es la convención habitual en IEEE).
-4. Si va en el portal, exportar esta tabla tal cual.
+3. Si el portal de envío llegara a pedirlo pero no en el manuscrito: exportar esta tabla tal cual.
+4. Si en algún momento se confirma que sí va en el `.tex` (poco probable según el punto 1): agregar como sección `\section*{Author Contributions}` antes de Acknowledgment, formato: "X.Y. conceived the study; A.B. developed the software; ..." (formato de frase, no tabla, es la convención habitual en IEEE).
 
 **Trazabilidad:** este documento es una tarea del candidato de trabajo adelantado ("qué podemos ir haciendo para ahorrar tiempo después") pedida por el usuario el 13-ago-2026 — no es una decisión aplicada al manuscrito todavía.
