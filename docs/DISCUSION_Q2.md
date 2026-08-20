@@ -39,7 +39,9 @@
 
 > 🚨 **CAMBIO DE RUMBO CERRADO (19-ago-2026) — ver P-20 en §4-quater.** El artículo reemplaza por completo el enfoque anterior: ya no es fidelidad de seguimiento multi-sujeto, es generación propia de trayectoria desde antropometría, validada contra bases de datos independientes (preferencia: peruanas/sudamericanas). **El tablero de abajo describe el artículo ANTERIOR — queda como historial, no como estado vigente**, hasta que se rehaga con el nuevo alcance.
 >
-> ⬜ **P-22 pendiente (§4-sexies, 20-ago-2026):** cerrando la última ambigüedad de alcance — confirmar si el banco físico puede ejecutar/medirse a sí mismo sin sujeto humano (sin ética) o si el artículo es 100% computacional. También ahí: 6 candidatos de algoritmo en secciones individuales, listos para revisar uno por uno.
+> 🟡 **P-22 parcial:** fase actual 100% computacional (generar + comparar contra base de datos), demostración física del banco queda diferida a decidir más adelante, no descartada.
+>
+> 🚨 **P-23 pendiente (§4-sexies, 20-ago-2026) — LA PREGUNTA MÁS IMPORTANTE ABIERTA AHORA MISMO.** Tus respuestas a los candidatos 2, 3 y 4 sugieren querer construir/entrenar un método propio combinando varios, no solo adoptar uno publicado tal cual. Cambia el rigor exigido, el tamaño de muestra necesario y el tiempo — hay que decidirlo antes de seguir avanzando en cualquier otra cosa del algoritmo.
 >
 > 📍 **Dónde contestar ahora mismo (20-ago-2026):** todo lo pendiente vive en **§4-sexies**, un poco más abajo en este mismo archivo — busca "4-sexies" (Ctrl+F). Ahí están: (1) las 2 preguntas de P-22, (2) las 6 secciones de candidato de algoritmo, cada una con su propio bloque `✍️`. No hace falta responder todo de una vez — cada bloque es independiente. **Dónde está el avance hacia Q1/Q2:** `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md`, sección **§13 "Tablero cuantificado"** — tiene el puntaje (29/100 al 05-ago) y qué falta para subir. Ese puntaje se recalcula apenas cierre P-22 (ver nota en §4-sexies).
 
@@ -678,7 +680,7 @@ Tres caminos, y no los elijo por cuenta propia porque cambian qué tan fuerte qu
 
 ## 4-sexies · Aclaración de alcance + candidatos de algoritmo en secciones (20-ago-2026)
 
-### P-22 · Cerrando la ambigüedad de una vez — CERO mediciones de personas, en cualquier nivel ⬜
+### P-22 · Cerrando la ambigüedad de una vez — CERO mediciones de personas, en cualquier nivel 🟡 PARCIAL
 
 Dijiste que estaba entendiendo mal dos cosas. Las fijo aquí, explícitas, para que no quede espacio a interpretación en ningún archivo:
 
@@ -688,6 +690,40 @@ Dijiste que estaba entendiendo mal dos cosas. Las fijo aquí, explícitas, para 
 ```
 ✍️ TU RESPUESTA
 Si medir personas queda fuera , nuesta idea es poder ejecutar nnuestro algoritmo y compararlo con base de datos publicas, la manera de como vamos a obtener expeirmentalmente el angulo y las trayectorias ya lo podemos ver despues 
+```
+
+🟡 **PARCIAL 20-ago-2026.** Confirmado sin ambigüedad: **medir personas queda fuera**, y el diseño inmediato es generar con el algoritmo y comparar contra bases de datos públicas — eso ya es una decisión cerrada. Lo que queda **deliberadamente diferido, no decidido todavía** (tus palabras: "la manera de cómo vamos a obtener experimentalmente el ángulo y las trayectorias ya lo podemos ver después"): si más adelante se agrega una demostración física del banco ejecutando la trayectoria (sin persona, solo hardware + iSen midiéndose a sí mismo). **Consecuencia práctica para ahora mismo:** la fase actual del artículo es **puramente computacional** — generar + comparar contra base de datos, sin tocar el simulador físico. Eso es lo que uso para evaluar revista y para el tablero de Q1/Q2. Si el equipo decide después sumar la demostración física, se reevalúa en ese momento sin tener que deshacer nada de esta fase.
+
+### P-23 · Hallazgo importante en tus respuestas — ¿adoptar un método tal cual, o construir uno propio combinando varios? 🚨 NUEVA, necesito que la cierres antes de avanzar más
+
+Al leer tus respuestas a los candidatos 2, 3 y 4 aparece algo que no estaba en el plan escrito hasta ahora, y que cambia el peso técnico del artículo de forma real — no lo aplico sin que lo confirmes:
+
+- **Candidato 2 (Yun/GPR):** pediste identificar qué parámetros de los 14 "influyen con mayor peso" para poder "complementarlos con otros".
+- **Candidato 3 (Moissenet):** dijiste textualmente **"el argumento no es solo adoptar un método publicado sin poder recopilar métodos y poder generar el nuestro"** — y que un modelo simple no ayuda a "identificar qué parámetros son los que más influyen".
+- **Candidato 4 (Semwal/LSTM+CNN):** preguntaste si el equipo podría **"integrar un algoritmo o entrenar una red neuronal"** propia.
+
+Las tres apuntan en la misma dirección: **no adoptar un modelo publicado sin tocarlo, sino comparar varios, identificar qué parámetros importan más, y construir/entrenar un método propio** (posiblemente combinando ideas de los seis candidatos). Eso es **distinto** de lo que dice el plan vigente hoy (`analisis_escalamiento_Q1_generador_trayectorias.md` §2.1 y §7.2): *"si los modelos se usan tal como están publicados, sin reajustar coeficientes, no hay entrenamiento — y todo el argumento de necesitar 30-40 sujetos desaparece [...] en el momento en que se ajuste aunque sea un parámetro con datos propios, vuelve la circularidad, vuelve el LOSO obligatorio y vuelve el requisito de n alto."*
+
+**Qué implica en la práctica si el equipo sí quiere construir/entrenar su propio método (no solo adoptar uno):**
+
+| | Adoptar tal cual (plan de agosto) | Construir/entrenar propio (lo que sugieren tus respuestas) |
+|---|---|---|
+| **Qué se reclama como aporte** | La reducción a 3 DOF (§5) + el contraste experimental de métodos ajenos | Un método de generación propio, más la reducción a 3 DOF — aporte más grande |
+| **Datos necesarios** | Solo para validar (comparar contra base de datos) | Datos para **entrenar** + datos separados para **validar** (no pueden ser los mismos, o es circular) |
+| **Validación cruzada** | No obligatoria | **LOSO obligatoria** (dejar-un-sujeto-fuera) si se ajusta cualquier coeficiente con datos propios |
+| **Tamaño de muestra** | La base de datos de validación alcanza (Camargo: 22, Hood: 18) | Bases de ~20 sujetos son **insuficientes para entrenar** con garantías — la literatura de agosto (§4.1) usa 10-113 sujetos según el método, y advierte que reentrenar necesita 30-40 |
+| **Nivel de rigor exigido por un revisor** | Moderado — "adoptamos y validamos" es una afirmación defendible con poco | Alto — cada elección de arquitectura/hiperparámetro necesita justificación y, si se puede, ablación |
+| **Tiempo** | Semanas | Meses — entrenar y ajustar un modelo propio de forma defendible no es rápido |
+
+**No es que una opción sea "mejor" — es que son dos artículos distintos**, con exigencias de rigor y de tiempo muy distintas, y afecta directo la revista y el checkpoint del 14-set. Antes de seguir necesito que elijas (o algo intermedio, dilo con tus palabras):
+
+- **(a) Adoptar tal cual** uno de los 6 candidatos, sin reentrenar — más rápido, aporte más acotado (la reducción a 3 DOF es lo que carga la novedad).
+- **(b) Construir/entrenar un método propio**, informado por comparar los 6 candidatos y sus parámetros más influyentes — más lento, pero aporte más fuerte y más cerca de justificar Q1.
+- **(c) Híbrido:** adoptar uno como base (ej. Koopman) y **extenderlo** de forma acotada y justificada (ej. agregar 1-2 parámetros más, no reentrenar todo desde cero) — un punto medio real, no solo "un poco de cada uno".
+
+```
+✍️ TU RESPUESTA
+
 ```
 
 ### Aclaración técnica (20-ago-2026) — no es una pregunta nueva, ya estaba resuelta en el diseño
@@ -718,7 +754,7 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 ```
 ✍️ TU RESPUESTA
-
+Podriamos complementar parametros
 ```
 
 #### Candidato 2 — Yun, Kim, Shin, Lee, Deshpande & Kim 2014 (*J Biomech*, Gaussian Process Regression)
@@ -733,7 +769,7 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 ```
 ✍️ TU RESPUESTA
-
+Es trabajoso reunir pero debe de haber paramettros que influyan con mayor peso y faciles de obtener y poser analizar que usan para generar esas trayectorias y complementarlas con otros
 ```
 
 #### Candidato 3 — Moissenet, Leboeuf & Armand 2019 (*Scientific Reports*, regresión múltiple)
@@ -748,6 +784,7 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 ```
 ✍️ TU RESPUESTA
+O sea el argumento no es solo adoptar un metodo publciado sin poder recopialr metodos y poder generar el nuestro , por eso se queire valdidar neustro metodo junto a  nuestro simulador. Y este que es simple no spuede ayuadr a identificar que parametrs son los que mas influyen , ya que deberia haber una razon por la cual una referenic usa 14 parametros y esta menos
 
 ```
 
@@ -763,7 +800,7 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 ```
 ✍️ TU RESPUESTA
-
+claro , nosotros podriamos integrar un algoritmo o entrengar un red neuroanl? que tanto nos aleja a nuestro objetivo o como se podria modifcar para poder acercarnos al mismo 
 ```
 
 #### Candidato 5 — Xin, Li, Qin, Liu, Wang, Luo, Zhuang & Zhou 2025 (*Electronics*, GPR + series de Fourier)
@@ -778,7 +815,7 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 ```
 ✍️ TU RESPUESTA
-
+Claro eso tmb es importante tener la longitud de ciertas partes para poder gnerar la trayectoria ya que finalmente se va a comapra con base de datos que tiene una longitud o parametros definidos y si en un futuro queiro probarlo con personas puedo hacer yo las medicioens y comprobar ya que tmb se espera que sea preciso 
 ```
 
 #### Candidato 6 — Zhao, Wei, Xie, Liu, Qu, Cao, Ding & Liao 2026 (*PLOS ONE*)
@@ -793,7 +830,7 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 ```
 ✍️ TU RESPUESTA
-
+Claro precedeciir GRF tmb tengo que incluirlo ya que con esto puedo dar una mejor aporte cientifico , algunos deficinion matetcmias tal vez no las entienda muy bien pero eso no sngifca que no s limitemos la idea es que pueda aprenderlo para poder explicarlo cuando me pregunten que es lo que estoy tratando de construir o impleemetnar 
 ```
 
 **Mi orden de preferencia, si tuviera que recomendar uno hoy:** 1 (Koopman) por adopción y simplicidad, luego 6 (Zhao) por integración directa con el código ya construido y por cubrir Fz también, luego 2 (Yun/GPR) por la incertidumbre explícita. Pero es tu decisión y la del equipo — por eso están separados, para que cada uno se pueda aceptar, descartar o dejar en duda de forma independiente.
