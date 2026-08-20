@@ -1,5 +1,9 @@
 # Guía de interpretación — Potencia a priori y TOST
 
+> 🟢 **Herramienta reutilizable tras el pivote (19-ago-2026) — ver `docs/codigos/INDICE_CODIGOS.md`.** El diseño sin circularidad del nuevo enfoque (validar contra datos que no entrenaron el algoritmo, `analisis_escalamiento_Q1_generador_trayectorias.md` §7.2) es exactamente donde TOST importa más — sigue aplicando, solo cambia el N disponible (ya no 15-50 sujetos propios, sino el tamaño de la base de datos externa elegida).
+
+
+
 **Para quién es este documento:** para leer el reporte de consola y las figuras de `PotenciaApriori_Core.m` y `TOST_Core.m` sin tener que recordar estadística de memoria, para saber qué decisiones metodológicas quedan tomadas de fábrica (y cuáles hay que ajustar con datos reales), y para tener listo el texto de respaldo para Métodos/Resultados. Construido el 13-ago-2026 a partir de los candidatos **A** (potencia a priori) y **B** (TOST) aprobados en `docs/DISCUSION_Q2.md` P-3.
 
 ---

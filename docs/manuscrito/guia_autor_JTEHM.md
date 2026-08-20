@@ -1,5 +1,7 @@
 # Guía de autor — IEEE JTEHM (Journal of Translational Engineering in Health and Medicine)
 
+> 🚨 **REVISTA REABIERTA — 19-ago-2026.** El pivote de enfoque (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20) dejó la revista **sin decidir** — puede seguir siendo JTEHM (Q2) o moverse a algo tipo IEEE TNSRE (Q1), según lo que recomendaba `planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` §11. Esta guía se conserva íntegra por si JTEHM se reconfirma, pero **no asumir que aplica** hasta que se cierre la decisión de revista.
+
 **Estado:** revista **decidida** el 03-ago-2026, vigente hasta que se diga lo contrario (ver `CLAUDE.md`). Quinta y última vuelta de la decisión de revista de esta sesión — reemplaza POI, Bioengineering y Prosthesis, evaluadas antes en la misma sesión.
 
 **Actualizado 03-ago-2026 (misma sesión, más tarde) contra la plantilla oficial real** que el usuario descargó de IEEE (`docs/manuscrito/JTEHM_LaTex_Template/`) — corrige dos cosas que la página pública de instrucciones no dejaba claras o decía distinto. Ver el detalle en las secciones 3 y 4 de abajo, marcado explícitamente dónde cambió.

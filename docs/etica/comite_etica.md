@@ -1,5 +1,7 @@
 # Redacción para el comité de ética — instrumentación y datos
 
+> 🚨 **SUPERADO por el pivote — 19-ago-2026.** El protocolo de ética descrito aquí (captura de sujetos nuevos, recaptura con iSen) queda **abandonado como plan vigente** — el nuevo enfoque (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20) valida contra bases de datos públicas ya existentes, no contra sujetos propios capturados bajo este protocolo. Se conserva por si se retoma la captura de sujetos en el futuro (p. ej. si se decide más adelante complementar con datos propios), pero **no es una tarea activa del ciclo actual**.
+
 ## Párrafo de instrumentación (pegar en metodología del protocolo)
 
 Se podrá emplear uno o más de los siguientes instrumentos de captura, de forma individual o combinada, según la etapa de validación técnica del sistema y la disponibilidad de cada uno en el momento de la sesión:

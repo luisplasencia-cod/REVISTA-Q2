@@ -1,5 +1,9 @@
 # Guía de interpretación — SPM1D y Bland-Altman
 
+> 🟢 **Herramienta clave tras el pivote (19-ago-2026) — ver `docs/codigos/INDICE_CODIGOS.md`.** `SPM1D_Core.m` es justo el motor que ya usa el candidato de algoritmo más fuerte encontrado (Zhao et al. 2026, `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` §4.1) — se reutiliza directo para comparar la trayectoria generada contra sujetos/bases de datos externas.
+
+
+
 **Para quién es este documento:** para leer el reporte de consola y las figuras que producen `SPM1D_Core.m` y `BlandAltman_Core.m` sin tener que recordar estadística de memoria, y para saber exactamente en qué comparación del proyecto aplica cada herramienta y en cuál todavía no. Escrito para ir directo del resultado a saber si es bueno, y para citar el respaldo metodológico en el manuscrito sin rebuscar literatura después.
 
 ---

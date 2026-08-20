@@ -1,5 +1,9 @@
 # Guía de interpretación — Procesamiento multi-sujeto (preparado para 15-20 sujetos)
 
+> 🟢 **Herramienta clave tras el pivote (19-ago-2026) — ver `docs/codigos/INDICE_CODIGOS.md`.** El motor de cálculo por lote se reutiliza tal cual para comparar N sujetos/registros de una base de datos externa (ej. Camargo 2021, 22 sujetos) contra la trayectoria generada — misma estructura de datos, distinto origen de los "sujetos". `Cargar_Sujetos_CSV.m` sí necesitará adaptarse al formato de la base de datos que se elija (`analisis_escalamiento_Q1_generador_trayectorias.md` §4.4-4.5), en vez de al formato de captura con iSen que asumía antes.
+
+
+
 **Para quién es este documento:** para leer la tabla y las figuras que produce `Procesar_Multisujeto_Core.m`, y para entender qué prueba exactamente `Test_Procesar_Multisujeto.m` antes de confiar en el pipeline con datos reales. Escrito antes de tener datos de más de un sujeto — a propósito: el objetivo de esta carpeta es que el día que lleguen 15-20 sujetos nuevos, el análisis esté listo y ya probado, no por construir.
 
 ---

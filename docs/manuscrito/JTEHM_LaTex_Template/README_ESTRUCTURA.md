@@ -1,5 +1,7 @@
 # Carpeta del manuscrito JTEHM — qué es cada archivo
 
+> 🚨 **CONTENIDO DEL `.tex` SUPERADO — 19-ago-2026.** La regla de oro de abajo (`.md` → `.tex`) sigue siendo el flujo de trabajo correcto, pero el contenido actual de `manuscrito_JTEHM.tex` describe el enfoque anterior (fidelidad de seguimiento multi-sujeto), reemplazado por completo — ver banner al inicio de `../../../CLAUDE.md` y `../../DISCUSION_Q2.md` P-20. La plantilla `IEEEJERM.cls` sigue siendo válida solo si la revista se reconfirma como JTEHM (sin decidir todavía, ver `../guia_autor_JTEHM.md`).
+
 **Reorganizado el 05-ago-2026** a pedido del usuario, para distinguir de un vistazo **qué es borrador y qué es lo final que va a Overleaf**.
 
 ## Regla de oro

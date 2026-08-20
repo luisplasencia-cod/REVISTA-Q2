@@ -1,5 +1,9 @@
 # Guía de interpretación — Validación clásica (RMSEnorm, r, %±1SD, ROM, CMC, ICC)
 
+> 🟡 **Relevancia parcial tras el pivote (19-ago-2026) — ver `docs/codigos/INDICE_CODIGOS.md`.** `Validacion_Plataforma.m`/`Validacion_Fuerza.m` son específicos del flujo de captura Kinovea/iSen, ahora sin plan vigente — quedan como referencia, no se ejecutan de nuevo. `Calcular_Metricas_Curva.m` (las fórmulas extraídas) sí se sigue reutilizando en `MULTISUJETO/` bajo el nuevo enfoque.
+
+
+
 **Para quién es este documento:** para leer la tabla semáforo que producen `Validacion_Plataforma.m` y `Validacion_Fuerza.m` (los scripts que ya reportaron los resultados de la conferencia) sin tener que recordar estadística de memoria, y para entender qué es `Calcular_Metricas_Curva.m` — el archivo nuevo que extrae esas mismas fórmulas para que las reutilice `CODIGOS/MULTISUJETO/`.
 
 **Por qué esta guía se escribe recién ahora:** `VALIDACIONES/` es la carpeta más antigua del proyecto — las fórmulas que contiene son la base de todo lo demás (`CALIBRACION/` y `ESTADISTICA/` las dan por conocidas), pero nunca tuvo su propia guía. Con `CODIGOS/MULTISUJETO/` reutilizándolas directamente, ya no puede quedar sin explicación.

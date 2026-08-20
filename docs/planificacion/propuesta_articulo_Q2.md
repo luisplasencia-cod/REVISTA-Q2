@@ -1,5 +1,7 @@
 # Propuesta del artículo Q2 — Simulador de marcha 3-DOF
 
+> 🚨 **SUPERADO por el pivote — 19-ago-2026.** La propuesta de fondo (argumento central, revista, objeciones anticipadas) describe el enfoque de fidelidad de seguimiento multi-sujeto, reemplazado por completo (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20). El nuevo argumento central (generación de trayectoria desde antropometría, validada contra bases de datos independientes) todavía no tiene su propia propuesta escrita — el material más cercano hoy es `analisis_escalamiento_Q1_generador_trayectorias.md`. Esta propuesta se conserva como referencia de estilo/estructura de lo que un documento de este tipo necesita cubrir, no como contenido vigente.
+
 **Rol de este documento:** propuesta de fondo, escrita desde la perspectiva de un revisor/editor de revista Q2 en ingeniería biomédica, para alinear al equipo antes de escribir una sola línea del manuscrito. No es el manuscrito — es el "por qué así" detrás de cada decisión de metodología, resultados y narrativa. Se apoya en `plan_trabajo_5_semanas_articulo_Q2.md` (misma carpeta), `../etica/comite_etica.md` y `../equipo/tarea_alessandro.md`, y no repite lo que ya está decidido ahí (ver `../../CLAUDE.md`).
 
 ---

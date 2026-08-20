@@ -1,5 +1,7 @@
 # Normas ISO relevantes para la validación del artículo Q2
 
+> 🟢 **Sigue vigente tras el pivote — 19-ago-2026.** El vocabulario de ISO 5725 y el marco estadístico (ICC, Bland-Altman, SPM) no dependen de qué se compare — siguen aplicando para validar la trayectoria generada contra sujetos/bases de datos externas (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20). ISO 10328 (referencia de magnitud de carga) queda con la misma relevancia incierta que el resto de la literatura de Fz, ver `literatura_GRF_protesica.md`.
+
 **Para quién es este documento:** evalúa, con búsqueda verificada (no de memoria), qué normas ISO pueden reforzar legítimamente la sección de Métodos del artículo — y deja explícito qué NO aplica, para no sobrevender una cita ante un revisor que sí conozca la norma.
 
 **Conclusión corta:** no existe una norma ISO dedicada a "validar un sistema de captura de movimiento" o "validar un simulador de marcha" — ese hueco lo llenan ICC, Bland-Altman y SPM (Nichols & Holmes 2002; Koo & Li 2016; Bland & Altman 1999), que el proyecto ya implementa (ver `CODIGOS/ESTADISTICA/GUIA_INTERPRETACION.md` y `CODIGOS/VALIDACIONES/GUIA_INTERPRETACION.md`). Lo que sí aporta la ISO es **vocabulario formal** (ISO 5725) y **una referencia de magnitud de carga** (ISO 10328) — ninguna reemplaza el diseño estadístico ya elegido.

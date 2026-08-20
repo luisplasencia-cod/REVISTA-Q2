@@ -1,5 +1,9 @@
 # Guía de interpretación — Presupuesto de incertidumbre (GUM/ISO 5725)
 
+> 🟢 **Herramienta reutilizable tras el pivote (19-ago-2026) — ver `docs/codigos/INDICE_CODIGOS.md`.** Sigue siendo válida en general; los componentes de incertidumbre concretos (instrumento, calibración) que asumía dependían del flujo de captura con iSen, ahora sin plan vigente — revisar cuando se defina qué se mide físicamente bajo el nuevo enfoque.
+
+
+
 **Para quién es este documento:** para leer el reporte de consola de `PresupuestoIncertidumbre_Core.m` sin tener que recordar la metodología GUM de memoria, para saber qué se le puede pedir a esta herramienta y qué no, y para tener listo el texto de respaldo para Métodos/Discusión. Construido el 16-ago-2026 a partir del **candidato E** (`docs/ESTADO_Y_RUMBO.md` §6), aprobado en `docs/DISCUSION_Q2.md` **P-19** ("no depende de nada, avanzar todo lo posible mientras los datos reales demoran").
 
 ---

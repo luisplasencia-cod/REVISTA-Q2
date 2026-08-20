@@ -1,5 +1,7 @@
 # Revistas candidatas para el artículo Q2 — comparativa y enlaces oficiales
 
+> 🚨 **DECISIÓN REABIERTA — 19-ago-2026.** La "DECISIÓN FINAL: IEEE JTEHM" de abajo quedó fijada para el enfoque anterior. El pivote (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20) reabre la elección de revista — puede seguir siendo JTEHM o moverse a algo tipo IEEE TNSRE (Q1), evaluado en `analisis_escalamiento_Q1_generador_trayectorias.md` §11. Las métricas/comparativas de este documento siguen siendo un buen punto de partida, pero **no dar la decisión por cerrada** hasta que se confirme de nuevo.
+
 Métricas verificadas el 31-jul-2026 y 03-ago-2026 (JCR/Scopus más recientes disponibles). Detalle de la justificación completa en `propuesta_articulo_Q2.md`, sección 3.
 
 ## DECISIÓN FINAL: IEEE JTEHM (03-ago-2026, sexta y última vuelta de esta sesión)

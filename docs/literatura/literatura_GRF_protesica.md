@@ -1,5 +1,7 @@
 # Literatura de referencia — GRF vertical en marcha protésica transtibial
 
+> 🟡 **Relevancia incierta tras el pivote — 19-ago-2026.** Este benchmark se construyó para la sección de corrección de Fz del artículo anterior (comparaciones simulador-vs-referencia con CSV pregrabado). Con el nuevo enfoque (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20), la relevancia depende de si el algoritmo de generación adoptado también predice GRF (el candidato Zhao et al. 2026 sí lo hace, ver `planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` §4.1) — si es así, este benchmark vuelve a ser útil tal cual. No se descarta, se re-evalúa cuando se decida el algoritmo final.
+
 **Para qué se usa:** benchmark de la sección 5 del artículo (Fz cruda vs. corregida vs. literatura). Búsqueda hecha el 31-jul-2026 con `exa` (web search académico). No sustituye una revisión sistemática — es el punto de partida para el benchmark cuantitativo de Fz.
 
 **Corrección importante sobre un supuesto previo:** en la sesión se había usado 100-120%BW como techo "típico" de vGRF para juzgar si el simulador sobreestima. Esta búsqueda muestra que ese número es válido solo para marcha a paso normal/cómodo — a paso rápido, o comparando el lado sano de amputados transtibiales, los picos reportados en literatura llegan a 150-170%BW. Cualquier benchmark que se use en el artículo debe estar igualado en velocidad y lado (protésico vs. sano) al protocolo real del simulador, no un número único genérico.
