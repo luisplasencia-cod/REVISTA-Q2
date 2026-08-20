@@ -6,11 +6,29 @@ Este archivo se lee automáticamente al iniciar una sesión de Claude Code en es
 >
 > 🔒 **Si la sesión es sobre el paper de conferencia, el trabajo se limita a esa carpeta:** solo se leen y se escriben archivos dentro de `Articulo de conferencia/`, no se importa ninguna decisión ni plazo ni referencia de este archivo, y no se mezclan los dos artículos en una misma respuesta. La única excepción es **consultar** (nunca modificar) los scripts y datos del repositorio — `CODIGOS/`, `REFERENCIAS/`, `SIMULADOR/`, `PERSONA SANA/` — cuando una observación del revisor exige un dato real que solo está ahí. La regla completa está en `Articulo de conferencia/CLAUDE.md`, sección "🔒 Regla de alcance".
 
+> 🚨 **PIVOTE DE FONDO — 19-ago-2026, decisión de reunión de equipo. Leer esto antes que el resto del archivo.**
+>
+> El artículo **reemplaza por completo** el enfoque descrito en el resto de este documento. Ya no es "el simulador reproduce fielmente una trayectoria pregrabada de múltiples sujetos, medida con iSen". Ahora es: **el simulador genera su propia trayectoria a partir de datos antropométricos (y otros), usando un algoritmo/modelo adoptado de literatura publicada — no creado por el equipo —, y esa trayectoria se valida contra bases de datos públicas independientes** (que no participaron en construir el algoritmo; preferencia declarada por bases de datos de marcha **peruanas o sudamericanas**).
+>
+> **Qué queda abandonado como plan vigente** (no se borra, se conserva como historial más abajo): el protocolo de ética en revisión, la captura de sujetos nuevos, la recaptura vía iSen, y las comparaciones 3/4/6 de fidelidad de seguimiento. Todo lo redactado del manuscrito (Introducción, 5.1-5.4, referencias, Impact Statement) **no se descarta, pero hay que reorientarlo** — no es válido tal cual bajo el nuevo enfoque.
+>
+> **Lo que SÍ sigue vivo:** casi toda la infraestructura de análisis ya construida (`CODIGOS/MULTISUJETO/`, `ESTADISTICA/` [SPM1D], `POTENCIA_EQUIVALENCIA/` [TOST], `INCERTIDUMBRE/`) — se reutiliza para comparar el modelo generado contra sujetos/bases de datos, en vez de comparar el simulador contra un CSV pregrabado.
+>
+> **Documento que pasa a ser el plan vigente:** `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` — hasta el 19-ago era "análisis de consulta para un artículo futuro (2027), no mezclar con este". Ya no aplica esa restricción; léelo, tiene el análisis técnico más completo que existe sobre esta línea (modelos candidatos, diseño de validación sin circularidad, riesgos, compuertas go/no-go).
+>
+> **Qué NO está decidido todavía:** la revista (se evaluará después de "ordenar mejor las ideas" — puede ser Q1 tipo IEEE TNSRE, o quedarse en Q2; ninguna plantilla se aplica sin esta decisión), y cuál algoritmo/modelo adoptar y contra qué base de datos validar — ambos son tareas de búsqueda activa, sin candidato fijo hoy.
+>
+> **Fecha:** sigue siendo referencial (no hay entrega dura), pero hay un checkpoint interno nuevo: **14-set-2026, "buen avance en implementación"** (no el artículo terminado).
+>
+> Detalle completo de la discusión y las respuestas exactas del usuario: `docs/DISCUSION_Q2.md`, P-20 en §4-quater.
+
 ## Qué es el proyecto
 
 Simulador biomecánico de 3 grados de libertad (horizontal, vertical, sagital) para evaluación experimental de prótesis transtibiales, desarrollado en el Laboratorio LIBRA — PUCP. Ya existe un paper de conferencia enviado a IBITeC 2026 ("Simulation-Driven Design and Functional Assessment of a Gait Simulator for Transtibial Prosthesis Evaluation"). El objetivo actual es un artículo nuevo, más profundo, para una revista Q2 — no una copia extendida del de conferencia.
 
 ## Objetivo inmediato y fecha límite
+
+> ⚠️ **Superado en parte el 19-ago-2026 — ver banner de pivote arriba.** El límite duro de 8 páginas de JTEHM ya no aplica necesariamente (revista sin decidir). El checkpoint vigente es **14-set-2026, "buen avance en implementación"** del nuevo enfoque — no una entrega de manuscrito.
 
 **Actualizado 11-ago-2026, decisión del usuario:** la quincena de setiembre 2026 **era una fecha referencial, no dura, y se puede extender de forma considerable.** No se activa ningún plan B de contenido reducido solo por presión de calendario — el camino principal (ver bloqueos abajo) tiene fecha concreta y se sostiene. La cifra "antes del 27-28 de agosto" para cerrar el manuscrito queda como orientación, no como límite estricto. Lo único que sigue siendo techo duro es el límite de **8 páginas de JTEHM** (formato de la revista, no de calendario).
 
@@ -20,6 +38,8 @@ Simulador biomecánico de 3 grados de libertad (horizontal, vertical, sagital) p
 - Alessandro (practicante nuevo, Biomédica): bajo supervisión directa del asesor, cumple su propio plan de trabajo de 16 semanas en paralelo. Su aporte a **este** artículo es acotado (ver más abajo) — el resto de su plan es para un segundo artículo futuro.
 
 ## Decisiones ya tomadas — no reabrir sin una razón fuerte y nueva
+
+> ⚠️ **Historial superado el 19-ago-2026 — ver banner de pivote arriba.** Todo lo que sigue describe el artículo tal como estaba planteado ANTES del cambio radical de enfoque. Se conserva por trazabilidad (regla del proyecto: no se borra, se marca superado), pero **no es el plan vigente** — en particular, la frase "no hay generación algorítmica de trayectorias, esa idea queda para trabajo futuro" (más abajo) es exactamente lo contrario de la decisión actual.
 
 - ~~Kinovea se mantiene activo como respaldo hasta que se demuestre concordancia con el sistema STT-IWS/iSen~~ — **reemplazado el 03-ago-2026, ver decisión "Cambio de foco" abajo: Kinovea queda fuera de este artículo por completo.**
 - **Sistema STT-IWS/iSen** (acceso confirmado y reservado) es, desde el 03-ago-2026, el **único instrumento** de este artículo: captura sujetos nuevos, mide la salida del propio simulador (montado en la plataforma), y recaptura al sujeto de referencia original. Ya no se usa para validación cruzada contra Kinovea ni contra el IMU de Alessandro — ver decisión abajo.

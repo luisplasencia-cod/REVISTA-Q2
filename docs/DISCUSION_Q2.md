@@ -37,6 +37,8 @@
 
 ---
 
+> 🚨 **CAMBIO DE RUMBO CERRADO (19-ago-2026) — ver P-20 en §4-quater.** El artículo reemplaza por completo el enfoque anterior: ya no es fidelidad de seguimiento multi-sujeto, es generación propia de trayectoria desde antropometría, validada contra bases de datos independientes (preferencia: peruanas/sudamericanas). **El tablero de abajo describe el artículo ANTERIOR — queda como historial, no como estado vigente**, hasta que se rehaga con el nuevo alcance.
+
 ## 1 · Tablero de avance
 
 **Global del artículo: 51 %** · `██████████░░░░░░░░░░` *(actualizado 17-ago-2026: candidato E construido, inconsistencia de 5.2 corregida, bloqueos sin cambio)*
@@ -584,6 +586,60 @@ si , no depende de nada , me gustaria ir avanzando en todo lo posible, ya que lo
 
 ---
 
+## 4-quater · CAMBIO RADICAL DE ENFOQUE — decisión de reunión de equipo (19-ago-2026)
+
+**Lo que dijiste:** el equipo se reunió y decide un cambio de enfoque para el artículo: buscar bases de datos públicas, algoritmos/software y patrones ya publicados para generar la trayectoria de marcha que se quiera, integrarlo al simulador para que **él mismo genere su trayectoria** a partir de datos antropométricos (y otros), y validar el resultado contra **otras bases de datos públicas verificadas y más generales — no las que sirvieron para construir el algoritmo.**
+
+**Esto no es una idea nueva — ya existe un análisis completo de exactamente esto**, guardado el 05-ago-2026 y deliberadamente mantenido **fuera** de este ciclo: `planificacion/analisis_escalamiento_Q1_generador_trayectorias.md`. Ese documento:
+
+- Ya identificó 5 modelos publicados de generación de trayectorias desde antropometría (regresión, GPR, splines, LSTM — §4.1), y ya resolvió que adoptar uno sin reentrenar es lo correcto (evita el problema de "necesitamos 40-60 sujetos para entrenar").
+- Ya resolvió **el mismo problema de circularidad que estás planteando ahora**: validar contra sujetos/datos que no se usaron para generar (§7.2, "sin circularidad") — es la misma exigencia que acabas de pedir con otras palabras.
+- Ya identificó el hueco real de literatura tras revisar 3 precedentes cercanos (§4.2): *"no existe generación de trayectorias personalizada por antropometría, ejecutada físicamente en un banco de prótesis, y validada contra los sujetos individuales para los que fue personalizada."*
+- Ya tiene compuertas go/no-go (G1-G6, §13.3) que se pueden resolver **sin un solo sujeto nuevo ni el simulador funcionando** — la más barata cuesta ~1 semana.
+- Ya recomendaba **IEEE TNSRE** (Q1, mismo costo de APC que JTEHM, sin el límite de 8 páginas tan estricto) en vez de JTEHM para este contenido, precisamente porque no cabe en 8 páginas.
+- Estimaba **9-12 meses de trabajo efectivo**, pensado como un **segundo artículo** que arranca después de cerrar este.
+
+### Mi opinión, directa
+
+La dirección técnica es sólida — no es un capricho, tiene un hueco de literatura real y un diseño experimental ya pensado con cuidado (incluida la parte de "sin circularidad" que pediste, que ya estaba resuelta). Y no se pierde el trabajo ya hecho: `MULTISUJETO/`, `ESTADISTICA/` (SPM1D), `POTENCIA_EQUIVALENCIA/` (TOST) sirven tal cual para esta línea también (§7.1 y §2.6 de ese documento lo dicen explícitamente).
+
+**Pero "cambio radical" tiene que resolver tres tensiones concretas antes de que yo toque cualquier archivo de almacenamiento:**
+
+1. **¿Esto reemplaza el artículo actual o lo absorbe como una parte?** Si se fusiona, el argumento central deja de ser "el simulador reproduce fielmente lo que se le graba" y pasa a ser "el simulador genera su propia trayectoria y esta iguala a sujetos reales que no participaron en generarla" — son afirmaciones distintas, no la misma con más datos. La fidelidad de seguimiento (comparaciones 3/4/6 actuales) pasaría a ser un **nivel de validación dentro del diseño nuevo** (nivel C del §7.1 de ese documento), no el resultado principal.
+2. **¿Sigue siendo JTEHM (8 páginas, Q2) o cambia la revista?** Con este alcance (modelo + reducción cinemática §5 + validación en 3 niveles), 8 páginas se quedan cortas — es literalmente lo que ya se había concluido en agosto.
+3. **¿Qué pasa con la fecha?** Ya no estamos hablando de "referencial, extensible" — estamos hablando de una escala de tiempo distinta. Prefiero que lo digas explícito ahora a que se vaya descubriendo en el camino.
+
+### Preguntas necesarias — P-20
+
+```
+✍️ TU RESPUESTA
+1. ¿Reemplaza al artículo actual, o el artículo actual se termina y envía tal cual, y esto es en verdad el "artículo 2" que ya estaba planeado (solo que ahora sí con fecha de arranque, no en 2027)?
+si reempalzamos , ya que ya murio el protocolo , ya murio la toma de datos , ya murio la validacion con los isen , ahora es seguir lo que estba planeado de implementar el algoritmo al simulador y se comeienza eso desde ahora y se deja todo a aparte la cual esto afecta a todo lo que hemos estado trabajando sobre el articulo redacto hasta ahora , las referencias , todo en general hay que orientarlo.
+2. Si reemplaza/absorbe: ¿seguimos en JTEHM con 8 páginas, o nos movemos a IEEE TNSRE (u otra) como ya recomendaba el análisis de agosto?
+hay que primero ordnear mejors todas nuestras ideas para analizar si nos movemos a IEEE TNSRe uy otra si nuestra investigacion esta apta para una Q1 o Q2 o hacer todo lo necesariopara llegar Q1 con el nuevo enfoque que hemos encontrado 
+3. ¿La fecha de envío sigue siendo "referencial, cuando sea" o el equipo ya tiene una nueva expectativa de cronograma con este alcance?
+si , sigue siendo referenicual pero para maximo el 14 de seitiembr se tien que tener u buen avance en implemetnacion no finalizado todo 
+4. Sobre "buscar bases de datos públicas, algoritmos/patrones": ¿ya tienen en mente algo puntual (un dataset, un paper, un método), o es tarea de investigación desde cero? El documento de agosto ya identificó 5 candidatos con parámetros publicados (§4.1) — ¿arrancamos de esa lista o el equipo quiere una búsqueda nueva?
+no tengo nada en mente es lo que quiero dedicerl tiempo ene busqueda o sea analiza si podemos avanzalo en otro .md o actualziar lo que ya tenemos filtra todo lo de este proyecto , hayq ue buscar muchos y los necesarios .
+5. Sobre "validar contra otras bases de datos públicas más generales, no las que sirvieron para el algoritmo": ¿el equipo ya tiene un dataset candidato para esto (ej. una base de marcha pública reconocida), o también es tarea de búsqueda?
+no tenemos nada de base hasta ahroa pero idealmente pueda se base de datos de persoans peruanas o sudamericas para comparar mas que nada ya que el algoritmo al poner talla , peso , sexo ,  y entre otros datos es indpendientmente la region , ya una vez implementado eso se puede comprar con base de datos peruanas o sudadmenticas ya verifcas
+
+```
+
+**No aplico nada a `CLAUDE.md` ni a `ESTADO_Y_RUMBO.md` hasta tener esto** — son decisiones de fondo que cambian el argumento central, la revista y el cronograma del proyecto entero, exactamente el tipo de cosa que la regla de este documento pide discutir antes de aplicar.
+
+✅ **CERRADA 19-ago-2026 — reemplazo total, no fusión.**
+
+1. **Reemplaza por completo al artículo actual, no lo absorbe.** Palabras textuales: "ya murió el protocolo, ya murió la toma de datos, ya murió la validación con los iSen". El camino de fidelidad de seguimiento (comparaciones 3/4/6, protocolo de ética en revisión, piloto de iSen) queda abandonado como plan vigente — no se continúa. El contenido ya redactado (Introducción, 5.1-5.4, referencias, Impact Statement, etc.) **no se descarta**, pero **hay que reorientarlo** a la nueva línea, no darlo por válido tal cual.
+2. **Revista: sin decidir.** Antes hay que "ordenar mejor las ideas" del nuevo enfoque y evaluar si el trabajo califica para Q1 (TNSRE u otra) o si conviene apuntar más conservador. No se fija ninguna revista todavía — **no se aplica ninguna plantilla nueva sin esta decisión**.
+3. **Fecha: sigue referencial, pero con un checkpoint interno nuevo — 14-set-2026, "buen avance en implementación", no el artículo terminado.** Es una fecha de progreso, no de envío.
+4. **Búsqueda del algoritmo/modelo: sin candidato fijo.** El equipo quiere dedicarle tiempo a la búsqueda — no arrancar directo de los 5 candidatos ya identificados en agosto sin más revisión. Pidió explícitamente que se evalúe si conviene actualizar `analisis_escalamiento_Q1_generador_trayectorias.md` (que ya trae esos 5) en vez de partir de cero en un documento nuevo, y que la búsqueda sea amplia ("muchos y los necesarios").
+5. **Base de datos de validación: sin candidato.** Preferencia explícita: **bases de datos de marcha peruanas o sudamericanas verificadas**, ya que el argumento del equipo es que el algoritmo (entrada: talla, peso, sexo, etc.) es independiente de la región — comparar contra una población sudamericana refuerza esa independencia mejor que una base norteamericana/europea genérica. Tarea de búsqueda, nada identificado todavía.
+
+**Consecuencia práctica para todo `docs/`:** `analisis_escalamiento_Q1_generador_trayectorias.md` deja de ser "análisis de consulta para el futuro, no mezclar" y pasa a ser **el plan vigente** de este ciclo. `CLAUDE.md` y `ESTADO_Y_RUMBO.md` necesitan una actualización de fondo, no un parche — ver el registro en §6 de qué se tocó y qué se conservó como historial superado (regla 10: no se borra, se marca superado).
+
+---
+
 ## 5 · Preguntas cerradas
 
 *(Se conservan con su respuesta para no volver a abrirlas. Cuando una de §4 se cierra, baja aquí.)*
@@ -691,6 +747,7 @@ Cada decisión cerrada aquí, con **dónde** se volcó. Esta tabla es el puente 
 | 17-ago | **P-17: link de acceso a Sudeesh 2024 (R4) entregado** — DOI y URL de ScienceDirect, instrucciones de acceso PUCP. Sigue esperando el PDF | `DISCUSION_Q2.md` §4-ter |
 | 17-ago | **P-18: respaldo de literatura encontrado para margen TOST y tamaños de efecto** — RMSD de Piche 2022 por articulación (rodilla 3.3°/tobillo 5.6°/cadera 7.3°), más fuerte que buscar un MDC externo porque es el instrumento exacto del proyecto. Decisión de qué articulación usar queda pendiente de tu confirmación — comparte pregunta con P-19/candidato E | `DISCUSION_Q2.md` §4-ter — **no aplicado a `references.bib` ni a las guías todavía** |
 | 17-ago | **P-19 aprobada y candidato E construido el mismo día:** `PresupuestoIncertidumbre_Core.m` (GUM/ISO 5725, ley de propagación de incertidumbre, Welch-Satterthwaite, factor de cobertura exacto), `Test_PresupuestoIncertidumbre.m` (7 pruebas), `GUIA_INTERPRETACION.md` | `CODIGOS/INCERTIDUMBRE/` (nueva carpeta) · `docs/codigos/INDICE_CODIGOS.md` §7 · `ESTADO_Y_RUMBO.md` §6 — **sin correr todavía en MATLAB/Octave** |
+| 19-ago | **P-20 — CAMBIO RADICAL: el artículo pasa de "fidelidad de seguimiento multi-sujeto" a "generación propia de trayectoria desde antropometría, validada contra bases de datos independientes".** Reemplazo total, no fusión — protocolo de ética, captura de sujetos e iSen quedan abandonados como plan vigente. Revista sin decidir (evaluar Q1/TNSRE vs. mantener Q2). Fecha sigue referencial, con checkpoint interno 14-set-2026 de "buen avance en implementación". Búsqueda de algoritmo y de base de datos de validación (preferencia: peruana/sudamericana) sin candidato fijo — tarea de investigación abierta | `analisis_escalamiento_Q1_generador_trayectorias.md` (pasa de "futuro, no mezclar" a plan vigente) · `../CLAUDE.md` y `ESTADO_Y_RUMBO.md` — **pendiente de actualización de fondo, ver tareas siguientes** |
 
 ---
 
