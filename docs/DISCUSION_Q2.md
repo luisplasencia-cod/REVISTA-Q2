@@ -658,8 +658,10 @@ Tres caminos, y no los elijo por cuenta propia porque cambian qué tan fuerte qu
 
 ```
 ✍️ TU RESPUESTA
-
+ no hay que buscar estudios aunque sea que ppdamso comparar ya que usar los isen necesitamos protoclo de etica y no lo vamos a conseguir por arora
 ```
+
+🟡 **INTERPRETADA, no cerrada del todo — confirma antes de fijarla.** Así la leo: **se descarta (a)** — capturar base propia con iSen — porque necesita protocolo de ética y no se va a conseguir por ahora (coherente con P-20: la ética queda abandonada como plan vigente). En su lugar, **hay que buscar entre estudios ya publicados algo con lo que sí podamos comparar** — o sea, se mantiene la línea de (b)/(c) y se sigue ampliando la búsqueda de datasets públicos en vez de cerrarse a uno solo todavía. Avísame si la lectura es al revés (que preferías no seguir buscando).
 
 ---
 
@@ -772,6 +774,7 @@ Cada decisión cerrada aquí, con **dónde** se volcó. Esta tabla es el puente 
 | 17-ago | **P-19 aprobada y candidato E construido el mismo día:** `PresupuestoIncertidumbre_Core.m` (GUM/ISO 5725, ley de propagación de incertidumbre, Welch-Satterthwaite, factor de cobertura exacto), `Test_PresupuestoIncertidumbre.m` (7 pruebas), `GUIA_INTERPRETACION.md` | `CODIGOS/INCERTIDUMBRE/` (nueva carpeta) · `docs/codigos/INDICE_CODIGOS.md` §7 · `ESTADO_Y_RUMBO.md` §6 — **sin correr todavía en MATLAB/Octave** |
 | 19-ago | **P-20 — CAMBIO RADICAL: el artículo pasa de "fidelidad de seguimiento multi-sujeto" a "generación propia de trayectoria desde antropometría, validada contra bases de datos independientes".** Reemplazo total, no fusión — protocolo de ética, captura de sujetos e iSen quedan abandonados como plan vigente. Revista sin decidir (evaluar Q1/TNSRE vs. mantener Q2). Fecha sigue referencial, con checkpoint interno 14-set-2026 de "buen avance en implementación". Búsqueda de algoritmo y de base de datos de validación (preferencia: peruana/sudamericana) sin candidato fijo — tarea de investigación abierta | `analisis_escalamiento_Q1_generador_trayectorias.md` (pasa de "futuro, no mezclar" a plan vigente) · `../CLAUDE.md` y `ESTADO_Y_RUMBO.md` — **pendiente de actualización de fondo, ver tareas siguientes** |
 | 19-ago | **Búsqueda del pivote — candidato de algoritmo nuevo (Zhao et al. 2026, entrada mínima + código público) y confirmación de que no existe base de datos de marcha peruana/sudamericana pública** — quedan 3 alternativas generales (GaitRec, Camargo, Hood et al. 2020 amputados), decisión de cuál usar pendiente en P-21 | `analisis_escalamiento_Q1_generador_trayectorias.md` §4.1 y §4.4 (nuevo) · `DISCUSION_Q2.md` §4-quinquies |
+| 19-ago | **P-21 interpretada (no cerrada): se descarta capturar base propia (necesita ética), se sigue buscando entre estudios publicados.** Verificación de confiabilidad/adopción de los 9 candidatos (algoritmo + base de datos) contra Semantic Scholar y Crossref — **un error real encontrado y corregido: el DOI de GaitRec apuntaba a otro dataset**; los DOIs de J Biomech 2013/2014 resultaron correctos pese a que una primera pasada los marcó como erróneos (verificado dos veces antes de tocar el archivo). Candidatos con adopción más sólida: Koopman 2014 (algoritmo) y Camargo 2021 (base de datos, 329 citas) | `analisis_escalamiento_Q1_generador_trayectorias.md` §4.4 (DOI corregido) y §4.5 (nuevo, tabla de confiabilidad) |
 
 ---
 

@@ -200,11 +200,37 @@ Alternativas generales, sí verificadas como públicas y activas hoy:
 
 | Dataset | Qué mide | Población | Por qué serviría / por qué no |
 |---|---|---|---|
-| [GaitRec (Horsak et al. 2020, *Scientific Data*)](https://doi.org/10.1038/s41597-020-0563-y) | GRF bilateral, 75,732 ensayos | 211 sanos + 2084 pacientes | Grande y público, pero **solo fuerza, no cinemática articular** — no sirve para validar la trayectoria generada, sí podría servir para la parte de Fz |
-| [Camargo et al. — EPIC Lab, Georgia Tech](https://www.epic.gatech.edu/opensource-biomechanics-camargo-et-al/) | Cinemática 3D completa + sensores, terreno variado | 22 sanos | Bien documentado, repositorio activo — buena opción genérica si no se insiste en sudamericano |
-| **[Hood, Ishmael et al. 2020, *Scientific Data*](https://doi.org/10.1038/s41597-020-0494-7)** | Cinemática y cinética completas, múltiples velocidades | **18 amputados transfemorales reales** | **El más valioso pese a no ser transtibial exacto** — es población protésica real, no sana. Sirve además para acercarse al vacío del §4.1 (no hay generador ajustado a amputados): compararía un modelo entrenado en sanos contra marcha protésica real, que es honestamente lo que este proyecto puede reclamar sin inventar un modelo nuevo |
+| [GaitRec — Horsak et al. 2020, *Scientific Data*](https://doi.org/10.1038/s41597-020-0481-z) *(DOI corregido 19-ago-2026, ver §4.5 — el original apuntaba a un dataset distinto)* | GRF bilateral, 75,732 ensayos | 211 sanos + 2084 pacientes | Grande y público, pero **solo fuerza, no cinemática articular** — no sirve para validar la trayectoria generada, sí podría servir para la parte de Fz |
+| [Camargo, Ramanathan, Flanagan & Young 2021, *Journal of Biomechanics*](https://doi.org/10.1016/j.jbiomech.2021.110320) | Cinemática 3D completa + sensores, escaleras/rampas/nivel | 22 sanos | Bien documentado, el más citado y reutilizado de los tres (§4.5) — buena opción genérica si no se insiste en sudamericano |
+| **[Hood, Ishmael, Gunnell, Foreman & Lenzi 2020, *Scientific Data*](https://doi.org/10.1038/s41597-020-0494-7)** | Cinemática y cinética completas, múltiples velocidades | **18 amputados transfemorales reales** | **El más valioso pese a no ser transtibial exacto** — es población protésica real, no sana. Sirve además para acercarse al vacío del §4.1 (no hay generador ajustado a amputados): compararía un modelo entrenado en sanos contra marcha protésica real, que es honestamente lo que este proyecto puede reclamar sin inventar un modelo nuevo |
 
 **Recomendación con esto:** llevar esta decisión a discusión explícita en `DISCUSION_Q2.md` (P-21) — no se elige por cuenta propia entre "capturar base propia con iSen" vs. "usar Hood 2020 (amputados, no regional)" vs. "usar Camargo (sanos, no regional)" sin que el equipo lo confirme, porque cambia qué tan fuerte es el argumento de independencia regional del artículo.
+
+### 4.5 Verificación de confiabilidad y adopción — 19-ago-2026
+
+El equipo pidió explícitamente que ningún candidato (algoritmo o base de datos) se adopte solo por estar publicado — tiene que haber evidencia de que es **confiable y ha servido a estudios o equipos profesionales reales**, no solo un paper aislado. Verificación hecha en dos pasadas: (1) búsqueda de adopción por terceros vía Semantic Scholar/búsqueda dirigida: (2) **contraverificación directa de cada DOI contra Crossref y la página del editor**, hecha después, porque la pasada 1 reportó dos DOIs como "incorrectos" que al verificarlos resultaron ser correctos — **la única corrección real que sobrevivió fue el DOI de GaitRec en la tabla de arriba** (apuntaba a un dataset distinto, ya corregido). Las citas son de Semantic Scholar, consultadas el 19-ago-2026 — cambian con el tiempo, no son un número fijo.
+
+**Candidatos de algoritmo:**
+
+| Candidato (autor real, verificado) | Venue | Citas | Evidencia de adopción por terceros | Confianza |
+|---|---|---|---|---|
+| Moissenet, Leboeuf & Armand 2019 *(antes "Sci Rep 2019")* | *Scientific Reports* (Nature) | 73 (4 influyentes) | Volumen moderado, sin ejemplos puntuales confirmados en esta pasada | **Media-alta** |
+| Yun, Kim, Shin, Lee, Deshpande & Kim 2014 *(antes "J Biomech 2013" — el año correcto es 2014, el DOI ya estaba bien)* | *Journal of Biomechanics* | 108 (7 influyentes) | Bien establecido en la línea de predicción de marcha por GPR | **Alta** |
+| Koopman, van Asseldonk & van der Kooij 2014 | *Journal of Biomechanics* 47(6):1447-1458 | 87 (8 influyentes) | Confirmado: el enfoque de "eventos clave por regresión" se reutiliza en robots de rehabilitación de marcha posteriores (línea LOPES/LOPES II) | **Alta** — sigue siendo el candidato de partida más defendible (§6) |
+| Semwal, Jain, Maheshwari & Khatwani 2023 *(antes "MTAP 2023")* | *Multimedia Tools and Applications* (Springer) | 59 (9 influyentes — mejor ratio de todos) | Sin ejemplos puntuales confirmados en esta pasada | **Media-alta** |
+| Xin, Li, Qin, Liu, Wang, Luo, Zhuang & Zhou 2025 *(antes "Electronics 2025")* | MDPI *Electronics* | 0 | Ninguna — demasiado reciente, no es defecto de calidad | **Media** |
+| Zhao, Wei, Xie, Liu, Qu, Cao, Ding & Liao 2026 | *PLOS ONE* | 0 | Ninguna — publicado en 2026 | **Media** — código y datos verificables en GitHub compensan la falta de adopción, pero es la apuesta más nueva de las seis |
+| *(no es generador, dato colateral de viabilidad de hardware)* Karakish, Fouz & ELsawaf 2022, "Gait Trajectory Prediction on an Embedded Microcontroller Using Deep Learning" | MDPI *Sensors* | — | Confirma que un modelo de este tamaño corre en un ESP32 a 2.4 ms | — |
+
+**Candidatos de base de datos de validación:**
+
+| Candidato | Venue | Citas | Evidencia de adopción por terceros | Confianza |
+|---|---|---|---|---|
+| Horsak, Slijepcevic, Raberger, Schwab, Worisch & Zeppelzauer 2020 (GaitRec) | *Scientific Data* (Nature) | 80 (7 influyentes) | Confirmada — artículo de divulgación propio y reúso documentado en literatura de ML de marcha | **Alta** — recordar: solo GRF, no cinemática articular |
+| Camargo, Ramanathan, Flanagan & Young 2021 | *Journal of Biomechanics* | **329 (59 influyentes)** | **El más verificado de los nueve** — usado en clasificación de fase de marcha con SVM, control de exoesqueletos con deep learning, múltiples estudios de ML citándolo directamente | **Muy alta** |
+| Hood, Ishmael, Gunnell, Foreman & Lenzi 2020 | *Scientific Data* (Nature) | 1 | Prácticamente ninguna evidencia de reúso por terceros todavía | **Media-baja** — venue confiable, adopción real no demostrada |
+
+**Lectura honesta de esta tabla:** los candidatos más recientes (Zhao 2026, Electronics 2025, Hood 2020) tienen cero o casi cero evidencia de adopción — no porque sean poco confiables, sino porque son demasiado nuevos para que otros equipos ya los hayan reutilizado. Eso es una limitación real a declarar si se adoptan, no un motivo automático de descarte. **Los dos candidatos con adopción más sólida y verificable son Koopman 2014 (algoritmo, ya recomendado en §6) y Camargo 2021 (base de datos, con el margen más amplio de los tres).**
 
 ---
 
