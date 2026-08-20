@@ -38,6 +38,8 @@
 ---
 
 > 🚨 **CAMBIO DE RUMBO CERRADO (19-ago-2026) — ver P-20 en §4-quater.** El artículo reemplaza por completo el enfoque anterior: ya no es fidelidad de seguimiento multi-sujeto, es generación propia de trayectoria desde antropometría, validada contra bases de datos independientes (preferencia: peruanas/sudamericanas). **El tablero de abajo describe el artículo ANTERIOR — queda como historial, no como estado vigente**, hasta que se rehaga con el nuevo alcance.
+>
+> ⬜ **P-22 pendiente (§4-sexies, 20-ago-2026):** cerrando la última ambigüedad de alcance — confirmar si el banco físico puede ejecutar/medirse a sí mismo sin sujeto humano (sin ética) o si el artículo es 100% computacional. También ahí: 6 candidatos de algoritmo en secciones individuales, listos para revisar uno por uno.
 
 ## 1 · Tablero de avance
 
@@ -662,6 +664,110 @@ Tres caminos, y no los elijo por cuenta propia porque cambian qué tan fuerte qu
 ```
 
 🟡 **INTERPRETADA, no cerrada del todo — confirma antes de fijarla.** Así la leo: **se descarta (a)** — capturar base propia con iSen — porque necesita protocolo de ética y no se va a conseguir por ahora (coherente con P-20: la ética queda abandonada como plan vigente). En su lugar, **hay que buscar entre estudios ya publicados algo con lo que sí podamos comparar** — o sea, se mantiene la línea de (b)/(c) y se sigue ampliando la búsqueda de datasets públicos en vez de cerrarse a uno solo todavía. Avísame si la lectura es al revés (que preferías no seguir buscando).
+
+---
+
+## 4-sexies · Aclaración de alcance + candidatos de algoritmo en secciones (20-ago-2026)
+
+### P-22 · Cerrando la ambigüedad de una vez — CERO mediciones de personas, en cualquier nivel ⬜
+
+Dijiste que estaba entendiendo mal dos cosas. Las fijo aquí, explícitas, para que no quede espacio a interpretación en ningún archivo:
+
+1. **Cero mediciones o captura de personas reales, en ningún momento de este ciclo.** La validación es 100% contra bases de datos públicas ya existentes (Camargo 2021, GaitRec, Hood 2020, u otra que se decida) — no contra nadie capturado por el equipo. Esto es **más estricto** que lo que decía el análisis original de agosto, que incluía un "Nivel C" de validación física (ejecutar el algoritmo en el banco real y medir con iSen — sin sujeto humano, pero sí una medición del propio banco). **Pregunta puntual que sí necesito:** ¿ese Nivel C físico (banco + iSen, sin ninguna persona de por medio, no necesita ética) también queda fuera, o lo único que se descarta es medir personas? Cambia bastante si el artículo es 100% computacional (generar + comparar contra datos ya existentes, sin tocar el simulador físico) o si conserva una demostración física del banco ejecutando la trayectoria generada.
+2. **El artículo original (fidelidad de seguimiento, JTEHM tal como estaba planteado el 17-ago) NO sigue en paralelo.** Ya estaba así de P-20 (reemplazo total, no fusión), lo reafirmo explícito porque puede que algún banner que escribí diera la impresión contraria. Hay **un solo artículo activo**: el de generación de trayectoria + validación contra bases de datos.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+### Revista — pendiente de la respuesta de arriba
+
+`analisis_escalamiento_Q1_generador_trayectorias.md` §11 recomendaba IEEE TNSRE asumiendo un diseño con validación física de 3 niveles (A/B/C). Si el alcance se reduce a **solo A y B** (numérico y de reducción cinemática, sin ejecutar nada en el banco), es un estudio más liviano — más rápido de completar, pero con un argumento de "aplicabilidad real" más débil ante un revisor de Q1 (todo queda en simulación, nada se demostró físicamente). Esa es exactamente la clase de objeción que un revisor Q1 hace primero. **Re-evalúo revista y qué tan cerca está de Q1/Q2 apenas cierres P-22.1** — no lo hago a ciegas porque la respuesta cambia el argumento completo, no solo el cronograma.
+
+### Candidatos de algoritmo — una sección por candidato, para revisar uno por uno
+
+Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_generador_trayectorias.md` §4.1 y §4.5), reorganizados en secciones individuales como pediste. Cada uno tiene mi lectura y un espacio para tu respuesta — no hace falta responder los seis de una sentada, uno a la vez está bien.
+
+#### Candidato 1 — Koopman, van Asseldonk & van der Kooij 2014 (*J Biomech* 47(6):1447-1458)
+
+**Qué es:** splines quínticos ajustados entre eventos clave del ciclo de marcha, con regresión sobre velocidad + talla. Diseñado explícitamente para generar trayectorias de referencia en **soporte robótico de marcha** — no es un modelo genérico adaptado después, nació para este tipo de uso.
+
+**Por qué es mi recomendación de partida:** de los seis, es el que tiene evidencia de adopción más sólida (87 citas, 8 influyentes, y el enfoque de "eventos clave por regresión" se reutiliza en robots de rehabilitación posteriores — línea LOPES/LOPES II). Entrada mínima (velocidad + talla), fácil de conseguir sin instrumentos especiales.
+
+**Riesgo:** entrada muy simple (solo 2 parámetros) — puede que la personalización que produce sea débil frente a un revisor que pregunte "¿esto realmente distingue entre sujetos, o converge casi a la misma curva para todos?". El escalado geométrico por longitudes de segmento (§5 del análisis) ayuda a compensar esto en la salida final, no en el modelo en sí.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+#### Candidato 2 — Yun, Kim, Shin, Lee, Deshpande & Kim 2014 (*J Biomech*, Gaussian Process Regression)
+
+**Qué es:** GPR sobre 14 parámetros corporales, 113 sujetos, 14 movimientos articulares — el dataset de entrenamiento más grande de los seis. Entrega incertidumbre asociada a cada predicción (banda de confianza por punto del ciclo), no solo un valor puntual.
+
+**Por qué podría convenir:** la incertidumbre explícita es una ventaja real para la validación — se puede comparar directo contra la banda ±1SD del sujeto real de la base de datos, una figura más fuerte que solo una curva media. También tiene adopción sólida (108 citas, 7 influyentes).
+
+**Riesgo:** requiere 14 parámetros corporales — más trabajoso de reunir que Koopman (2) o Zhao (6), aunque siguen siendo medidas antropométricas estándar, no captura de marcha.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+#### Candidato 3 — Moissenet, Leboeuf & Armand 2019 (*Scientific Reports*, regresión múltiple)
+
+**Qué es:** regresión múltiple clásica desde velocidad, sexo, edad e IMC. El más simple de los seis de implementar y explicar — sin caja negra, coeficientes interpretables.
+
+**Por qué podría convenir:** simplicidad. Si el argumento del artículo es "adoptamos un método publicado, no inventamos uno", un modelo interpretable es más fácil de defender ante la pregunta "¿por qué funciona?" que una red neuronal.
+
+**Riesgo:** de los tres con buena adopción (junto a 1 y 2), es el que tiene menos evidencia concreta de reúso por terceros en la verificación de ayer — 73 citas pero sin ejemplos puntuales confirmados de quién lo reutilizó.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+#### Candidato 4 — Semwal, Jain, Maheshwari & Khatwani 2023 (*MTAP*, LSTM+CNN)
+
+**Qué es:** red neuronal (LSTM+CNN) entrenada con antropometría+velocidad, r=0.98 contra las curvas originales, validado en un rango de velocidad de 0.49–1.76 m/s — el rango más amplio reportado de los seis.
+
+**Por qué podría convenir:** mejor ajuste numérico reportado (r=0.98) y el rango de velocidad más amplio, que le da más margen para cubrir la velocidad real de los sujetos de la base de datos de validación que se elija.
+
+**Riesgo:** es una red neuronal — más difícil de justificar cada modificación ante un revisor ("¿por qué se ajustó así?") que un modelo de regresión o splines. Y es de un venue de cómputo (Multimedia Tools and Applications), no de biomecánica — puede pesar menos como respaldo metodológico en un artículo de ingeniería biomédica.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+#### Candidato 5 — Xin, Li, Qin, Liu, Wang, Luo, Zhuang & Zhou 2025 (*Electronics*, GPR + series de Fourier)
+
+**Qué es:** GPR combinado con series de Fourier, entrada: longitud de muslo, longitud de pierna, peso — pensado para personalizar trayectorias de exoesqueleto.
+
+**Por qué podría convenir:** entrada de solo 3 parámetros, todos antropométricos directos (nada de velocidad ni edad/sexo), y el contexto de exoesqueleto es cercano al de un banco de prótesis (ambos accionan un miembro externo).
+
+**Riesgo:** cero citas — es el más nuevo de los seis (2025) y sin ninguna evidencia de adopción todavía. Venue (MDPI *Electronics*) de menor peso relativo en biomecánica.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+#### Candidato 6 — Zhao, Wei, Xie, Liu, Qu, Cao, Ding & Liao 2026 (*PLOS ONE*)
+
+**Qué es:** el más nuevo, entrada mínima (solo longitud de pierna, masa, cadencia), salida más completa (ángulos + momentos articulares + GRF, cubre cinemática y fuerza a la vez). Código y coeficientes públicos en GitHub. Ya usa SPM1D para validar — el mismo motor que `CODIGOS/ESTADISTICA/` ya tiene construido y probado.
+
+**Por qué podría convenir:** es el único que predice también GRF (retoma la línea de corrección de Fz del artículo anterior, si se quiere conservar algo de ese trabajo) y el más fácil de integrar con el código que ya existe en el proyecto.
+
+**Riesgo:** cero citas por ser de 2026 — nadie más lo ha usado todavía, es la apuesta más nueva. Entrenado con solo 10 sujetos (validado con 4), la muestra más chica de entrenamiento de los seis.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+**Mi orden de preferencia, si tuviera que recomendar uno hoy:** 1 (Koopman) por adopción y simplicidad, luego 6 (Zhao) por integración directa con el código ya construido y por cubrir Fz también, luego 2 (Yun/GPR) por la incertidumbre explícita. Pero es tu decisión y la del equipo — por eso están separados, para que cada uno se pueda aceptar, descartar o dejar en duda de forma independiente.
 
 ---
 
