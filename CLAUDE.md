@@ -20,7 +20,9 @@ Este archivo se lee automáticamente al iniciar una sesión de Claude Code en es
 >
 > **Fecha:** sigue siendo referencial (no hay entrega dura), pero hay un checkpoint interno nuevo: **14-set-2026, "buen avance en implementación"** (no el artículo terminado).
 >
-> Detalle completo de la discusión y las respuestas exactas del usuario: `docs/DISCUSION_Q2.md`, P-20 en §4-quater.
+> **Regla que NO cambia con el pivote, reafirmada 20-ago-2026: este artículo sigue sin citar ni mencionar el paper de conferencia IBITeC 2026, ni reformular su enfoque/redacción.** Con el checkpoint del 14-set-2026, este artículo se escribe ahora — el de conferencia casi seguro sigue sin publicarse cuando este se envíe. Mismo dataset del sujeto original, mismo laboratorio: riesgo real de superposición de publicación/auto-plagio. El encuadre tiene que ser propio.
+>
+> Detalle completo de la discusión y las respuestas exactas del usuario: `docs/DISCUSION_Q2.md`, P-20 en §4-quater y P-22 en §4-sexies.
 
 ## Qué es el proyecto
 

@@ -113,6 +113,13 @@ Lo único empírico que existe hoy: los 6 trials válidos de Fz del simulador (p
 
 ## 2 · Reglas de trabajo — esto es lo que nos limita
 
+> 🚨 **Vigencia revisada tras el pivote — 20-ago-2026.** No todas las reglas de abajo sobrevivieron igual:
+> - **Siguen intactas:** 1 (verificar toda cita), 3 (no rellenar `[PENDIENTE]` con supuestos), 8 (convención de ángulo `atan2`), 9 (uso de ` ``` `), 10 (no borrar explicaciones), 11 (documentar literatura en `docs/`).
+> - **Regla 6 (no citar el paper de conferencia IBITeC 2026) NO solo sigue vigente — se reafirma con más fuerza**, reconfirmado explícitamente por el usuario el 20-ago-2026: con el cronograma nuevo (checkpoint 14-set-2026), este artículo se escribe **ahora**, no en 2027 como asumía el análisis de agosto — el paper de conferencia casi con certeza sigue sin publicarse cuando se envíe este manuscrito. Mismo dataset del sujeto original, mismo laboratorio: **riesgo real de superposición de publicación/auto-plagio.** El enfoque, la redacción y el encuadre tienen que ser propios, no una reformulación de lo ya escrito para la conferencia — ni siquiera indirectamente, por ejemplo copiando su estructura o frases de la Introducción. Ver corrección aplicada en `analisis_escalamiento_Q1_generador_trayectorias.md` §9.
+> - **Regla 5 queda literalmente invertida** por el pivote (P-20): la generación algorítmica de trayectorias ya no es "fuera de alcance para más adelante", es el contenido central de este artículo.
+> - **Reglas 2 (8 páginas, JTEHM) y 7 (fuera de alcance) dependen de P-22/revista** — no asumir que siguen tal cual hasta que se cierre esa decisión.
+> - **Regla 4** (nada que dependa de ética antes de aprobación) queda sin objeto — no hay captura de sujetos en el plan vigente, así que no hay nada pendiente de ética que ejecutar.
+
 Salen de decisiones ya tomadas. **No se reabren sin una razón fuerte y nueva.**
 
 1. **Ninguna cita se fija sin verificarla contra la fuente.** No es un trámite: en dos rondas de verificación, **6 de 6** citas identificadas por búsqueda tenían algún error — un título equivocado, un resumen de suplemento confundido con artículo, un congreso confundido con revista, un sistema IMU distinto del supuesto, **un DOI inventado por el buscador a partir del patrón de la URL**, y una revisión entera que era de otro tema.
@@ -680,7 +687,7 @@ Dijiste que estaba entendiendo mal dos cosas. Las fijo aquí, explícitas, para 
 
 ```
 ✍️ TU RESPUESTA
-
+Si medir personas queda fuera , nuesta idea es poder ejecutar nnuestro algoritmo y compararlo con base de datos publicas, la manera de como vamos a obtener expeirmentalmente el angulo y las trayectorias ya lo podemos ver despues 
 ```
 
 ### Aclaración técnica (20-ago-2026) — no es una pregunta nueva, ya estaba resuelta en el diseño
@@ -701,6 +708,8 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 #### Candidato 1 — Koopman, van Asseldonk & van der Kooij 2014 (*J Biomech* 47(6):1447-1458)
 
+**Link:** https://doi.org/10.1016/j.jbiomech.2014.01.037 · página del artículo (ScienceDirect): https://www.sciencedirect.com/science/article/abs/pii/S0021929014000682
+
 **Qué es:** splines quínticos ajustados entre eventos clave del ciclo de marcha, con regresión sobre velocidad + talla. Diseñado explícitamente para generar trayectorias de referencia en **soporte robótico de marcha** — no es un modelo genérico adaptado después, nació para este tipo de uso.
 
 **Por qué es mi recomendación de partida:** de los seis, es el que tiene evidencia de adopción más sólida (87 citas, 8 influyentes, y el enfoque de "eventos clave por regresión" se reutiliza en robots de rehabilitación posteriores — línea LOPES/LOPES II). Entrada mínima (velocidad + talla), fácil de conseguir sin instrumentos especiales.
@@ -713,6 +722,8 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 ```
 
 #### Candidato 2 — Yun, Kim, Shin, Lee, Deshpande & Kim 2014 (*J Biomech*, Gaussian Process Regression)
+
+**Link:** https://doi.org/10.1016/j.jbiomech.2013.09.032 · página del artículo (ScienceDirect): https://www.sciencedirect.com/science/article/abs/pii/S0021929013004879
 
 **Qué es:** GPR sobre 14 parámetros corporales, 113 sujetos, 14 movimientos articulares — el dataset de entrenamiento más grande de los seis. Entrega incertidumbre asociada a cada predicción (banda de confianza por punto del ciclo), no solo un valor puntual.
 
@@ -727,6 +738,8 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 #### Candidato 3 — Moissenet, Leboeuf & Armand 2019 (*Scientific Reports*, regresión múltiple)
 
+**Link:** https://doi.org/10.1038/s41598-019-45397-4 (acceso abierto, gratis) — https://www.nature.com/articles/s41598-019-45397-4
+
 **Qué es:** regresión múltiple clásica desde velocidad, sexo, edad e IMC. El más simple de los seis de implementar y explicar — sin caja negra, coeficientes interpretables.
 
 **Por qué podría convenir:** simplicidad. Si el argumento del artículo es "adoptamos un método publicado, no inventamos uno", un modelo interpretable es más fácil de defender ante la pregunta "¿por qué funciona?" que una red neuronal.
@@ -739,6 +752,8 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 ```
 
 #### Candidato 4 — Semwal, Jain, Maheshwari & Khatwani 2023 (*MTAP*, LSTM+CNN)
+
+**Link:** https://doi.org/10.1007/s11042-023-14733-2 — https://link.springer.com/article/10.1007/s11042-023-14733-2 (puede pedir acceso/pago, revisar con acceso PUCP)
 
 **Qué es:** red neuronal (LSTM+CNN) entrenada con antropometría+velocidad, r=0.98 contra las curvas originales, validado en un rango de velocidad de 0.49–1.76 m/s — el rango más amplio reportado de los seis.
 
@@ -753,6 +768,8 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 
 #### Candidato 5 — Xin, Li, Qin, Liu, Wang, Luo, Zhuang & Zhou 2025 (*Electronics*, GPR + series de Fourier)
 
+**Link:** https://doi.org/10.3390/electronics14234554 (acceso abierto, gratis — MDPI)
+
 **Qué es:** GPR combinado con series de Fourier, entrada: longitud de muslo, longitud de pierna, peso — pensado para personalizar trayectorias de exoesqueleto.
 
 **Por qué podría convenir:** entrada de solo 3 parámetros, todos antropométricos directos (nada de velocidad ni edad/sexo), y el contexto de exoesqueleto es cercano al de un banco de prótesis (ambos accionan un miembro externo).
@@ -765,6 +782,8 @@ Mismos 6 candidatos ya identificados y verificados (`analisis_escalamiento_Q1_ge
 ```
 
 #### Candidato 6 — Zhao, Wei, Xie, Liu, Qu, Cao, Ding & Liao 2026 (*PLOS ONE*)
+
+**Link:** https://doi.org/10.1371/journal.pone.0338041 (acceso abierto, gratis) · código y datos: https://github.com/zhaohuan13/predictive-model-of-joint-dynamics-and-ground-reaction-force
 
 **Qué es:** el más nuevo, entrada mínima (solo longitud de pierna, masa, cadencia), salida más completa (ángulos + momentos articulares + GRF, cubre cinemática y fuerza a la vez). Código y coeficientes públicos en GitHub. Ya usa SPM1D para validar — el mismo motor que `CODIGOS/ESTADISTICA/` ya tiene construido y probado.
 

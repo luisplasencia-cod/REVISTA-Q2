@@ -361,7 +361,9 @@ Sin plazo impuesto, pero sin alargarlo. Arranca **después** de cerrar el envío
 
 **Total ≈ 9-12 meses de trabajo efectivo → envío a mediados/finales de 2027.** Las fases 0 y 1 son las de mejor relación valor/costo: no dependen de ética, ni de sujetos nuevos, ni de que el hardware esté integrado, y **la fase 1 es la que decide si el artículo es viable** — si la reducción cinemática no reproduce las trayectorias de plataforma ya conocidas, todo lo demás se cae, y es mejor saberlo en octubre de 2026 que en 2027.
 
-**Ventaja secundaria del plazo largo:** para 2027, el paper de conferencia IBITeC 2026 ya estará publicado y el artículo de JTEHM también. El artículo 2 **puede y debe citar a ambos**, construyendo una línea de trabajo propia y citable — con lo que el problema de superposición de publicación que forzó el pivote del 03-ago desaparece por completo.
+~~**Ventaja secundaria del plazo largo:** para 2027, el paper de conferencia IBITeC 2026 ya estará publicado y el artículo de JTEHM también. El artículo 2 **puede y debe citar a ambos**, construyendo una línea de trabajo propia y citable — con lo que el problema de superposición de publicación que forzó el pivote del 03-ago desaparece por completo.~~
+
+> 🚨 **CORREGIDO 20-ago-2026 — el párrafo de arriba ya NO aplica.** Se basaba en un envío a 2027; con el pivote (`CLAUDE.md` banner inicial, `DISCUSION_Q2.md` P-20, checkpoint interno 14-set-2026), este es el artículo que se está escribiendo **ahora**, no dentro de un año. El paper de conferencia IBITeC 2026 **casi con certeza no estará publicado todavía** cuando se envíe este manuscrito, y el manuscrito de JTEHM del enfoque anterior nunca se llegó a enviar. **Vuelve a aplicar la regla original, sin excepción:** este artículo **no cita ni menciona** el paper de conferencia IBITeC 2026 (mismo dataset del sujeto original, mismo laboratorio — riesgo real de superposición de publicación/auto-plagio si se detecta después) — reafirmado explícitamente por el usuario el 20-ago-2026. El enfoque, la redacción y el encuadre de este artículo tienen que ser propios, no una reformulación de lo ya escrito para la conferencia.
 
 ---
 
