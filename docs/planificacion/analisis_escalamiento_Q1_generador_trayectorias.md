@@ -1,6 +1,17 @@
 # Análisis exploratorio — Escalar a Q1 mediante generación de trayectorias desde antropometría
 
 **Creado:** 05-ago-2026 · **Revisión 2:** 05-ago-2026 (misma sesión, tras reformulación del usuario)
+
+> 🚨 **PROMOVIDO A PLAN VIGENTE — 19-ago-2026.** Hasta aquí este documento decía "no modifica ninguna decisión vigente, es para un artículo futuro" — **eso ya no es cierto.** El equipo decidió en reunión (`DISCUSION_Q2.md` P-20) reemplazar por completo el artículo que estaba en curso (validación multi-sujeto por fidelidad de seguimiento, IEEE JTEHM) por **esta línea**. Lo que sigue en este documento es, desde hoy, el análisis técnico más completo que existe del plan vigente — léelo entero antes de proponer nada nuevo sobre el proyecto.
+>
+> **Lo que cambia respecto a lo escrito originalmente aquí (dejado sin editar abajo, por trazabilidad):**
+> - **Ya no arranca "después de cerrar JTEHM"** — arranca ahora. El checkpoint es 14-set-2026, "buen avance en implementación" (no el envío).
+> - **La revista NO está decidida.** TNSRE (§11) sigue siendo la recomendación técnica de este documento, pero el usuario pidió "ordenar mejor las ideas" antes de comprometerse — no asumir TNSRE como definitivo todavía.
+> - **Ningún modelo de §4.1 ni ninguna base de datos de validación está seleccionada todavía.** El equipo pidió explícitamente ampliar la búsqueda, no partir directo de esos 5 candidatos sin revisión. Preferencia nueva y explícita para la validación: **bases de datos de marcha peruanas o sudamericanas** verificadas (no estaba en el análisis original) — argumento del equipo: el algoritmo toma talla/peso/sexo/etc. como entrada, así que es independiente de la región, y una base de datos sudamericana refuerza esa independencia mejor que una norteamericana/europea genérica.
+> - **Los tres bloqueos de `ESTADO_Y_RUMBO.md` (RPi-ESP32, ética, iSen) ya no son el cuello de botella del artículo** — el diseño de este documento (§2.4) ya señalaba que la captura de sujetos y la generación numérica (niveles A y B de §7.1) no dependen del simulador. El hardware solo hace falta para el nivel C (validación física), más adelante.
+>
+> **Rol original de este documento (histórico, ya no vigente — se conserva sin editar por trazabilidad):**
+
 **Rol de este documento:** **NO es un plan ni una decisión.** Es un análisis de consulta, guardado para retomarlo cuando corresponda. **No modifica ninguna decisión vigente de `CLAUDE.md`** — el artículo en curso sigue siendo la validación multi-sujeto en IEEE JTEHM (setiembre 2026), y el simulador sigue ejecutando CSV pregrabado en ese ciclo.
 
 ## Qué cambió en la revisión 2

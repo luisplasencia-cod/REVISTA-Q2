@@ -1,5 +1,7 @@
 # ESTADO Y RUMBO — Artículo Q2
 
+> 🚨 **SUPERADO EN LO SUSTANCIAL — 19-ago-2026, pivote de fondo. Ver `DISCUSION_Q2.md` P-20 y el banner al inicio de `../CLAUDE.md`.** El artículo reemplaza el enfoque de "fidelidad de seguimiento multi-sujeto" (todo lo que describe este documento) por "generación propia de trayectoria desde antropometría, validada contra bases de datos independientes". Las 4 comparaciones, los 3 bloqueos y el argumento central de abajo describen el artículo **anterior** — quedan como historial y como inventario de herramientas reutilizables (§6, casi todo el código sigue vivo), no como el plan vigente. **No usar este documento para planificar el trabajo actual** hasta que se rehaga con el nuevo alcance.
+
 **Documento maestro. Empezar por aquí.** Consolida lo disperso en `planificacion/`, `manuscrito/` y `literatura/` para responder tres preguntas sin tener que leer cinco archivos: **qué es el artículo, qué se toca, y qué falta.**
 
 **Actualizado:** 11-ago-2026 · **Revista:** IEEE JTEHM · **Envío:** setiembre 2026 como referencia, **confirmado extensible sin problema** (decisión del usuario, 11-ago) — el techo duro real es el límite de 8 páginas, no el calendario
@@ -81,7 +83,7 @@
 
 ### Futuro — no es este artículo
 
-`planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` — la línea del generador de trayectorias desde antropometría, para el artículo 2 (2027, IEEE TNSRE). **No mezclar con el Q2.**
+*(Vacío desde el 19-ago-2026. `planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` — la línea del generador de trayectorias — ya NO es "artículo futuro, no mezclar": es el plan vigente del artículo actual. Ver el banner de pivote al inicio de este documento y de `../CLAUDE.md`.)*
 
 ### Archivados en `_archivo/` — superados, se conservan
 
