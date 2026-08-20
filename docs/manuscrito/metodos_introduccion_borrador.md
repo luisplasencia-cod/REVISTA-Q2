@@ -1,5 +1,7 @@
 # Borrador — Introducción (gancho) y Métodos 5.1-5.2
 
+> 🚨 **SUPERADO por el pivote — 19-ago-2026.** Todo este borrador describe el enfoque de fidelidad de seguimiento multi-sujeto, reemplazado por completo (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20): generación de trayectoria desde antropometría, validada contra bases de datos públicas independientes. Se conserva por trazabilidad y porque parte de la prosa de necesidad clínica podría reutilizarse, pero **no es el contenido vigente** — la Introducción y Métodos hay que reescribirlos desde el nuevo argumento central.
+
 > **Este archivo es el BORRADOR.** La versión final vive en `JTEHM_LaTex_Template/manuscrito_JTEHM.tex` (junto al `.cls` y al `.bib` que necesita para compilar). Se redacta aquí primero; lo que queda resuelto pasa allá. **Si los dos difieren, manda el `.tex`.** Estructura completa de la carpeta: `JTEHM_LaTex_Template/README_ESTRUCTURA.md`.
 
 **Estado: borrador de trabajo, no final.** Prosa lista para pasar a Overleaf/plantilla de **IEEE JTEHM** (decisión final de revista, 03-ago-2026 — ver `docs/manuscrito/JTEHM_LaTex_Template/manuscrito_JTEHM.tex` y `docs/manuscrito/guia_autor_JTEHM.md`) y ajustar formato de autores. **Recordar el límite de 8 páginas incluyendo referencias** al trasladar este contenido — puede necesitar recortarse. Los tramos marcados `[PENDIENTE: ...]` dependen de datos o decisiones que todavía no existen — no completar con números inventados.

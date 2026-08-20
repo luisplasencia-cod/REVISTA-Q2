@@ -1,5 +1,7 @@
 # Validación de instrumentación inercial (iSen/STT-IWS) — literatura de respaldo
 
+> 🚨 **SUPERADO por el pivote — 19-ago-2026.** Todo este documento sostenía la decisión de usar iSen como instrumento único de captura de sujetos nuevos, que queda abandonada (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20). Piche et al. 2022 (§1) sigue siendo una cita válida y bien verificada si el proyecto vuelve a medir algo físicamente con iSen más adelante, pero no es literatura activa para el enfoque actual (generación desde antropometría, validación contra bases de datos públicas).
+
 > **⚠️ CORRECCIÓN 11-ago-2026 — leer antes que el resto del documento.**
 >
 > Las dos citas de este archivo se verificaron contra la fuente, y **una de las dos no dice lo que aquí se afirmaba**:

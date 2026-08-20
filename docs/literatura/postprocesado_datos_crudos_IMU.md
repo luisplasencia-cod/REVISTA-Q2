@@ -1,5 +1,7 @@
 # Post-procesado de datos crudos de IMU — qué sí y qué no afecta a este proyecto
 
+> 🚨 **SUPERADO en su mayor parte — 19-ago-2026.** Este documento asumía captura de sujetos nuevos con iSen, que queda abandonada como plan vigente (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20/P-21 — se descartó capturar base propia por requerir ética). El hallazgo específico del filtro de suavizado calibrado a la velocidad del simulador sigue siendo válido si en algún momento se vuelve a medir la salida física del banco, pero no es tarea activa hoy.
+
 **Para quién es este documento:** responde una pregunta concreta de sesión (03-ago-2026): ¿el post-procesado de los datos crudos de los IMU (iSen) tiene algo que pueda afectar los resultados del proyecto? Resumen corto: **la mayoría de los problemas clásicos de post-procesado de IMU ya están cubiertos por el diseño actual (fusión de sensores propia de iSen + protocolo de calibración estática ya planeado) — pero hay un punto real y específico de este proyecto que sí hay que resolver: el filtro de suavizado tiene que calibrarse para la velocidad real del simulador, no asumir la de marcha humana normal.**
 
 ---

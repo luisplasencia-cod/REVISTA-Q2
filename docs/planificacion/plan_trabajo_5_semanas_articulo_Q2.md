@@ -1,6 +1,8 @@
 # Plan de trabajo — 5 semanas hacia el artículo Q2
 ### Simulador de marcha 3-DOF · Validación multi-instrumento y multi-sujeto
 
+> 🚨 **SUPERADO por el pivote — 19-ago-2026.** Este cronograma y su matriz de comparaciones describen el enfoque de fidelidad de seguimiento multi-sujeto, reemplazado por completo (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20/P-21). Las fórmulas estadísticas (RMSEnorm, ICC(3,1), SPM1D, etc.) siguen siendo válidas y reutilizables — el diseño de validación en sí, no. El plan vigente está en `analisis_escalamiento_Q1_generador_trayectorias.md`.
+
 **Objetivo del ciclo:** artículo enviado antes de la quincena de setiembre, con manuscrito prácticamente cerrado para la sesión de aceptación del 27-28 de agosto.
 
 **Regla de oro de todo el plan:** ningún cambio de instrumento o de metodología reemplaza lo que ya existe hasta que se pruebe que funciona. Nada se ejecuta con sujetos (ni el original ni nuevos) hasta que el comité de ética apruebe el protocolo.

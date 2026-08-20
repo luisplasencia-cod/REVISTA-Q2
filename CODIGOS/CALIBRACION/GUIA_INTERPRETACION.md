@@ -1,5 +1,9 @@
 # Guía de interpretación — Calibración del offset vertical
 
+> 🟢 **Herramienta reutilizable tras el pivote (19-ago-2026) — ver `docs/codigos/INDICE_CODIGOS.md`.** Sigue siendo válida; su uso concreto en el artículo depende de si el ensayo físico de offset vuelve a ser parte del plan.
+
+
+
 **Para quién es este documento:** para leer el reporte de consola y las dos figuras que produce `Calibracion_Offset_Core.m` sin tener que recordar estadística de memoria. Está escrito para poder ir directo del resultado a saber si es bueno, y para poder citar el respaldo metodológico en el manuscrito sin tener que rebuscar literatura después.
 
 ---

@@ -1,5 +1,7 @@
 # Referencias verificadas para el manuscrito JTEHM
 
+> 🟡 **Relevancia mixta tras el pivote — 19-ago-2026.** Estas 10 citas se verificaron para el argumento de fidelidad de seguimiento multi-sujeto, ya superado (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20). Algunas siguen siendo útiles de forma directa (Sudeesh 2024 sobre arquitectura 3-DOF, Etoundi 2022 sobre bancos robóticos — ambas hablan del banco en sí, no del enfoque de captura). Otras (Piche 2022/iSen, Rattanakoch/Noraxon) pierden relevancia porque dependían de la captura con iSen, ahora abandonada. El estándar de verificación (nunca fijar una cita sin comprobarla contra la fuente) sigue aplicando igual a cualquier cita nueva del enfoque actual — ver también `planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` §4.5, con el mismo estándar ya aplicado a los candidatos de algoritmo/base de datos nuevos.
+
 **Creado:** 05-ago-2026 · **Actualizado:** 15-ago-2026
 **Para qué sirve:** `metodos_introduccion_borrador.md` y `JTEHM_LaTex_Template/manuscrito_JTEHM.tex` arrastraban claves `\cite{PENDIENTE_*}` con citas identificadas por búsqueda pero **sin verificar** — marcadas dos veces en la documentación como "no usar en un envío real sin confirmar". Este archivo cierra esa deuda: lo verificado va con entrada BibTeX lista para pegar; lo que sigue incompleto está marcado con exactamente qué falta.
 

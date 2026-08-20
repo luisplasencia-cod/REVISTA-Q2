@@ -1,5 +1,7 @@
 # Preregistro OSF — borrador (candidato F)
 
+> 🚨 **SUPERADO por el pivote — 19-ago-2026.** Las hipótesis (H1 fidelidad, H2 representatividad, H3 repetibilidad) son del enfoque anterior, reemplazado por completo (`CLAUDE.md` banner inicial, `docs/DISCUSION_Q2.md` P-20/P-21) — y de todas formas dependían de captura de sujetos con ética, ahora abandonada. Si se retoma un preregistro bajo el nuevo enfoque, hay que reescribirlo desde cero con las hipótesis del modelo generador (`analisis_escalamiento_Q1_generador_trayectorias.md` §7.2-7.3), no adaptar este.
+
 **Estado: BORRADOR, no publicado en OSF todavía.** Sale del candidato **F** aprobado en `docs/DISCUSION_Q2.md` P-3 (11-ago-2026). Sigue la plantilla estándar de OSF ("OSF Preregistration" / basada en Van 't Veer & Giner-Sorolla 2016), adaptada a un estudio de validación de instrumento/simulador, no un ensayo clínico. **No se publica sin aprobación explícita** — mismo flujo que el resto del proyecto (discutir → aprobar → aplicar).
 
 **Por qué importa el orden:** un preregistro solo protege el argumento si se publica **antes** de recolectar el primer dato de un sujeto nuevo. Hoy (13-ago-2026) no hay ningún sujeto nuevo capturado — la ventana sigue abierta, pero se cierra el día que arranque la campaña de captura (que a su vez depende de la aprobación de ética, comité 18-ago-2026).
