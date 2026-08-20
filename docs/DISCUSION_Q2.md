@@ -640,6 +640,29 @@ no tenemos nada de base hasta ahroa pero idealmente pueda se base de datos de pe
 
 ---
 
+## 4-quinquies · Resultado de la búsqueda del pivote (19-ago-2026)
+
+Primera búsqueda tras P-20. Detalle completo en `planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` §4.1 (candidato nuevo) y §4.4 (bases de datos) — resumen aquí:
+
+**Algoritmo — candidato nuevo, el más fuerte hasta ahora:** [Zhao et al. 2026, PLOS ONE](https://doi.org/10.1371/journal.pone.0338041). Entrada mínima (solo longitud de pierna, masa, cadencia — ni pide edad/sexo), salida completa (ángulos + momentos articulares + GRF, cubre cinemática y fuerza juntas), coeficientes y **código en GitHub**, y ya usa SPM1D para validar — el mismo motor que `CODIGOS/ESTADISTICA/` ya tiene construido. Dato colateral: [Karakish et al. 2022](https://doi.org/10.3390/s22218441) confirma que un modelo de este tamaño corre en un ESP32 (el mismo microcontrolador del banco) a 2.4 ms.
+
+**Base de datos de validación — resultado honesto, no lo que se esperaba:** **no existe ninguna base de datos pública de marcha peruana o sudamericana** con antropometría, verificada. Búsqueda amplia en español e inglés, sin resultado. Alternativas reales: GaitRec (solo GRF, no sirve para trayectoria), Camargo/Georgia Tech (22 sanos, cinemática completa), y **Hood/Ishmael et al. 2020** (18 amputados transfemorales reales, cinemática/cinética completa) — este último es el más valioso porque es población protésica real, no sana, aunque no sea transtibial exacto ni regional.
+
+### P-21 · Qué hacer con el vacío de base de datos regional ⬜
+
+Tres caminos, y no los elijo por cuenta propia porque cambian qué tan fuerte queda el argumento de independencia regional del artículo:
+
+- **(a) Capturar la base propia** con el iSen (ya disponible y probado) en un grupo de sujetos peruanos/sudamericanos — sostiene el criterio regional al 100%, pero es trabajo de campo nuevo (reclutamiento, captura), no una base ya existente.
+- **(b) Usar Hood et al. 2020** (amputados transfemorales reales, EE.UU.) — no es regional, pero es población protésica real, que ataca el otro vacío señalado en agosto (§8: "todos los modelos están ajustados a sanos").
+- **(c) Usar Camargo/Georgia Tech** (sanos, EE.UU.) — la opción más simple técnicamente, pero no aporta nada nuevo frente al vacío de "ajustado solo a sanos" y tampoco es regional.
+
+```
+✍️ TU RESPUESTA
+
+```
+
+---
+
 ## 5 · Preguntas cerradas
 
 *(Se conservan con su respuesta para no volver a abrirlas. Cuando una de §4 se cierra, baja aquí.)*
@@ -748,6 +771,7 @@ Cada decisión cerrada aquí, con **dónde** se volcó. Esta tabla es el puente 
 | 17-ago | **P-18: respaldo de literatura encontrado para margen TOST y tamaños de efecto** — RMSD de Piche 2022 por articulación (rodilla 3.3°/tobillo 5.6°/cadera 7.3°), más fuerte que buscar un MDC externo porque es el instrumento exacto del proyecto. Decisión de qué articulación usar queda pendiente de tu confirmación — comparte pregunta con P-19/candidato E | `DISCUSION_Q2.md` §4-ter — **no aplicado a `references.bib` ni a las guías todavía** |
 | 17-ago | **P-19 aprobada y candidato E construido el mismo día:** `PresupuestoIncertidumbre_Core.m` (GUM/ISO 5725, ley de propagación de incertidumbre, Welch-Satterthwaite, factor de cobertura exacto), `Test_PresupuestoIncertidumbre.m` (7 pruebas), `GUIA_INTERPRETACION.md` | `CODIGOS/INCERTIDUMBRE/` (nueva carpeta) · `docs/codigos/INDICE_CODIGOS.md` §7 · `ESTADO_Y_RUMBO.md` §6 — **sin correr todavía en MATLAB/Octave** |
 | 19-ago | **P-20 — CAMBIO RADICAL: el artículo pasa de "fidelidad de seguimiento multi-sujeto" a "generación propia de trayectoria desde antropometría, validada contra bases de datos independientes".** Reemplazo total, no fusión — protocolo de ética, captura de sujetos e iSen quedan abandonados como plan vigente. Revista sin decidir (evaluar Q1/TNSRE vs. mantener Q2). Fecha sigue referencial, con checkpoint interno 14-set-2026 de "buen avance en implementación". Búsqueda de algoritmo y de base de datos de validación (preferencia: peruana/sudamericana) sin candidato fijo — tarea de investigación abierta | `analisis_escalamiento_Q1_generador_trayectorias.md` (pasa de "futuro, no mezclar" a plan vigente) · `../CLAUDE.md` y `ESTADO_Y_RUMBO.md` — **pendiente de actualización de fondo, ver tareas siguientes** |
+| 19-ago | **Búsqueda del pivote — candidato de algoritmo nuevo (Zhao et al. 2026, entrada mínima + código público) y confirmación de que no existe base de datos de marcha peruana/sudamericana pública** — quedan 3 alternativas generales (GaitRec, Camargo, Hood et al. 2020 amputados), decisión de cuál usar pendiente en P-21 | `analisis_escalamiento_Q1_generador_trayectorias.md` §4.1 y §4.4 (nuevo) · `DISCUSION_Q2.md` §4-quinquies |
 
 ---
 

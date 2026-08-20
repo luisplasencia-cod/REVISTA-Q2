@@ -156,6 +156,16 @@ Búsqueda verificada. Ninguno de estos se puede reclamar como aporte propio, y t
 
 **Esto es bueno, no malo:** son cinco métodos publicados, documentados, con parámetros disponibles. Adoptar uno es legítimo y rápido.
 
+#### Candidato nuevo, 19-ago-2026 — el más fuerte encontrado hasta ahora
+
+Búsqueda ampliada tras el pivote de P-20 (`DISCUSION_Q2.md`). **Verificado a texto completo:**
+
+- **[Zhao et al. 2026, PLOS ONE](https://doi.org/10.1371/journal.pone.0338041)** — *"A predictive model of joint dynamics and ground reaction force using only leg length, body mass, and walking cadence"*. Entrada: **solo** longitud de pierna, masa corporal y cadencia — ni siquiera pide edad/sexo, la entrada más mínima de todos los candidatos, calza perfecto con "cinta métrica y balanza". Método: series de Fourier (parte cinemática) + ecuaciones de Lagrange (parte dinámica). Salida: ángulos de cadera/rodilla y momentos de cadera/rodilla/tobillo en plano sagital, **más GRF vertical y anteroposterior** — cubre de una vez la parte cinemática y la de fuerza que el proyecto ya trabajaba por separado. **Coeficientes publicados en su Tabla 1, y código + datos en GitHub** (`github.com/zhaohuan13/predictive-model-of-joint-dynamics-and-ground-reaction-force`). Validado con SPM1D contra Vicon+AMTI — **el mismo motor estadístico que ya está construido y probado en `CODIGOS/ESTADISTICA/SPM1D_Core.m`**, cero adaptación necesaria del lado del análisis. Entrenado con 10 sujetos sanos, validado con 4 sanos separados (Xi'an Jiaotong University) — **sin validación externa independiente todavía**, que es exactamente el rol que puede cumplir este proyecto.
+- **Dato colateral, no es un generador pero es evidencia de viabilidad de hardware:** [Karakish, Fouz & Elsawaf 2022, *Sensors*](https://doi.org/10.3390/s22218441) corre un MLP de estimación de marcha **desplegado en un ESP32** — el mismo microcontrolador que ya está instalado en el banco — con 2.4 ms de tiempo de inferencia. No usa antropometría como entrada (usa IMU de shank/foot), así que no sirve como generador, pero confirma que un modelo de este tamaño cabe en el hardware que ya existe sin necesitar más cómputo.
+- **Vacío que se confirma, no se resuelve:** sigue sin existir ningún modelo de generación de trayectoria desde antropometría entrenado/ajustado a marcha protésica o población amputada — todos los candidatos (los 5 de agosto + Zhao 2026) están ajustados a sujetos sanos. Sigue siendo el riesgo de la fila 2 de §8.
+
+**Con Zhao 2026 en la mesa, se actualiza la recomendación del §6:** sigue siendo razonable partir de J Biomech 2014 (pensado para robótica) o Sci Rep 2019 (más simple) como candidatos, pero **Zhao 2026 es hoy el más fuerte de los seis** — entrada más mínima, salida más completa (cinemática + GRF juntas), y ya compatible con la herramienta de análisis que el proyecto tiene construida.
+
 ### 4.2 Los tres precedentes que definen el hueco — prioridad de lectura máxima
 
 Aquí está el hallazgo que reordena el análisis. **No es cierto que "nadie haya cerrado el lazo sobre hardware"** — como decía la versión 1 de este documento. Hay que corregirlo:
@@ -179,6 +189,22 @@ Prueba HiL donde **el amputado se modela** (modelo Virtual Pivot Point) y la pr�
 > **No existe: generación de trayectorias personalizada por antropometría, ejecutada físicamente en un banco de prótesis, y validada contra los sujetos individuales para los que fue personalizada.**
 
 Esa frase es el aporte, y es defendible — pero es una frase estrecha. Cualquier desviación (no personalizar, no validar contra los mismos sujetos, no ejecutar físicamente) la devuelve a territorio ya ocupado.
+
+### 4.4 Bases de datos de validación externa — búsqueda 19-ago-2026, resultado honesto
+
+El pivote (P-20, `DISCUSION_Q2.md`) pide validar el modelo generado contra datos que **no** participaron en construirlo — sin circularidad, mismo principio del §7.2 — y con preferencia explícita del equipo por una base **peruana o sudamericana**, porque el argumento de independencia regional del modelo (entrada = antropometría, no geografía) se sostiene mejor si la validación cruza de continente.
+
+**No existe ninguna base de datos pública de marcha peruana o sudamericana, con antropometría, verificada y disponible hoy.** Búsqueda en español e inglés, sin resultado — no es que falte buscar más, es un vacío real del campo en esta región. Si el equipo insiste en el criterio regional, **la opción realista es capturar la base propia** (con el iSen que ya está disponible y probado) en vez de esperar encontrar una publicada que probablemente no existe.
+
+Alternativas generales, sí verificadas como públicas y activas hoy:
+
+| Dataset | Qué mide | Población | Por qué serviría / por qué no |
+|---|---|---|---|
+| [GaitRec (Horsak et al. 2020, *Scientific Data*)](https://doi.org/10.1038/s41597-020-0563-y) | GRF bilateral, 75,732 ensayos | 211 sanos + 2084 pacientes | Grande y público, pero **solo fuerza, no cinemática articular** — no sirve para validar la trayectoria generada, sí podría servir para la parte de Fz |
+| [Camargo et al. — EPIC Lab, Georgia Tech](https://www.epic.gatech.edu/opensource-biomechanics-camargo-et-al/) | Cinemática 3D completa + sensores, terreno variado | 22 sanos | Bien documentado, repositorio activo — buena opción genérica si no se insiste en sudamericano |
+| **[Hood, Ishmael et al. 2020, *Scientific Data*](https://doi.org/10.1038/s41597-020-0494-7)** | Cinemática y cinética completas, múltiples velocidades | **18 amputados transfemorales reales** | **El más valioso pese a no ser transtibial exacto** — es población protésica real, no sana. Sirve además para acercarse al vacío del §4.1 (no hay generador ajustado a amputados): compararía un modelo entrenado en sanos contra marcha protésica real, que es honestamente lo que este proyecto puede reclamar sin inventar un modelo nuevo |
+
+**Recomendación con esto:** llevar esta decisión a discusión explícita en `DISCUSION_Q2.md` (P-21) — no se elige por cuenta propia entre "capturar base propia con iSen" vs. "usar Hood 2020 (amputados, no regional)" vs. "usar Camargo (sanos, no regional)" sin que el equipo lo confirme, porque cambia qué tan fuerte es el argumento de independencia regional del artículo.
 
 ---
 
