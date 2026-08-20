@@ -255,6 +255,20 @@ El equipo pidió explícitamente que ningún candidato (algoritmo o base de dato
 
 **Consecuencia práctica:** Yun 2014, vía este toolbox, pasa a ser **el candidato más fácil de cumplir P-23 al pie de la letra** de los tres en danza (Koopman, Zhao, Yun) — no hay que programar nada, solo correr `Gait_Pred.m` con los hiperparámetros ya publicados. Candidato a sumarse como tercer modelo del contraste, una vez que alguien del equipo descargue el `.zip` de SourceForge y confirme que corre.
 
+**✅ Verificado 20-ago-2026 — el `.zip` de SourceForge se descargó y el código se revisó (no solo el manual).** 120 archivos, íntegro: `database/Data_x.mat` + `Data_y.mat` (108 sujetos), `Gait_Pred.m`, `Gait_Model.m`, dependencias GPR completas en `GP/`, y los 14 archivos de hiperparámetros ya optimizados (`hyp/hyp_op1.mat`…`hyp_op14.mat` + `hyp_op_P.mat` para el período). Copia local en `docs/literatura/pdfs/yun2014_toolbox/`.
+
+**Interfaz confirmada, lista para usar sin modificar nada:**
+
+```matlab
+Gait_Kinematics = Gait_Pred(test_body_parameter, 'database', 'hyp')
+```
+
+- **Entrada:** vector de 14 valores — `[Edad, Talla(cm), Masa(kg), Sexo(0:f 1:m), Long.Muslo(mm), Long.Pantorrilla(mm), Ancho Bi-trocantéreo(mm), Ancho Bi-ilíaco(mm), ASIS(mm), Diámetro Rodilla(mm), Long.Pie(mm), Altura Maléolo(mm), Ancho Maléolo(mm), Ancho Pie(mm)]`.
+- **Salida:** celda de 15 elementos (14 movimientos articulares + período de marcha), cada uno con `.mean` (trayectoria predicha, tiempo normalizado) y `.std` (incertidumbre). **Los que importan para la reducción del §5: `R./L. Knee Flexion` y `R./L. Ankle P.flex.` — exactamente rodilla y tobillo, sin nada más que extraer.**
+- Corre en Matlab **y** Octave (detecta `OCTAVE_VERSION` automáticamente) — mismo patrón de compatibilidad dual que ya sigue el resto de `CODIGOS/` del proyecto.
+
+**Con esto, Yun 2014 deja de ser "en espera" — es un tercer candidato confirmado y listo**, junto a Koopman 2014 y Zhao 2026 (P-24). No hace falta ninguna acción más del equipo para este candidato en particular; el siguiente paso es técnico (construir el pipeline de comparación), no de investigación.
+
 ---
 
 ## 5. La contribución técnica que falta poner en el centro: la reducción a 3 DOF
