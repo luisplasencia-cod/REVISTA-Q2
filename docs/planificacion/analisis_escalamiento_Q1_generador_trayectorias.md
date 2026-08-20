@@ -232,6 +232,19 @@ El equipo pidió explícitamente que ningún candidato (algoritmo o base de dato
 
 **Lectura honesta de esta tabla:** los candidatos más recientes (Zhao 2026, Electronics 2025, Hood 2020) tienen cero o casi cero evidencia de adopción — no porque sean poco confiables, sino porque son demasiado nuevos para que otros equipos ya los hayan reutilizado. Eso es una limitación real a declarar si se adoptan, no un motivo automático de descarte. **Los dos candidatos con adopción más sólida y verificable son Koopman 2014 (algoritmo, ya recomendado en §6) y Camargo 2021 (base de datos, con el margen más amplio de los tres).**
 
+**Importancia de parámetros por candidato — búsqueda 20-ago-2026 (para P-23, combinar sin reentrenar):**
+
+| Candidato | ¿Reporta importancia/peso de sus parámetros? |
+|---|---|
+| Yun 2014 (14 parámetros, GPR) | **Sin verificar — texto completo no accesible en esta pasada** (PDF del autor devolvió binario ilegible, ResearchGate bloqueó acceso con 403). Pendiente de acceso institucional PUCP, mismo patrón que R4 (Sudeesh 2024) |
+| Koopman 2014 | No aplica — usa solo 2 parámetros (velocidad, talla), no hay "ranking" con tan pocos |
+| Moissenet 2019 | Los coeficientes de su regresión (4 predictores) indican peso relativo implícitamente, pero no se confirmó que el paper lo discuta como "importancia" explícita |
+| Semwal 2023 (LSTM+CNN) | No — es caja negra, sin desglose de features |
+| Xin 2025 | No encontrado — 3 parámetros mapeados por GPR a coeficientes de Fourier, sin ranking |
+| Zhao 2026 | Ya minimalista por diseño (3 parámetros) — no hay ranking que hacer con tan pocos |
+
+**Lectura honesta:** la pregunta "qué parámetros influyen más" (P-23, Candidato 2) es más difícil de responder de lo que parecía — la mayoría de los seis candidatos no reportan esto explícitamente, sea porque usan pocos parámetros (Koopman, Zhao) o porque son caja negra (Semwal). **Yun 2014 sigue siendo la mejor apuesta** para responderla, pero necesita el texto completo — acción pendiente: acceso institucional PUCP, igual que R4.
+
 ---
 
 ## 5. La contribución técnica que falta poner en el centro: la reducción a 3 DOF
@@ -260,6 +273,16 @@ Por qué esto convierte el artículo:
 - **La adaptación deja de ser "a nuestro antojo"** y pasa a ser justificable. Importante: un revisor castiga las modificaciones ad hoc. Toda modificación al modelo publicado tiene que tener una razón declarada (restricción del banco, rango de los motores, límite de velocidad) y, si se puede, una **ablación** que muestre qué aporta cada una.
 
 **Comprobación pendiente:** confirmar si la reducción es exactamente 3 DOF o si el banco impone acoplamientos adicionales (p. ej. si el eje sagital rota sobre un punto fijo y no sobre el centro articular anatómico, aparece un error de offset que hay que modelar). Esto se resuelve con el CAD y con el equipo de Mecatrónica, no con literatura.
+
+### 5-bis. Respaldo bibliográfico de la reducción — búsqueda 20-ago-2026
+
+Se buscó si esta transformación (ángulos articulares → orientación del segmento tibial) ya está resuelta en literatura, en vez de derivarla desde cero. **Resultado: sí, y es biomecánica clásica bien establecida — no hay que inventarla, hay que citarla.**
+
+- **Es la relación estándar entre ángulo relativo (articular) y ángulo absoluto (de segmento).** Cadera/rodilla/tobillo son ángulos **relativos** (entre dos segmentos adyacentes); la inclinación del segmento tibial respecto a la horizontal —exactamente la convención `atan2` que ya usa este proyecto— es un ángulo **absoluto**. La relación entre ambos es directa: el ángulo absoluto de un segmento se obtiene sumando/restando los ángulos relativos articulares desde una referencia (típicamente el pie o el suelo) a lo largo de la cadena cinemática. **Cita de respaldo:** Winter, *Biomechanics and Motor Control of Human Movement* — el texto de referencia estándar del campo para esta distinción (edición/DOI a verificar antes de fijarla en el manuscrito, no confirmado a texto completo todavía).
+- **Reencuadre honesto de la novedad, no una mala noticia:** que la transformación en sí sea cinemática de libro de texto **no le quita valor al aporte** — al contrario, lo hace más defendible ante un revisor porque no es un método ad hoc inventado por el equipo. La novedad real está en **aplicar** esta reducción estándar al problema específico de un banco de prótesis de 3-DOF y **validarla** contra bases de datos independientes — no en la matemática de la transformación misma.
+- **OpenSim, confirmado como la herramienta/referencia metodológica establecida del campo** para este tipo de cálculo (orientación de segmento desde ángulos articulares, vía su motor de cinemática directa/inversa, con modelos de pierna que usan `hip_flexion`/`knee_angle`/`ankle_angle` como coordenadas generalizadas). No hace falta instalarlo, pero es una cita de respaldo metodológico reconocida — más fuerte que presentar la reducción como un cálculo propio sin precedente.
+
+**Consecuencia práctica para las longitudes de segmento (entrada de la reducción):** si el equipo no mide directamente todas las longitudes de segmento de cada sujeto, existe el estándar de facto del campo para estimarlas desde talla/masa/sexo: **de Leva 1996**, *"Adjustments to Zatsiorsky-Seluyanov's segment inertia parameters"*, *Journal of Biomechanics* 29(9):1223-1230, DOI `10.1016/0021-9290(95)00178-6` — verificado (2900+ citas, PDF completo disponible). **Caveat real:** calibrado para adultos jóvenes; existe un ajuste posterior para adultos mayores (2015, ScienceDirect) si la cohorte de validación elegida no es de adultos jóvenes — revisar según qué base de datos se termine usando (Camargo/GaitRec/Hood).
 
 ---
 
