@@ -40,6 +40,8 @@
 > 🚨 **CAMBIO DE RUMBO CERRADO (19-ago-2026) — ver P-20 en §4-quater.** El artículo reemplaza por completo el enfoque anterior: ya no es fidelidad de seguimiento multi-sujeto, es generación propia de trayectoria desde antropometría, validada contra bases de datos independientes (preferencia: peruanas/sudamericanas). **El tablero de abajo describe el artículo ANTERIOR — queda como historial, no como estado vigente**, hasta que se rehaga con el nuevo alcance.
 >
 > ⬜ **P-22 pendiente (§4-sexies, 20-ago-2026):** cerrando la última ambigüedad de alcance — confirmar si el banco físico puede ejecutar/medirse a sí mismo sin sujeto humano (sin ética) o si el artículo es 100% computacional. También ahí: 6 candidatos de algoritmo en secciones individuales, listos para revisar uno por uno.
+>
+> 📍 **Dónde contestar ahora mismo (20-ago-2026):** todo lo pendiente vive en **§4-sexies**, un poco más abajo en este mismo archivo — busca "4-sexies" (Ctrl+F). Ahí están: (1) las 2 preguntas de P-22, (2) las 6 secciones de candidato de algoritmo, cada una con su propio bloque `✍️`. No hace falta responder todo de una vez — cada bloque es independiente. **Dónde está el avance hacia Q1/Q2:** `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md`, sección **§13 "Tablero cuantificado"** — tiene el puntaje (29/100 al 05-ago) y qué falta para subir. Ese puntaje se recalcula apenas cierre P-22 (ver nota en §4-sexies).
 
 ## 1 · Tablero de avance
 
@@ -680,6 +682,14 @@ Dijiste que estaba entendiendo mal dos cosas. Las fijo aquí, explícitas, para 
 ✍️ TU RESPUESTA
 
 ```
+
+### Aclaración técnica (20-ago-2026) — no es una pregunta nueva, ya estaba resuelta en el diseño
+
+Preguntaste: si no se encuentra una base de datos que ya tenga "la trayectoria del segmento tibial" lista, ¿se puede usar en cambio cualquier fuente/algoritmo que dé **posiciones de rodilla y tobillo**, y de ahí estimar la trayectoria tibial? **Sí, y de hecho es exactamente como ya está diseñado** — no hace falta un plan B, es el plan A:
+
+- **Los 6 candidatos de algoritmo (abajo) YA predicen ángulos de cadera, rodilla y tobillo** — ninguno da "trayectoria tibial" directamente, todos dan ángulos articulares clásicos. Lo mismo pasa con **los 3 candidatos de base de datos de validación** (Camargo, GaitRec, Hood — cinemática articular estándar, no un ángulo de segmento).
+- **La trayectoria del segmento tibial (lo que el simulador de verdad necesita, con la convención `atan2` del proyecto) se DERIVA de esos ángulos articulares**, no se busca ya hecha en ninguna parte. Esa derivación es exactamente la **"reducción a 3 DOF"** descrita en `analisis_escalamiento_Q1_generador_trayectorias.md` §5 — cinemática directa: ángulos articulares + longitudes de segmento del sujeto → posición/orientación del segmento tibial. Es, de hecho, **la contribución técnica propia más importante del artículo** (fila 2 del tablero §13, la que más define si esto es Q1 o Q2), no un cálculo secundario.
+- **Consecuencia práctica:** esto amplía qué cuenta como candidato válido — cualquier algoritmo o base de datos que reporte ángulos articulares estándar de cadera/rodilla/tobillo sirve, sin necesidad de que ya venga en el formato exacto del simulador. No se descarta ningún candidato de los ya listados por este motivo — todos califican.
 
 ### Revista — pendiente de la respuesta de arriba
 
