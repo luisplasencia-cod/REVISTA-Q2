@@ -1,5 +1,9 @@
 # Claude Code — configuración local (no compartida con el equipo)
 .claude/settings.local.json
+.claude/settings.json
+
+# macOS
+.DS_Store
 
 # Archivos sueltos sin relación con el artículo Q2
 /TESIS AGUILAR - GONZALES.pdf
