@@ -4,6 +4,12 @@ Guía para dejar la segunda laptop (Mac u otra) al mismo nivel que esta: mismo r
 
 Hecha el 19-ago-2026, a partir de lo instalado en la laptop principal (Windows). Si en el futuro se agrega o quita un plugin, actualizar esta lista.
 
+## Estado en la Mac (actualizado 22-ago-2026)
+
+- **Pasos 1-4 (repo, marketplaces, plugins) — completos.** Los 4 marketplaces de terceros agregados y los 7 plugins instalados.
+- **Bug encontrado al instalar `thinking-skills@thinking-skills-marketplace`:** el `plugin.json` del repo de terceros (`tjboudreaux/cc-thinking-skills`) declara `"skills": ["skills/"]` (sin prefijo `./`), que la versión actual del CLI rechaza con `skills: Invalid input` — el schema exige que cada ruta empiece con `./` (`"./skills/"` sí valida). Es un bug del repo externo, no de esta instalación. **Fix aplicado localmente en la Mac:** se editó a mano el `plugin.json` cacheado en `~/.claude/plugins/marketplaces/thinking-skills-marketplace/.claude-plugin/plugin.json`, cambiando `"skills/"` → `"./skills/"`. Ese parche vive fuera del repo (`~/.claude`, no se sincroniza por git) y **se pierde si se corre `/plugin marketplace update`** — si el error reaparece en cualquier laptop, aplicar el mismo cambio de una línea.
+- **Paso 5 (base de datos KIST) — pendiente, dejado para la próxima sesión en la Mac.** No es bloqueante para nada del código ya escrito, solo hace falta si se va a correr `Gait_Pred.m`/`demo_Gait_Pred.m` del toolbox Yun 2014. Ver instrucciones completas abajo.
+
 ## 1. Clonar el repo
 
 ```bash
