@@ -68,9 +68,18 @@ Por diseño, algunos archivos quedan fuera de git a propósito (ver `.gitignore`
 
 Sin este paso, `Gait_Pred.m`/`demo_Gait_Pred.m` no van a poder cargar la base y el toolbox no corre.
 
+**Material suplementario del paper Yun et al. 2014 (J Biomech, ScienceDirect)** — manual del toolbox y figuras extra de los 113 sujetos (referenciadas en la Fig. 7 del artículo, ver `docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md` línea ~248). Es material de Elsevier con acceso restringido, tampoco va al repo.
+
+1. Con acceso institucional PUCP (VPN o red de campus), abrir:
+   `https://www.sciencedirect.com/science/article/abs/pii/S0021929013004879`
+2. Descargar los dos adjuntos de "Supplementary data" (`mmc1.pdf` — manual, `mmc2.pdf` — figuras, ~3.2 MB).
+3. Colocarlos en `docs/literatura/pdfs/yun2014_supp/` del repo local (crear la carpeta si no existe).
+
+Sin este paso no se pierde funcionalidad de código — solo referencia documental para `docs/algoritmo/diseno_matematico_generador.md`.
+
 ## Notas
 
 - Los pasos 2-4 son instalación **global de usuario** (`~/.claude`), no tocan el repo — no hace falta commitear ni pushear nada por esto.
 - `.claude/settings.local.json` (permisos locales) **no** se sincroniza por diseño — cada laptop arma su propio historial de permisos allow/deny a medida que se usa. No es necesario copiarlo.
 - Si se agrega un plugin nuevo en una laptop, conviene volver a este archivo y sumarlo a la lista para que la otra laptop no se quede desactualizada.
-- **Nunca** subir `docs/literatura/pdfs/yun2014_toolbox/database/*.mat` a git, aunque git no se queje — está en `.gitignore` a propósito.
+- **Nunca** subir `docs/literatura/pdfs/yun2014_toolbox/database/*.mat`, el `.zip` de SourceForge, ni el `.zip`/carpeta de material suplementario de ScienceDirect a git, aunque git no se queje — los tres están en `.gitignore` a propósito.
