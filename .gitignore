@@ -12,3 +12,13 @@ __pycache__/
 # licencia prohibe redistribución fuera del toolbox. Se mantiene en disco
 # local para correr Gait_Pred.m, nunca en el repo (es público).
 docs/literatura/pdfs/yun2014_toolbox/database/*.mat
+
+# Release .zip del toolbox Yun 2014 (SourceForge) — trae la base KIST
+# empaquetada adentro, mismo motivo que arriba. Descargar aparte, ver
+# docs/configuracion/setup_nueva_laptop.md §5.
+docs/literatura/pdfs/Gait_Kinematics_Prediction_V1.01_Release.zip
+
+# Material suplementario de ScienceDirect/Elsevier (paywalled, acceso
+# institucional PUCP) — no redistribuible en un repo público.
+docs/literatura/pdfs/ScienceDirect_files_*.zip
+docs/literatura/pdfs/yun2014_supp/
