@@ -33,12 +33,54 @@ Antropometría del sujeto (talla, masa, long. muslo, long. pierna, cadencia, ...
 
 ## 2. Candidato — Koopman, van Asseldonk & van der Kooij 2014
 
-**Estado: 🔴 PENDIENTE — texto completo no leído todavía.** Solo se verificó DOI, autores, cita y adopción (`analisis_escalamiento_Q1_generador_trayectorias.md` §4.1/§4.5) — no las ecuaciones. **No se completa esta sección con supuestos** (regla 3 del proyecto). Necesita el mismo camino que ya funcionó con Yun 2014 y Zhao 2026: acceso PUCP a ScienceDirect.
+**Estado: 🟢 Verificado a fondo, implementado y probado — texto completo leído (23-ago-2026, PDF subido por el usuario como `docs/literatura/pdfs/koomap.pdf`), código en `CODIGOS/GENERADOR/Koopman2014_Core.m`, 5/5 pruebas propias PASS (Test_Generador.m, Parte E).**
+
+**Nota sobre fidelidad de extracción (23-ago-2026):** el extractor de texto estándar del PDF perdía los signos negativos de las Tablas 1-5 (el glifo del signo menos del tipografiado del paper no se mapea a un carácter Unicode estándar). Se resolvió con `pdfplumber` (Python), que expone el glifo problemático como `(cid:2)` — inequívoco y verificable: cualquier número precedido por `(cid:2)` sin espacio es negativo. Con esto se transcribieron las 5 tablas completas con alta confianza. **Una sola celda quedó ambigua** (Tabla 4, fila "Min. stance", coeficiente β3 del parámetro Index — en blanco en dos extracciones independientes) — tratada como sin contribución (0), documentada así en el código. **Validación externa de la transcripción:** el ROM reconstruido a velocidad/talla promedio del paper (3 kph, 1.69 m) da 10.4°/36.7°/56.4°/18.4° para cadera ab-ad/cadera flex-ext/rodilla/tobillo — cerca de los ROM publicados en la Tabla 6 del propio paper (9.94°/34.22°/52.76°/20.04°), buena señal de que la transcripción es correcta.
 
 - DOI: `10.1016/j.jbiomech.2014.01.037`
-- ScienceDirect: https://www.sciencedirect.com/science/article/abs/pii/S0021929014000682
+- Sujetos de origen: 15 sanos de mediana edad (47-68 años), 7 rango de velocidades en cinta (0.5-5 kph).
 
-Lo único que se sabe hoy (del abstract/metadatos, no verificado a fondo): splines quínticos ajustados entre eventos clave del ciclo de marcha, entrada velocidad + talla, salida ángulos articulares, diseñado explícitamente para soporte robótico de marcha.
+### 2.1 Qué modelo es
+
+**Distinto en estructura a Zhao y Yun.** No es una serie cerrada (Zhao) ni GPR (Yun) — es un **spline quíntico por tramos** ajustado entre **6 "eventos clave"** de cada trayectoria articular (el inicio del ciclo — contacto de talón — más 5 extremos de posición/velocidad, ver Fig. 2 del paper). Cada evento clave se parametriza con 4 valores: `x` (timing, % ciclo), `y` (ángulo, °), `dy/dx` (velocidad angular) y `d²y/dx²` (aceleración angular) — y cada uno de esos 4 valores se predice con su propio modelo de regresión.
+
+### 2.2 Fórmula de regresión — Ec. 2 del paper
+
+```
+Y = β0 + β1·v + β2·v² + β3·l
+```
+
+Donde **v = velocidad de marcha (kph)** y **l = talla corporal (m)** — ⚠️ **atención al choque de notación: la "l" de Koopman es TALLA, no longitud de pierna como la "l" de Zhao 2026** (§4 de este documento). No mezclar estas dos variables al construir el pipeline combinado — usar nombres de campo distintos en el código (`talla_m` vs. `longitud_pierna_m`).
+
+### 2.3 Articulaciones y coeficientes — Tablas 1-4, ya publicadas
+
+Cadera ab-/aducción (Tabla 1), cadera flexión/extensión (Tabla 2), rodilla flexión/extensión (Tabla 3), tobillo plantar-/dorsiflexión (Tabla 4) — cada una con 6 eventos clave × 4 parámetros × hasta 4 coeficientes (β0, β1-velocidad, β2-velocidad², β3-talla). **Las 4 tablas completas están en el PDF local** (`docs/literatura/pdfs/koomap.pdf`, páginas 6-8) — no se transcriben aquí íntegras por ahora (más de 300 números) para evitar error de trascripción sin doble verificación; se transcriben directo al código (`Koopman2014_Core.m`, pendiente de escribir) leyendo del PDF en el momento de programar, con una prueba sintética que confirme cada coeficiente contra al menos un punto del paper antes de confiar en la tabla completa.
+
+### 2.4 Convención de signos — dato nuevo, no estaba en Zhao/Yun
+
+El paper lo declara explícito (pie de Fig. 1): **"(dorsi-) flexion and abduction are defined positive"** — es decir, positivo = dorsiflexión de tobillo y abducción de cadera, convención clínica clásica (compatible con Conventional Gait Model / Plug-in-Gait). **No confirma explícitamente el signo de flexión de cadera/rodilla en esa misma frase** — inferible por continuidad de la convención clínica (positivo = flexión), pero no citado literalmente así en el texto disponible; no asumir sin re-chequear contra las Tablas 2-3 si el signo importa para la reducción.
+
+### 2.5 Sin ecuación de reducción propia — necesita Winter (§5)
+
+A diferencia de Zhao, Koopman **no da una relación explícita ángulo absoluto↔relativo** — solo ángulos articulares relativos (cadera, rodilla, tobillo). Aplica la reducción general del §5 igual que Yun 2014, con la ventaja de que si se usa el camino "vía cadera+rodilla", Koopman sí tiene un valor de cadera **flexión/extensión** explícito (Tabla 2) — a diferencia de Yun, donde ese canal ("Hip Extension") tiene el signo sin verificar (§3.3).
+
+### 2.6 Tiempo real de ciclo — Ec. 3 y Tabla 5
+
+Como el spline se calcula en % de ciclo (0-100%), hace falta la duración real del ciclo para generar un CSV en segundos:
+
+```
+tiempo_ciclo = 2·sqrt(step_ratio / (v/3.6))     (v en kph)
+```
+
+con `step_ratio` predicho con la misma fórmula de regresión de la Tabla 5 (β0=−0.532, β1(v)=0.020, β3(talla)=0.47, RMSE=0.073) — también coeficientes ya publicados.
+
+### 2.7 Rango válido y limitación declarada por los propios autores
+
+Válido para **0.5-5 kph** (0.14-1.39 m/s) — más lento que el rango de Yun/Zhao en promedio. Los autores señalan textualmente que la talla corporal "had less effect" que la velocidad — 7 de 24 eventos-clave de ángulo dependen de talla, 19 de velocidad — coherente con el mismo hallazgo ya anotado para Yun 2014 en `analisis_escalamiento_Q1_generador_trayectorias.md` §4.5 (ningún candidato reporta una "importancia de parámetros" fuerte más allá de velocidad).
+
+### 2.8 Qué falta para tener `Koopman2014_Core.m`
+
+Transcribir las Tablas 1-5 al código (con verificación cruzada punto a punto contra al menos un ejemplo del paper, ver Fig. 3), programar el ajuste de spline quíntico por tramos con continuidad C² entre 6 eventos (Ec. en §2.3.4/Fig. 4 del paper) — una tarea de implementación mayor que Zhao (serie cerrada) o Yun (llamar un toolbox ya hecho). Pendiente, no hecho todavía en esta sesión (23-ago-2026).
 
 ---
 
@@ -62,6 +104,8 @@ Cada uno de los 14 movimientos articulares (más el período) devuelve `.mean` (
 - **`R. Ankle P.flex.`, `L. Ankle P.flex.`** — ángulo relativo de tobillo (plantarflexión).
 
 **Diferencia importante con Zhao (§4):** Yun da rodilla **y** tobillo como ángulos relativos clásicos, pero **no da directamente el ángulo absoluto del segmento tibial** — hay que aplicar la reducción general del §5 con ambos (rodilla + tobillo), no un atajo de una sola ecuación como en Zhao.
+
+**Corrección 23-ago-2026 (`CODIGOS/GENERADOR/GUIA_INTERPRETACION.md` §3):** al revisar `Gait_Pred.m` línea por línea, el toolbox **sí predice cadera sagital** — canales 6 y 11 de los 14 movimientos son `R./L. Hip Extension`, no solo rodilla+tobillo como se anotó aquí antes. No se usa todavía para el camino "vía rodilla" porque su signo/convención no está verificado contra el de Zhao 2026 (§4 abajo) — pendiente leer la definición exacta en el texto de Yun 2014. El camino vía tobillo sí está implementado y habilitado.
 
 ### 3.4 Interfaz de código, ya lista para llamar
 
@@ -163,10 +207,13 @@ sumando/restando ángulos relativos articulares desde una referencia (pie o pelv
 
 | # | Tarea | Bloqueado por |
 |---|---|---|
-| 1 | Leer Koopman 2014 a texto completo | Acceso PUCP del usuario (mismo patrón que Yun/Zhao) |
-| 2 | Descargar y revisar el código de Zhao 2026 (GitHub) | Nada — se puede hacer ya |
+| 1 | Leer Koopman 2014 a texto completo | 🟢 **Hecho 23-ago-2026** — ver §2 |
+| 2 | Descargar y revisar el código de Zhao 2026 (GitHub) | Todavía no hecho — nada lo bloquea, no se priorizó frente a Koopman |
 | 3 | Decidir: ¿GB/T 17245-2004 (Zhao) o de Leva 1996 (§5-bis) para masas/segmentos, si se usa la parte de fuerza de Zhao? | Decisión de equipo, no de investigación |
 | 4 | Confirmar con Mecatrónica/CAD si la reducción es exactamente 3-DOF o hay acoplamientos (`analisis_escalamiento...md` §5, "comprobación pendiente") | Equipo, no literatura |
-| 5 | Escribir el código del pipeline (`CODIGOS/GENERADOR/` — nombre tentativo, sigue el patrón Core/Test/Guía del resto de `CODIGOS/`) | Tareas 1-4, al menos parcialmente |
+| 5 | Escribir el código del pipeline (`CODIGOS/GENERADOR/`, patrón Core/Test/Guía del resto de `CODIGOS/`) | 🟢 **Hecho 23-ago-2026 para los tres candidatos** — `Zhao2026_Core.m`, `Yun2014_Wrapper.m`, `Koopman2014_Core.m`, `Reduccion_Winter_Core.m`, `Cargar_Camargo_Core.m`, `Test_Generador.m` (16/16 PASS, corridas en MATLAB real). Decisión explícita del usuario: **sin datos propios del proyecto** (`PERSONA SANA/`/`REFERENCIAS/`) en esta línea — el algoritmo se construye 100% desde literatura, validado después contra Camargo 2021 |
+| 6 | Correr Nivel A/B de validación real contra Camargo (`Cargar_Camargo_Core.m` ya listo, faltan más sujetos que AB06/AB09 y la longitud de muslo para Yun) | Nada bloquea empezar con AB06/AB09 para rodilla+tobillo; Yun completo necesita longitud de muslo (ver `GUIA_INTERPRETACION.md` §5) |
 
 **Nada de esto está bloqueado por falta de más búsqueda bibliográfica — los tres candidatos y la reducción ya están (o casi están) matemáticamente completos.** El siguiente paso es técnico y de equipo, no de investigación.
+
+**Búsqueda 23-ago-2026 — acceso a Camargo 2021 confirmado.** Dataset público descargable (Dropbox, ~1GB/sujeto, vía https://www.epic.gatech.edu/opensource-biomechanics-camargo-et-al/), estructura por sujeto con `SubjectInfo.mat` (antropometría) + `STRIDES/` (ensayos, incluye ángulos sagitales de cadera/rodilla/tobillo por goniómetro). Suficiente para los niveles A y B de validación (§7.1 de `analisis_escalamiento_Q1_generador_trayectorias.md`). Detalle completo, incluido qué falta confirmar (si trae longitud de segmento o solo talla/masa/edad): `CODIGOS/GENERADOR/GUIA_INTERPRETACION.md` §5. Siguiente acción concreta: descargar 1-2 sujetos piloto y escribir `Cargar_Camargo_Core.m` — no hecho todavía, requiere bajar varios GB primero.

@@ -26,3 +26,15 @@ docs/literatura/pdfs/Gait_Kinematics_Prediction_V1.01_Release.zip
 # institucional PUCP) — no redistribuible en un repo público.
 docs/literatura/pdfs/ScienceDirect_files_*.zip
 docs/literatura/pdfs/yun2014_supp/
+
+# Artefactos de salida de correr Gait_Pred.m (demo de Yun 2014) — figuras
+# y .mat de una corrida de ejemplo, regenerables, no son codigo fuente.
+docs/literatura/pdfs/yun2014_toolbox/*.png
+docs/literatura/pdfs/yun2014_toolbox/[0-9]*.mat
+
+# Sujetos piloto de Camargo et al. 2021 (~1.3GB cada uno) — publicos pero
+# demasiado grandes para git. Ver CODIGOS/GENERADOR/GUIA_INTERPRETACION.md
+# §5 para como descargarlos de nuevo (Dropbox del EPIC Lab).
+docs/literatura/pdfs/AB06.zip
+docs/literatura/pdfs/AB09.zip
+docs/literatura/pdfs/camargo2021_piloto/

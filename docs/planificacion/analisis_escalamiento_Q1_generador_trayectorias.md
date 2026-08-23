@@ -524,6 +524,27 @@ Toda sección que se agregue de aquí en adelante cierra con su **estado cuantif
 
 **Historial de recálculos:** 05-ago-2026 → 29/100 (línea base).
 
+### 13.5 Recálculo post-pivote (23-ago-2026) — nuevo tablero, dimensiones distintas
+
+**Por qué es una tabla nueva y no un recálculo de §13.1:** las filas de §13.1 (hardware RPi-ESP32, ética, cohorte capturada) pertenecían al plan **anterior al pivote de P-20** (`docs/DISCUSION_Q2.md`) — la fase activa hoy es 100% computacional (P-22), esas filas ya no miden lo que decide si esta línea llega a buen puerto. §13.1 se conserva sin tocar como registro histórico. Esta tabla mide el plan vigente: generar la trayectoria desde antropometría (literatura, sin datos propios) y validarla contra Camargo 2021.
+
+| # | Dimensión | Peso | Hoy | Aporta | Qué la cierra |
+|---|---|---|---|---|---|
+| 1 | **Candidatos de algoritmo implementados y probados** (Koopman + Zhao + Yun) | 20 | 95% | 19.0 | Ya cerrado — 17/17 pruebas PASS en MATLAB real, incluida validación externa (ROM de Koopman cerca del publicado en su Tabla 6). El 5% que falta: una celda ambigua en las tablas de Koopman (documentada, no bloqueante) |
+| 2 | **Reducción cinemática** (ángulos articulares → segmento tibial → x,z,φ de plataforma, §5) | 15 | 40% | 6.0 | Vía tobillo lista y conectada para los 3 candidatos. `Segmento_Posicion_Core.m` (23-ago) ya convierte ángulo+longitud en posición (x,y) relativa, con invariante física verificada contra datos reales. Falta encadenar el muslo (mismo problema de signo de Yun/Koopman) y calibrar contra el cero real del banco — **eso último sigue bloqueado por Mecatrónica/CAD** |
+| 3 | **Validación Nivel A/B contra Camargo 2021** | 20 | 25% | 5.0 | `Cargar_Camargo_Core.m` listo y probado con AB06 real (marcadores, ángulos IK, longitud de tibia real). **La comparación en sí — correr los 3 candidatos con antropometría real de un sujeto de Camargo y medir el error contra sus ángulos reales — todavía no se ejecutó ni una vez** |
+| 4 | **Rigor estadístico reutilizado** (SPM1D, ICC(3,1), TOST, potencia a priori) | 15 | 85% | 12.75 | Ya construido y probado con sintéticos en sesiones previas (`ESTADISTICA/`, `POTENCIA_EQUIVALENCIA/`) — reutilizable tal cual. Falta aplicarlo con los datos reales de esta línea específica |
+| 5 | **Posicionamiento en la literatura** (diseño de validación en 3 niveles A/B/C, §7) | 10 | 40% | 4.0 | Diseño ya definido en este documento. Precedente clave (Sudeesh 2024 / R4) sigue bloqueado por 403 de ScienceDirect sin acceso institucional — pendiente desde antes del pivote |
+| 6 | **Encaje editorial / revista** | 10 | 10% | 1.0 | Sin decidir tras el pivote (banner de `CLAUDE.md`) — puede ser Q1 tipo TNSRE o quedarse en Q2, depende de qué tan lejos llegue el camino físico (fila 7) |
+| 7 | **Camino físico final** (cinemática completa + banco real, Nivel C) | 10 | 0% | 0.0 | Diferido, no descartado (P-22) — depende de Mecatrónica/CAD y, más adelante, de la integración RPi-ESP32 |
+| | **TOTAL** | **100** | | **47.75** | |
+
+**Lectura honesta del ~48:** casi la mitad del camino, y a diferencia del 29 de §13.1, **este casi-mitad sí es del tipo que decide si la línea funciona** (filas 1 y 2, el algoritmo en sí y su conversión a posición). Pero el patrón de riesgo se repite: lo más rápido de construir (código) ya está; lo que realmente prueba que sirve (fila 3, la validación real) sigue en 25%. **Ese es el próximo cuello de botella, no falta de código — falta correr el código que ya existe contra datos reales y mirar el número que sale.**
+
+**Palanca de mayor retorno inmediata:** cerrar la fila 3 (correr Nivel A/B real con AB06/AB09) no depende de nadie más que de escribir el script comparador (reusa `Calcular_Metricas_Curva.m`/`SPM1D_Core.m`, ya construidos) — sube esa fila de 25% a ~70% y el total a ~57/100, sin esperar a Mecatrónica, a una decisión de revista, ni a ningún acceso bloqueado.
+
+**Historial de recálculos (post-pivote):** 23-ago-2026 → 46.25/100 (línea base de esta tabla) · 23-ago-2026 (mismo día, más tarde, `Segmento_Posicion_Core.m`) → 47.75/100.
+
 ---
 
 ## Fuentes consultadas (05-ago-2026)
