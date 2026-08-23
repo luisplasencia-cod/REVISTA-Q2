@@ -88,6 +88,21 @@ Ya ejecutados, generaron los `.mat` que vive en `REFERENCIAS/` (curvas media±SD
 | `PresupuestoIncertidumbre_Core.m` | Combina componentes de incertidumbre (validación del instrumento, residuo de calibración de offset, repetibilidad ensayo-a-ensayo) siguiendo la ley de propagación de incertidumbre de la GUM (JCGM 100:2008): incertidumbre combinada por RSS, grados de libertad efectivos por Welch-Satterthwaite, factor de cobertura `k` calculado exactamente (no asumido en 2), incertidumbre expandida. Reporta qué % de la incertidumbre total aporta cada fuente — el diagnóstico más útil. Genérico, no hardcodea ningún número del proyecto. | Cuando exista una tabla de componentes real (instrumento + calibración de offset + repetibilidad) para el ángulo de plataforma. Decisión pendiente antes de usarlo así (ver guía, sección 6): qué cifra de Piche 2022 (rodilla/tobillo/cadera) usar como analogía del ángulo medido. |
 | `Test_PresupuestoIncertidumbre.m` | Prueba con datos sintéticos (7 pruebas): combinación RSS exacta, un solo componente, grados de libertad efectivos dominados por el componente con menos gl, contribución porcentual, ensanchamiento de `k` con muestras chicas, error controlado por campo faltante, y un caso de uso realista con las cifras de Piche 2022. | Antes de usar el Core con datos reales. |
 
+## 8. `GENERADOR/` — generador de trayectoria desde antropometría *(nuevo, 23-ago-2026)*
+
+**Guía:** `CODIGOS/GENERADOR/GUIA_INTERPRETACION.md`
+
+**Estado: los tres candidatos construidos, probados y corridos en MATLAB real (23-ago-2026, 16/16 PASS).** Es el código central del pivote de fondo (`CLAUDE.md`, banner inicial) — genera ángulos articulares desde antropometría y los reduce al ángulo absoluto del segmento tibial. **Sin datos propios del proyecto** (`PERSONA SANA/`/`REFERENCIAS/`) — algoritmo 100% de literatura, decisión explícita del usuario (23-ago-2026), validado después contra Camargo 2021 (2 sujetos piloto ya descargados, ver la guía §5).
+
+| Script | Para qué sirve | Cuándo correrlo |
+|---|---|---|
+| `Zhao2026_Core.m` | Genera φ_cadera(t), φ_rodilla(t) y θ_tibia = φ_cadera − φ_rodilla con los coeficientes ya publicados (Tabla 1, Zhao et al. 2026) — sin reentrenar. | Ya listo, dar longitud de pierna y cadencia. |
+| `Yun2014_Wrapper.m` | Llama al toolbox real de Yun 2014 (`Gait_Pred.m`, sin reentrenar) y aplica la reducción vía tobillo. | Cuando el toolbox esté en disco (`docs/literatura/pdfs/yun2014_toolbox/`, base KIST gitignored por licencia). |
+| `Koopman2014_Core.m` | Genera las 4 trayectorias articulares (cadera ab/ad, cadera flex/ext, rodilla, tobillo) con splines quínticos entre 6 eventos clave, coeficientes ya publicados (Tablas 1-5) — sin reentrenar. | Ya listo, dar velocidad (kph) y talla (m). |
+| `Reduccion_Winter_Core.m` | Relación general ángulo relativo↔absoluto: calcula θ_tibia vía rodilla y/o vía tobillo, y cruza ambos caminos como chequeo interno. | Lo llama `Yun2014_Wrapper.m`; también se puede usar con Koopman o con datos de Camargo. |
+| `Cargar_Camargo_Core.m` | Carga un ensayo real de Camargo 2021 (marcadores + ángulos IK + longitud de tibia real) para validación Nivel A/B. | Cuando el sujeto piloto esté en disco (`docs/literatura/pdfs/camargo2021_piloto/`). |
+| `Test_Generador.m` | 16 pruebas: sintéticas (Zhao + reducción) + reales (Yun con su toolbox, Camargo con AB06, Koopman contra el ROM publicado en su Tabla 6). | Ya corrido, 16/16 PASS. Re-correr si se modifica algún Core. |
+
 ---
 
 ## Qué es "tentativo" y sigue existiendo, pero no es el rumbo actual
