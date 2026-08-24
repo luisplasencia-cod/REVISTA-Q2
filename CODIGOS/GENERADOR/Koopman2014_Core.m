@@ -59,10 +59,10 @@ end
 if ~(isnumeric(l_m) && isscalar(l_m) && l_m > 0)
     error('l_m debe ser un escalar positivo (talla corporal en metros). Se recibio: %s', mat2str(l_m));
 end
-if v_kph < 0.5 || v_kph > 5
-    warning('Koopman2014_Core:fueraDeRango', ...
-        'v_kph=%.2f esta fuera del rango validado por el paper (0.5-5 kph) - extrapolacion, no interpolacion.', v_kph);
-end
+% La advertencia de rango (0.5-5 kph) se dispara dentro de
+% Tiempo_Ciclo_Koopman2014_Core.m (23-ago-2026, E4 de
+% plan_100_generador.md) - no se duplica aqui para no generar dos
+% advertencias con distinto id por la misma condicion.
 
 tablas = tablas_koopman();
 pct_ciclo = linspace(0, 100, opciones.nMuestras);
@@ -76,11 +76,10 @@ for k = 1:numel(tablas)
 end
 
 % --- Tabla 5: tiempo real de ciclo (Ec. 3 del paper) ---
-% step_ratio = beta0 + beta1*v + beta3*l  (sin termino v^2 en esta fila)
-coef_step_ratio = [-0.532, 0.020, 0, 0.47];
-step_ratio = evaluar_regresion(coef_step_ratio, v_kph, l_m);
-out.step_ratio = step_ratio;
-out.tiempo_ciclo_s = 2 * sqrt(step_ratio / (v_kph/3.6));
+% Extraido a Tiempo_Ciclo_Koopman2014_Core.m (23-ago-2026, E4) para
+% reusarlo como motor de temporizacion compartido - misma formula, sin
+% duplicar el coeficiente.
+[out.tiempo_ciclo_s, out.step_ratio] = Tiempo_Ciclo_Koopman2014_Core(v_kph, l_m);
 
 % --- Reduccion via tobillo (Reduccion_Winter_Core.m), pie plano en apoyo ---
 theta_pie_cero = zeros(size(pct_ciclo));
@@ -91,6 +90,29 @@ red = Reduccion_Winter_Core(struct( ...
     'signo_tobillo', -1));  % ver nota de signo en el encabezado de esta funcion
 out.theta_tibia_via_tobillo_rad = red.theta_tibia_via_tobillo_rad;
 out.theta_tibia_via_tobillo_deg = rad2deg(red.theta_tibia_via_tobillo_rad);
+
+% --- Reduccion via rodilla (NUEVO 23-ago-2026, E2 de plan_100_generador.md) ---
+% cadera_flexext YA declarado "flexion positive" por el propio paper
+% (Fig.1: "(dorsi-)flexion and abduction are defined positive") y
+% confirmado empiricamente (forma de curva contra hitos de marcha normal
+% de Perry & Burnfield/Winter, ver GUIA_INTERPRETACION.md #3) - MISMO
+% signo que Zhao 2026 (theta_tibia = theta_muslo - phi_rodilla, Sec.2.6,
+% con theta_muslo ~= phi_cadera bajo pelvis-vertical=0). Sin inversion
+% de signo necesaria para este camino (a diferencia del tobillo, arriba).
+theta_muslo_rad = deg2rad(out.cadera_flexext.angulo_deg);
+phi_rodilla_rad = deg2rad(out.rodilla_flexext.angulo_deg);
+red_rod = Reduccion_Winter_Core(struct( ...
+    'theta_muslo_rad', theta_muslo_rad, ...
+    'phi_rodilla_rad', phi_rodilla_rad));
+out.theta_tibia_via_rodilla_rad = red_rod.theta_tibia_via_rodilla_rad;
+out.theta_tibia_via_rodilla_deg = rad2deg(red_rod.theta_tibia_via_rodilla_rad);
+
+% --- Chequeo cruzado rodilla vs tobillo ---
+red_ambos = Reduccion_Winter_Core(struct( ...
+    'theta_muslo_rad', theta_muslo_rad, 'phi_rodilla_rad', phi_rodilla_rad, ...
+    'theta_pie_rad', theta_pie_cero, 'phi_tobillo_rad', phi_tobillo_rad, ...
+    'signo_tobillo', -1));
+out.chequeo_cruzado_max_abs_deg = red_ambos.diferencia_max_abs_deg;
 
 end
 
