@@ -42,11 +42,30 @@ function out = Yun2014_Wrapper(test_body_parameter, toolbox_dir)
 %   .theta_tibia_via_tobillo_R_rad, .theta_tibia_via_tobillo_L_rad
 %       Reduccion via tobillo (Reduccion_Winter_Core), asumiendo pie
 %       plano en apoyo (theta_pie = 0) - supuesto declarado, no dato
-%       medido. Camino "via rodilla" (usando Hip Extension) NO se calcula
-%       aqui todavia: el signo/convencion de "Hip Extension" de Yun no
-%       esta verificado contra la convencion de Reduccion_Winter_Core -
-%       usar .R_hip_extension/.L_hip_extension directo si se quiere
-%       intentarlo, con el signo como parametro explicito.
+%       medido.
+%   .theta_tibia_via_rodilla_R_rad, .theta_tibia_via_rodilla_L_rad
+%       (NUEVO 23-ago-2026, E2 de plan_100_generador.md) Reduccion via
+%       rodilla: theta_tibia = theta_muslo - phi_rodilla, con
+%       theta_muslo_rad = deg2rad(R_hip_extension) - MISMA convencion de
+%       pelvis-vertical=0 que usa Zhao2026_Core.m (verificado a texto
+%       completo, Zhao 2026 pag.8: "the angle of the pelvis in the
+%       sagittal plane is zero during walking; thus theta_hip=phi_hip").
+%       Signo determinado EMPIRICAMENTE (no por la etiqueta del canal,
+%       que dice "Hip Extension" pero mide flexion): se corrio el
+%       toolbox real y se comparo la forma contra los hitos de marcha
+%       normal de Perry & Burnfield/Winter - R_hip_extension resulto
+%       positivo cerca de 0%/100% (contacto inicial/fin de balanceo) y
+%       negativo a mitad de ciclo, EXACTAMENTE el patron de flexion
+%       positiva (no de extension positiva, que invertiria el signo).
+%       Misma conclusion para R_knee_flexion: siempre >= 0 en el ciclo,
+%       consistente con flexion positiva (coincide con Koopman y Zhao).
+%       Ver CODIGOS/GENERADOR/GUIA_INTERPRETACION.md #3 para el detalle
+%       numerico completo de esta verificacion (deciles, script
+%       reproducible). Diferencia_max_abs_deg contra la via tobillo
+%       queda en out.chequeo_cruzado_R/L como diagnostico interno - un
+%       valor grande no invalida el generador (las dos vias tienen
+%       supuestos distintos: pie plano vs pelvis vertical), pero se
+%       reporta para que quede trazado.
 %
 % Fuente: docs/planificacion/analisis_escalamiento_Q1_generador_trayectorias.md
 % #4.5, docs/algoritmo/diseno_matematico_generador.md #3.
@@ -103,5 +122,36 @@ red_L = Reduccion_Winter_Core(struct( ...
     'theta_pie_rad', theta_pie_cero, ...
     'phi_tobillo_rad', deg2rad(out.L_ankle_plantarflexion.mean)));
 out.theta_tibia_via_tobillo_L_rad = red_L.theta_tibia_via_tobillo_rad;
+
+% --- Reduccion via rodilla (NUEVO 23-ago-2026, E2) ---
+% theta_muslo ~= phi_cadera bajo el supuesto pelvis-vertical=0 (Zhao 2026
+% pag.8, verificado a texto completo). signo_rodilla=-1 por defecto
+% (Reduccion_Winter_Core.m), misma convencion que Zhao Sec.2.6:
+% theta_tibia = theta_muslo - phi_rodilla.
+red_rod_R = Reduccion_Winter_Core(struct( ...
+    'theta_muslo_rad', deg2rad(out.R_hip_extension.mean), ...
+    'phi_rodilla_rad', deg2rad(out.R_knee_flexion.mean)));
+out.theta_tibia_via_rodilla_R_rad = red_rod_R.theta_tibia_via_rodilla_rad;
+
+red_rod_L = Reduccion_Winter_Core(struct( ...
+    'theta_muslo_rad', deg2rad(out.L_hip_extension.mean), ...
+    'phi_rodilla_rad', deg2rad(out.L_knee_flexion.mean)));
+out.theta_tibia_via_rodilla_L_rad = red_rod_L.theta_tibia_via_rodilla_rad;
+
+% --- Chequeo cruzado: las dos vias deberian ser parecidas (supuestos
+% distintos: pie plano en apoyo vs pelvis vertical) ---
+chq_R = Reduccion_Winter_Core(struct( ...
+    'theta_muslo_rad', deg2rad(out.R_hip_extension.mean), ...
+    'phi_rodilla_rad', deg2rad(out.R_knee_flexion.mean), ...
+    'theta_pie_rad', theta_pie_cero, ...
+    'phi_tobillo_rad', deg2rad(out.R_ankle_plantarflexion.mean)));
+out.chequeo_cruzado_R_max_abs_deg = chq_R.diferencia_max_abs_deg;
+
+chq_L = Reduccion_Winter_Core(struct( ...
+    'theta_muslo_rad', deg2rad(out.L_hip_extension.mean), ...
+    'phi_rodilla_rad', deg2rad(out.L_knee_flexion.mean), ...
+    'theta_pie_rad', theta_pie_cero, ...
+    'phi_tobillo_rad', deg2rad(out.L_ankle_plantarflexion.mean)));
+out.chequeo_cruzado_L_max_abs_deg = chq_L.diferencia_max_abs_deg;
 
 end

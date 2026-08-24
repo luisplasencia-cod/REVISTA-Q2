@@ -332,7 +332,7 @@ n_total = n_total + 1;
 lastwarn('');
 Koopman2014_Core(6.0, l_test);
 [msg, id] = lastwarn();
-if strcmp(id, 'Koopman2014_Core:fueraDeRango')
+if strcmp(id, 'Tiempo_Ciclo_Koopman2014_Core:fueraDeRango')
     fprintf('[PASS] Test 16: v_kph=6 (fuera de 0.5-5) dispara advertencia de rango, no error\n'); n_pass = n_pass + 1;
 else
     fprintf('[FAIL] Test 16: no se disparo la advertencia esperada para v_kph fuera de rango\n');
