@@ -84,17 +84,25 @@ for cand = {'Koopman','Zhao','Yun'}
     c = cand{1};
     try
         r = Generar_Trayectoria(a, c);
+        % ACTUALIZADO 24-ago-2026 (decision del usuario, ciclo continuo):
+        % el APOYO sigue arrancando en (0,0), pero el BALANCEO ya NO -
+        % ahora continua exactamente donde termino el apoyo, para que el
+        % ciclo completo no tenga un salto artificial en el cambio de
+        % fase. El recorte a (0,0) por fase, si se necesita, se aplica al
+        % EXPORTAR, no aca. Ver Generar_Trayectoria.m, bloque "Ensamblar
+        % salida".
         campos_ok = isfield(r,'apoyo') && isfield(r,'balanceo') && ...
             isfield(r.apoyo,'x_cm') && isfield(r.apoyo,'y_cm') && isfield(r.apoyo,'angulo_deg') && ...
             numel(r.apoyo.x_cm) == numel(r.apoyo.t_s) && ...
             r.apoyo.x_cm(1) == 0 && r.apoyo.y_cm(1) == 0 && ...
-            r.balanceo.x_cm(1) == 0 && r.balanceo.y_cm(1) == 0;
+            abs(r.balanceo.x_cm(1) - r.apoyo.x_cm(end)) < 1e-9 && ...
+            abs(r.balanceo.y_cm(1) - r.apoyo.y_cm(end)) < 1e-9;
         ok = campos_ok && all(isfinite(r.apoyo.x_cm)) && all(isfinite(r.balanceo.angulo_deg));
     catch ME
         ok = false;
         fprintf('   (excepcion: %s)\n', ME.message);
     end
-    nPass = reportar(nPass, ok, nTotal, sprintf('Generar_Trayectoria(%s) corre y normaliza cada fase a (0,0)', c));
+    nPass = reportar(nPass, ok, nTotal, sprintf('Generar_Trayectoria(%s): apoyo arranca en (0,0) y balanceo CONTINUA el ciclo sin salto', c));
 end
 
 % ---- Test 13: Escribir_CSV_Simulador produce archivos con la

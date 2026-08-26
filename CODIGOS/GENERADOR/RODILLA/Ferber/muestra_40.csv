@@ -1,0 +1,41 @@
+sub_id,datestring,filename,speed_w,age,Height,Weight,Gender,DominantLeg,InjDefn,InjJoint,InjSide,SpecInjury,InjDuration,InjJoint2,InjSide2,SpecInjury2,Activities,Level,YrsRunning,RaceDistance,RaceTimeHrs,RaceTimeMins,RaceTimeSecs,YrPR,NumRaces
+100599,2012-09-05 10:19,20120905T101928.json,1.116220625,34,159.1,54.0,Male,Right,No injury,No Injury,Right,,,No Injury,Right,,running; cycling,Competitive,6.0,10k,,35,,0.0,
+100571,2012-07-24 14:29,20120724T142911.json,1.118999029,61,168.2,66.3,Male,Right,No injury,No Injury,Right,,,No Injury,Right,,running; bike; swim,Competitive,40.0,Full Marathon,2,44,,,
+100218,2011-09-21 14:18,20110921T141851.json,1.115861426,52,170.7,72.0,Male,Left,No injury,Ankle,Bilateral,achilles tendonitis,,No Injury,Right,,biking,Recreational,,Casual Runner (no times),,,,,
+100342,2011-11-02 13:56,20111102T135604.json,1.115239961,42,172.2,62.9,Male,Left,No injury,Knee,Right,pain,,No Injury,Right,,running,Recreational,,Casual Runner (no times),,,,,
+100262,2010-04-13 22:22,20100413T222256.json,1.239561789,26,173.4,68.6,Male,Right,No injury,No Injury,Right,,,No Injury,Right,,running,Recreational,1.0,Casual Runner (no times),,,,,
+100004,2014-09-29 10:27,20140929T102709.json,1.148794295,39,175.0,61.0,Male,Left,No injury,,,,,,,,Running,Competitive,24.0,5K,HH,13,38,2000.0,12.0
+100242,2009-06-17 13:18,20090617T131821.json,1.243531356,54,175.4,94.6,Male,Left,No injury,No Injury,Right,,,No Injury,Right,,Biking,Recreational,999.0,Casual Runner (no times),,,,,
+200336,2014-09-08 18:25,20140908T180457.json,1.253658935,34,177.0,84.0,Male,Left,No injury,,,,,,,,"Running, cycling",Recreational,10.0,5K,21,00,00,2012.0,3.0
+100212,2011-09-14 14:03,20110914T140313.json,1.1032,49,177.6,83.7,Male,Left,No injury,Hip/Pelvis,Left,pain,,Ankle,Right,pain,running,Recreational,,Casual Runner (no times),,,,,
+100580,2012-07-31 12:21,20120731T122100.json,1.122700177,50,178.2,72.5,Male,Right,No injury,No Injury,Right,,,No Injury,Right,,running,Recreational,5.0,Casual Runner (no times),,,,,
+101141,2014-07-15 17:32,20140715T173237.json,1.306236693,40,179.8,100.4,Male,Right,No injury,,,,,,,,"running, walking",Recreational,3.0,Half Marathon,HH,MM,SS,,
+200285,2014-06-20 9:17,20140620T091759.json,1.317583357,18,180.0,70.0,Male,Right,No injury,No Injury,,,,,,,Middle Distance Track,Competitive,7.0,Other distance,HH,MM,SS,,
+101403,2015-03-07 10:35,20150307T111046.json,1.724653201,36,181.0,75.2,Male,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+100099,2010-02-03 14:24,20100203T142442.json,1.50071828,31,181.5,86.4,Male,,No injury,Knee,Right,other,,No Injury,Right,,"volleyball, soccer, skiing",Recreational,,Casual Runner (no times),,,,,
+100997,2014-02-04 12:28,20140204T122805.json,1.1429483,55,182.3,95.5,Male,Left,No injury,No Injury,Right,,,No Injury,Right,,sdf,Competitive,,Casual Runner (no times),,,,,
+100793,2013-07-08 18:16,20130708T181629.json,1.112584723,32,183.5,75.1,Male,Right,No injury,No Injury,Right,,,No Injury,Right,,running; cycle; x country ski,Recreational,3.0,Half Marathon,1,19,,,2.0
+101809,2016-08-12 12:25,20160812T122556.json,1.319785513,31,185.4,104.5,Male,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+100817,2013-08-13 19:43,20130815T120052.json,1.116611008,49,186.5,83.0,Male,Right,No injury,No Injury,Right,,,No Injury,Right,,Running,Recreational,1.5,Casual Runner (no times),,,,,5.0
+101500,2016-03-22 10:53,20160322T105330.json,1.31769993,21,190.0,77.0,Male,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+200295,2014-06-24 11:47,20140624T114744.json,1.255925784,18,195.0,86.0,Male,Right,No injury,,,,,,,,AFL,Competitive,14.0,Casual Runner (no races),HH,MM,SS,,
+100511,2012-05-26 10:24,20120526T102409.json,0.919676063,62,150.0,57.9,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,running; weights; cardio,Recreational,25.0,Casual Runner (no times),,,,,
+100682,2012-11-29 0:00,20121129T000000.json,1.121211539,18,155.9,53.8,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,varsity soccer/ weight training,Recreational,6.0,Casual Runner (no times),,,,,
+101264,2014-10-04 15:36,20141004T153651.json,1.189845369,25,158.0,50.0,Female,Right,No injury,,,,,,,,Run,Competitive,8.0,5K,HH,15,13,2012.0,15.0
+100899,2014-01-16 12:50,20140116T125000.json,1.123130759,33,159.0,47.72727273,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,running,Recreational,19.0,Full Marathon,4,45,,,
+100850,2013-09-13 14:04,20130913T140414.json,1.115037648,35,161.0,57.1,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,running,Recreational,4.0,5k,,30,00,,
+101498,2016-03-07 10:44,20160307T104430.json,1.316832643,26,163.0,59.0,Female,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+101393,2015-02-23 10:30,20150223T112223.json,1.119765964,19,163.5,58.1,Female,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+101407,2015-03-04 10:45,20150304T104531.json,1.130853723,28,164.5,60.2,Female,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+100254,2009-06-23 20:25,20090623T202557.json,1.254217322,37,165.0,52.6,Female,Left,No injury,Knee,Left,patellofemoral pain syndrome,,No Injury,Right,,Running,Competitive,,Casual Runner (no times),,,,,
+101035,2014-10-22 10:52,20141022T105245.json,0.988676126,57,165.5,87.5,Female,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+100518,2012-05-26 9:49,20120526T094911.json,1.117337904,44,167.0,64.9,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,running; weight training,Recreational,2.0,Casual Runner (no times),,,,,
+100834,2013-05-16 13:46,20130516T134625.json,1.121758871,61,168.0,82.1,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,Walking,Recreational,0.0,Casual Runner (no times),,,,,
+100532,2012-06-07 14:47,20120607T144722.json,1.120246331,50,169.0,69.4,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,running; yoga; cycling; swimming,Recreational,20.0,Casual Runner (no times),,,,,
+100727,2013-04-10 10:54,20130410T105446.json,1.116189221,22,170.0,63.0,Female,Left,No injury,No Injury,Right,,,No Injury,Right,,Running,Recreational,8.0,10k,,40,00,,4.0
+102002,2017-06-06 11:43,20170606T122535.json,1.121247144,19,170.0,54.4,Female,,No injury,"No injury,No injury",,,,,,,,,,,,,,,
+100732,2013-04-22 19:48,20130422T194836.json,1.122491038,29,171.5,67.1,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,Running/Yoga,Recreational,3.5,Full Marathon,4,44,,,2.0
+100991,2014-02-19 12:09,20140219T120958.json,1.144442381,27,173.0,66.2,Female,Right,No injury,No Injury,Right,,,No Injury,Right,,"running, yoga, fitness classes",Recreational,2.0,Casual Runner (no times),,,,,0.0
+101339,2014-11-06 15:34,20141106T153435.json,1.219646518,37,175.0,60.5,Female,Right,No injury,,,,,,,,running,Competitive,,,HH,MM,SS,,
+100320,2011-02-11 11:18,20110211T111845.json,1.126879285,43,176.7,65.6,Female,Left,No injury,Knee,Left,bursitis,,No Injury,Right,,"Circuit, yoga, running",Competitive,999.0,Casual Runner (no times),,,,,
+100755,2013-05-13 14:11,20130513T141144.json,1.106050916,46,187.5,88.8,Female,Left,No injury,No Injury,Right,,,No Injury,Right,,Running,Competitive,12.0,Casual Runner (no times),,,,,

@@ -86,6 +86,17 @@ if ~isfile(fullfile(toolbox_dir, 'database', 'Data_x.mat'))
            'Esta gitignored por licencia KIST - ver docs/configuracion/setup_nueva_laptop.md #5.'], toolbox_dir);
 end
 
+% Asegura que Reduccion_Winter_Core.m (misma carpeta que este archivo)
+% siga siendo resoluble DESPUES del cd() de abajo, sin depender de que
+% otro candidato la haya "cacheado" antes en la misma sesion de MATLAB -
+% bug real encontrado el 24-ago-2026: llamando Yun2014_Wrapper como
+% PRIMER candidato de la sesion (antes de cualquier Koopman2014_Core),
+% el cd() a toolbox_dir hacia que Reduccion_Winter_Core dejara de
+% resolverse ("Incorrect number or types of inputs or outputs"), porque
+% dependia solo de que esta carpeta fuera el directorio de trabajo
+% (resolucion dinamica por cwd), no de estar en el path persistente.
+addpath(fileparts(mfilename('fullpath')));
+
 dir_original = pwd;
 cleaner = onCleanup(@() cd(dir_original)); %#ok<NASGU> vuelve al cwd aunque algo falle
 cd(toolbox_dir);

@@ -38,3 +38,13 @@ docs/literatura/pdfs/yun2014_toolbox/[0-9]*.mat
 docs/literatura/pdfs/AB06.zip
 docs/literatura/pdfs/AB09.zip
 docs/literatura/pdfs/camargo2021_piloto/
+
+# Muestra de 40 sujetos de Ferber et al. 2024 (Running Injury Clinic
+# Kinematic Dataset, Figshare+ 10.25452/figshare.plus.24255795.v1) —
+# ~1GB, publico (CC BY 4.0) pero demasiado grande para git. Se descargan
+# archivos individuales via remotezip (sin bajar el ZIP completo de
+# 22.75GB) — ver CODIGOS/GENERADOR/RODILLA/Ferber/Cargar_Ferber2024_Core.m
+# y docs/algoritmo/busqueda_modelos_antropometria_rodilla.md para volver
+# a generar la muestra (sub_id/filename estan en muestra_40.csv, que SI
+# se versiona).
+CODIGOS/GENERADOR/RODILLA/Ferber/muestra40_raw/
