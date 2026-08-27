@@ -82,7 +82,7 @@ Sin dependencias entre 1-4 (archivos de escritura distintos) → paralelizables.
 
 - [ ] Tarea 1 (TOBILLO/Zhao) — Agente A
 - [ ] Tarea 2 (TOBILLO/Yun) — Agente B
-- [ ] Tarea 3 (INCLINACION_TIBIAL/Zhao) — Agente C
+- [x] Tarea 3 (INCLINACION_TIBIAL/Zhao) — Agente C — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (r crudo=-0.303, calibrado=0.303/RMSEnorm=3.39 — Zhao no viable para tibia con lado nativo, defasaje de fase, hallazgo reportado tal cual)
 - [ ] Tarea 4 (INCLINACION_TIBIAL/Yun) — Agente D
 - [ ] Tarea 5 (auditoría no-regresión Koopman) — Agente E
 - [ ] Tarea 6 (actualizar CIERRE docs) — Agente E
