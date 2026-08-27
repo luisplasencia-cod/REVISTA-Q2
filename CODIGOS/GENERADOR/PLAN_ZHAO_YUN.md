@@ -81,9 +81,9 @@ Sin dependencias entre 1-4 (archivos de escritura distintos) → paralelizables.
 ## Progreso
 
 - [x] Tarea 1 (TOBILLO/Zhao) — Agente A — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (X r=0.974/RMSE=10.99cm, Y r=0.914/RMSE=2.51cm — peor que Koopman en ambos ejes, consistente con el defasaje de fase ya documentado; Zhao no competitivo con lado nativo)
-- [ ] Tarea 2 (TOBILLO/Yun) — Agente B
+- [x] Tarea 2 (TOBILLO/Yun) — Agente B — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (X r=0.990/RMSE=7.08cm, Y r=0.831/RMSE=3.39cm — peor que Koopman en ambos ejes, ganancia de tibia negativa (forma invertida), mismo patrón que Zhao; individual 6 sujetos sin outliers, r_x 0.978-0.996, r_y 0.736-0.907)
 - [x] Tarea 3 (INCLINACION_TIBIAL/Zhao) — Agente C — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (r crudo=-0.303, calibrado=0.303/RMSEnorm=3.39 — Zhao no viable para tibia con lado nativo, defasaje de fase, hallazgo reportado tal cual)
-- [ ] Tarea 4 (INCLINACION_TIBIAL/Yun) — Agente D
+- [x] Tarea 4 (INCLINACION_TIBIAL/Yun) — Agente D — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (r crudo=-0.300, calibrado=0.300/RMSEnorm=4.417 — Yun no viable para tibia con canal nativo vía tobillo R_, mismo defecto de forma/fase que Zhao, hallazgo reportado tal cual)
 - [ ] Tarea 5 (auditoría no-regresión Koopman) — Agente E
 - [ ] Tarea 6 (actualizar CIERRE docs) — Agente E
 - [ ] Tarea 7 (actualizar pipeline doc) — Agente E

@@ -72,3 +72,26 @@
   - Calibrado (afín LOSO): ganancia SIEMPRE negativa (rango -0.69 a -0.86) — la calibración solo invierte el signo del error de fase sin corregirlo (r_cal = |r_crudo|, mismo mecanismo ya documentado para Zhao en esta misma pieza). RMSE calibrado 12-20°, RMSEnorm calibrado 3.1-5.9 — sigue "Deficiente" en la escala del proyecto (<1 sería "Excelente").
 - **Interpretación, igual que Zhao:** Yun tampoco reproduce la forma del ángulo tibial real con su configuración nativa (vía tobillo, canal R_) — el defecto es de fase/forma, no de escala, y la calibración afín no lo puede rescatar. **Yun no es un candidato viable para el ángulo tibial**, mismo veredicto que Zhao, por una razón de la misma naturaleza (aunque el mecanismo interno de cada modelo sea distinto).
 - Script individual lanzado, en curso (log `yun_individual_log.txt`, recorriendo los 15 sujetos de nuevo). Se completará la Tarea 4 cuando termine.
+
+## Tarea 2 (TOBILLO/Yun) — COMPLETADA (Agente B, retomando tras el falso "completed" de arriba)
+
+- El turno anterior de este mismo agente (B) había reportado "completed" antes de que el proceso MATLAB en background terminara (ver nota de arriba) — al recibir la notificación real de fin de proceso (exit code 0), se retomó la tarea para verificar y cerrar.
+- Confirmado en `yun_run_log.txt`: los 15 sujetos cargaron sin error tanto en la corrida de grupo como en la de individual (dos pasadas completas de `Yun2014_Wrapper`, sin fallos, sin `NaN` en ninguna columna de `Evaluar_vs_Kuopio_Tobillo_Fases_Yun_resultados.csv` ni de `Evaluar_Individual_Kuopio_Tobillo_Yun_resultados.csv`).
+- **Resultado final de grupo (N=15, coincide con el checkpoint parcial de arriba, confirmado dígito a dígito contra el CSV):** muslo ganancia=0.853, offset=13.12°; tibia ganancia=-0.692, offset=-20.69° (NEGATIVA en los 15 sujetos, rango -0.646 a -0.780 — señal de forma tibial invertida respecto al dato real, mismo patrón que Zhao). X: r=0.990 (SD=0.007), RMSE=7.08cm. Y: r=0.831 (SD=0.066), RMSE=3.39cm; amplitud modelo/real=0.51 (el modelo reproduce ~51% de la excursión vertical real, calculado por chequeo cruzado, no forzado desde otra tarea).
+- **Resultado individual (6 sujetos [40,37,43,46,19,28], igual que Koopman/Zhao):**
+
+  | sub_id | sexo | talla_cm | masa_kg | r_x | rmse_x (cm) | r_y | rmse_y (cm) |
+  |---|---|---|---|---|---|---|---|
+  | 40 | M | 183.6 | 136.14 | 0.986 | 7.74 | 0.763 | 2.42 |
+  | 37 | M | 186.6 | 90.38 | 0.994 | 4.92 | 0.825 | 3.48 |
+  | 43 | M | 179.0 | 61.02 | 0.995 | 7.46 | 0.800 | 2.97 |
+  | 46 | F | 165.0 | 64.61 | 0.996 | 8.45 | 0.907 | 2.73 |
+  | 19 | F | 169.0 | 63.24 | 0.978 | 9.48 | 0.736 | 2.64 |
+  | 28 | M | 172.5 | 103.59 | 0.996 | 4.74 | 0.890 | 3.52 |
+
+  Sin outliers extremos — r_x se mantiene 0.978-0.996 y r_y 0.736-0.907 en los 6 sujetos de antropometría diversa, consistente con el promedio de grupo. El sujeto 19 (mujer, talla media) tiene el peor r_y (0.736) pero no un RMSE atípico.
+- **Interpretación, sin forzar corrección (regla de oro del plan):** Yun con canal R_ nativo y vía tobillo (la regla ya corregida el 26-ago) reproduce razonablemente la FORMA de X (r≈0.99) pero con RMSE bastante peor que Koopman (7.08 vs 2.90cm) y un Y claramente inferior tanto en r (0.831 vs 0.985) como en amplitud reproducida (51% vs la referencia de Koopman). La ganancia de tibia negativa en los 15 sujetos es la misma señal de forma-invertida ya vista en Zhao (Tarea 1) y en el propio ángulo tibial de Yun (Tarea 4) — **Yun no es competitivo con Koopman para tobillo con su configuración nativa**, mismo veredicto que Zhao, consistente entre las 3 piezas evaluadas esta noche (rodilla ya cerrada antes, tobillo y ángulo tibial esta noche). No se probó el "truco de lado" (L_/R_) ni vía rodilla — decisión D2 de `DECISIONES.md`, explícitamente no reabierta por esta tarea.
+- Tiempo total: la corrida de grupo (15 sujetos, GP completo por sujeto) tardó de 00:27 a 00:53 (~26 min); la corrida individual (recalcula los 15 de nuevo porque `Evaluar_Individual_Kuopio_Tobillo_Yun.m` llama a `Evaluar_vs_Kuopio_Tobillo_Fases_Yun(false)`, que no cachea entre invocaciones de MATLAB separadas) tardó de 00:53 a 01:18 (~25 min). Total ~51 min para las dos corridas en un solo proceso `matlab -batch` secuencial.
+- No se tocó ningún archivo de Koopman ni de Zhao, ni ningún archivo con "_Zhao" en el nombre. No se tocó `INCLINACION_TIBIAL/` (Tarea 4, de otro agente).
+- Archivos de esta tarea (ya en disco, algunos ya committeados en el checkpoint parcial `5668111`, el resto — resultados/figura del individual — pendientes de commit en esta misma entrada): `TOBILLO/Evaluar_vs_Kuopio_Tobillo_Fases_Yun.m`, `TOBILLO/Evaluar_vs_Kuopio_Tobillo_Fases_Yun_resultados.csv`, `TOBILLO/Evaluar_vs_Kuopio_Tobillo_Fases_Yun_figura.png`, `TOBILLO/Evaluar_Individual_Kuopio_Tobillo_Yun.m`, `TOBILLO/Evaluar_Individual_Kuopio_Tobillo_Yun_resultados.csv`, `TOBILLO/Evaluar_Individual_Kuopio_Tobillo_Yun_figura.png`. El log de consola `TOBILLO/yun_run_log.txt` se deja en disco sin commitear (mismo criterio que el resto de la noche: los logs de corrida no se versionan).
+- Checkbox de Tarea 2 marcado en `PLAN_ZHAO_YUN.md`.
