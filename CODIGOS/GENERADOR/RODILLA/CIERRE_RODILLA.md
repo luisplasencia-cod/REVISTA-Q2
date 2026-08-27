@@ -4,24 +4,63 @@
 
 Documento de cierre de esta carpeta, pedido explícito del usuario ("necesito ver el modelo, la razón por la que se descartan las otras, la comparación con la base, y el desplazamiento horizontal y vertical, de forma super estructurada"). Es el punto de entrada — el resto de archivos de `RODILLA/` son el detalle que sostiene cada afirmación de aquí.
 
-## 1. Modelo ganador: **Koopman 2014**
+## 1. Modelo ganador: **Koopman 2014** — con una corrección importante del 26-ago-2026, ver §1-bis
 
-Gana sin excepción en las **4 fuentes reales independientes** probadas hasta hoy — desde n=1 (chequeo rápido) hasta n=246 (ángulo, grupo) y n=40 con posición 3D real y antropometría real sujeto-a-sujeto (la prueba más exigente y la única que cumple el criterio que fijó el usuario: "cualquier base que tenga sexo/talla/peso específico, que pueda setearse en el modelo, para una comparación correcta"):
+> ⚠️ **Actualizado 26-ago-2026 — la fila de Maastricht de esta tabla estaba mal por un bug real, ver §1-bis.** Se mantiene el resto de esta sección como quedó el 24/25-ago para trazabilidad, pero la conclusión "gana sin excepción" ya NO es exacta — léase junto con §1-bis antes de citar esta tabla en el manuscrito.
+
+Gana en las fuentes reales probadas hasta hoy — desde n=1 (chequeo rápido) hasta n=246 (ángulo, grupo) y n=40 con posición 3D real y antropometría real sujeto-a-sujeto (la prueba más exigente y la única que cumple el criterio que fijó el usuario: "cualquier base que tenga sexo/talla/peso específico, que pueda setearse en el modelo, para una comparación correcta"):
 
 | Fuente real | n | Qué se comparó | Antropometría | Koopman | Zhao | Yun |
 |---|---|---|---|---|---|---|
-| `REFERENCIAS/Control_apoyo_Luis_V4.csv` + balanceo | 1 | ángulo tibial, ciclo completo | No documentada | **r=0.982** | r=-0.21 | r=-0.28 |
+| `REFERENCIAS/Control_apoyo_Luis_V4.csv` + balanceo | 1 | ángulo tibial, ciclo completo | No documentada | **r=0.982** | r=-0.21 (lado no confirmado, ver §1-bis) | r=-0.28 |
 | Winter, Tabla A.1 | 1 | rodilla rel. cadera (X) | No documentada — **por eso queda fuera de la decisión final**, ver §5 | r=0.816 | r=0.613 | r=0.468 |
-| Maastricht (OSF t72cw) | 246 (grupo hombres 18-29) | flexión de rodilla nativa | Grupo de edad, no por sujeto exacto | **r=0.933, RMSE=7.6°** | r=-0.30 | r=-0.33 |
-| **Ferber 2024 (Figshare+ 24255795)** | **40** (muestra sana estratificada, 20M/20F) | **posición 3D real, rodilla rel. cadera, horizontal Y vertical** | **Sexo+talla+peso REAL por sujeto, seteado en el modelo uno a uno** | **r_x=0.945 (SD 0.045), r_y=0.791 (SD 0.144)** | no evaluado (ya descartado, ver §2) | no evaluado (ya descartado, ver §2) |
+| Maastricht (OSF t72cw) | 246 (grupo hombres 18-29) | flexión de rodilla nativa | Grupo de edad, no por sujeto exacto | r=0.933, RMSE=7.6° | **r=0.982, RMSE=4.1° — CORREGIDO, ver §1-bis** | **r=0.955, RMSE=7.2° — CORREGIDO, ver §1-bis** |
+| **Ferber 2024 (Figshare+ 24255795)** | **40** (muestra sana estratificada, 20M/20F) | **posición 3D real, rodilla rel. cadera, horizontal Y vertical** | **Sexo+talla+peso REAL por sujeto, seteado en el modelo uno a uno** | **r_x=0.945 (SD 0.045), r_y=0.791 (SD 0.144)** | **no evaluado — la razón para descartarlo ya no aplica del todo, ver §1-bis** | **no evaluado — idem, ver §1-bis** |
 
 Con la prueba más exigente (Ferber, N=40, antropometría real sujeto-a-sujeto, posición no solo ángulo) Koopman predice el desplazamiento horizontal de la rodilla con r=0.945 en promedio (rango 0.795–0.996 entre los 40 sujetos, **ninguno negativo**) y el vertical con r=0.791 (rango 0.390–0.962). Ver figura `Evaluar_vs_Ferber_figura.png` y tabla `Evaluar_vs_Ferber_resultados.csv`.
+
+## 1-bis. Hallazgo 26-ago-2026: NO es un bug de lado — es un defecto de fase real en el canal de rodilla de Zhao/Yun, que "derecha" corrige por coincidencia
+
+El usuario, mirando las figuras con atención, notó que Zhao/Yun "parecían invertidas" y pidió verificar por qué. La investigación tuvo dos rondas — la primera (más abajo) llegó a una conclusión INCOMPLETA que la segunda ronda (§1-ter) corrigió. Se documentan las dos, en orden, porque la primera explicación es un error real que vale la pena que quede visible (no se borra el razonamiento equivocado, se marca como superado).
+
+**Primera ronda (parcialmente incorrecta, corregida en §1-ter):**
+
+1. Se confirmó el paper de Zhao a texto completo (PLOS ONE, DOI 10.1371/journal.pone.0338041): el ciclo arranca en contacto de talón (0%), misma convención del proyecto.
+2. Se notó que `Zhao2026_Core.m` distingue 'izquierda' (Ec.1, default) de 'derecha' (Ec.2, +j·π de desfase por armónico), y que `Evaluar_vs_Maastricht.m` usaba 'izquierda' sin más, mientras Maastricht es explícitamente rodilla derecha ("RKneeFlex"). Con 'derecha': r sube de -0.30 a +0.982 en Maastricht.
+3. Se interpretó esto como "el parámetro de lado estaba mal puesto" — **interpretación incompleta, ver §1-ter para la causa real.**
+4. Se probó el mismo cambio en Control_Luis (mejora a r=+0.56, sin confirmar el lado real del sujeto, no se aplicó) y Winter (empeora, 0.613→-0.392) — esta inconsistencia entre datasets fue la primera señal de que "lado anatómico" no era la explicación correcta, aunque en el momento no se identificó la causa.
+5. Yun mostró el mismo patrón con `L_knee_flexion` (r=-0.332→+0.955 en Maastricht), reforzando (equivocadamente) la lectura de "lado".
+
+## 1-ter. Causa real (26-ago-2026, segunda ronda, delegada a un fork): un desfase de fase de 50% acoplado a dos canales, uno con defecto real y otro sin él
+
+Se re-evaluó Zhao/Yun contra Ferber (N=40, posición real vía cadera) con ambos lados, y el resultado se INVIRTIÓ por completo respecto a Maastricht — el lado que arregla Maastricht es el que arruina Ferber, para los dos candidatos:
+
+| Candidato (vs. Ferber, N=40) | r_x | RMSE_x | r_y | RMSE_y |
+|---|---|---|---|---|
+| Koopman | 0.945 | 4.29 | 0.791 | 2.04 |
+| **Zhao, lado='izquierda' (default, nunca tocado)** | **0.947** | 5.37 | **0.815** | 2.05 |
+| Zhao, lado='derecha' (el que "arregló" Maastricht) | -0.862 | 29.84 | -0.566 | 3.04 |
+| Yun, lado='R' (default) | 0.902 | 5.87 | -0.698 | 3.36 |
+| Yun, lado='L' (el que "arregló" Maastricht) | -0.983 | 29.31 | 0.668 | 2.01 |
+
+**Causa raíz, verificada numéricamente (no especulación):** el parámetro `lado` de `Zhao2026_Core.m` **no es un reflejo espacial** — es un desfase de fase idéntico de **50% del ciclo**, aplicado por igual a `phi_cadera` y `phi_rodilla` (mismo `signo_fase` para los dos canales). Confirmado: con 'izquierda' vs 'derecha', ambas curvas conservan su rango exacto, solo el pico se corre 50 puntos porcentuales (rodilla: 22%→72%; cadera: 83%→33%).
+
+- **`phi_rodilla` con 'izquierda' (default) tiene un defecto de fase real y preexistente**: pico en 22% del ciclo, cuando el pico fisiológico real de flexión de rodilla es ~70% — **exactamente el defasaje ya documentado desde la selección inicial de candidatos** (§2 más abajo: "pico adelantado ~20-25% vs ~70% fisiológico"). Ese diagnóstico original SÍ era correcto para este canal. Al aplicar 'derecha', el desfase de 50% mueve el pico a 72% — casi exacto — **por coincidencia matemática, no por una corrección anatómica real.**
+- **`phi_cadera` con 'izquierda' NO tenía ningún defecto** — su pico en 83% ya es consistente con el timing real de cadera (flexión terminal de balanceo, ~85-90%). Aplicar 'derecha' (necesario solo para rodilla) desplaza también la cadera, que no lo necesitaba, a 33% — rompiéndola. Como Ferber y Winter derivan la POSICIÓN de la rodilla a partir de `phi_cadera` (rotación del muslo), no de `phi_rodilla`, el "arreglo" de Maastricht los arruina.
+- Yun probablemente comparte la misma historia (R/L son regresiones GP independientes, no el mismo desfase interno, pero el patrón empírico es idéntico: L ayuda al canal de rodilla, R ayuda al canal de cadera) — consistente con la misma explicación, no confirmado con el mismo nivel de detalle que Zhao por límite de tiempo de la investigación.
+
+**Conclusión correcta, reemplaza la de §1-bis:** no existe un "lado correcto" único para Zhao ni para Yun — cada canal (cadera, rodilla) tiene su propio estado de fase independiente, y el modelo publicado los acopla a un solo parámetro que no puede corregir uno sin mover el otro. **Regla práctica de aquí en adelante:** comparaciones que usan `phi_rodilla`/knee-flexion nativo (Maastricht) → usar 'derecha' (corrige el defecto real de ese canal). Comparaciones que derivan posición de `phi_cadera`/hip (Ferber, Winter) → usar 'izquierda' (el canal de cadera nunca tuvo defecto). **No es una inconsistencia por resolver ni una propiedad de "qué pierna es" — es una limitación real de cómo Zhao2026_Core.m acopla los dos canales, y debe documentarse así en el manuscrito, no como "elegimos el lado que mejor ajusta".**
+
+**Dato que sigue siendo una buena noticia, con esta explicación correcta:** el canal de cadera de Zhao (con su valor original, izquierda) **iguala o supera a Koopman en Ferber** (r_x=0.947 vs 0.945, r_y=0.815 vs 0.791) — es genuinamente bueno para posición, sin necesitar ningún ajuste. Su canal de rodilla, en cambio, sí tiene el defecto de fase ya documentado desde el principio del proyecto — consistente, no contradictorio, con la razón original por la que se prefirió Koopman para ángulo tibial. Yun sigue sin una configuración que ajuste bien en los dos ejes de Ferber a la vez.
+
+**Pendiente, decisión del usuario:** con esta explicación correcta, ¿tiene sentido evaluar Zhao con phi_cadera (izquierda) para todo lo que sea posición (Ferber, Kuopio rodilla/tobillo) y con phi_rodilla (derecha) solo donde se use flexión nativa? Sería una elección de ingeniería declarada explícitamente, no un ajuste oculto — el código y el hallazgo ya están listos para esa decisión.
 
 ## 2. Por qué se descartan los demás
 
 ### Modelos ya implementados en el proyecto (comparados directamente)
 
-- **Zhao 2026 y Yun 2014**: fase de flexión de rodilla desalineada del ciclo real (pico adelantado ~20-25% del ciclo vs. ~70% fisiológico) — correlación **negativa** contra las 3 primeras fuentes (Control_Luis, Winter, Maastricht). No se volvieron a evaluar contra Ferber porque el patrón ya estaba establecido con evidencia suficiente (3/3 fuentes en contra, mismo signo).
+- **Yun 2014**: ver §1-ter — su canal de rodilla (`R_knee_flexion`) SÍ tiene el defasaje de pico ya documentado aquí (por eso se descartó originalmente), pero ese defecto se puede corregir por el mismo truco de "canal cruzado" que Zhao (`L_knee_flexion` en vez de R). El canal de cadera, en cambio, sigue sin dar una posición consistente en los dos ejes de Ferber a la vez. Reabierto parcialmente, no cerrado del todo.
+- **Zhao 2026**: ver §1-ter — su canal de rodilla tiene el mismo defasaje de pico ya documentado aquí (pico en 22% vs ~70% fisiológico), pero es corregible con la ecuación "derecha" (que por coincidencia desplaza el pico a 72%). Su canal de cadera nunca tuvo el defecto y ya es competitivo con Koopman en posición (Ferber). Reabierto, no cerrado del todo — no descartado, tampoco ganador claro.
 - **Romero-Sorozábal 2024**: da posición 3D directa (sin pasar por ángulo), pero su eje Z (vertical) de rodilla/tobillo sale ~2x más profundo de lo anatómicamente posible — anomalía real de la fuente publicada (verificada dos veces, no es error de transcripción). Se excluyó del ensamble; nunca fue candidato ganador de rodilla por sí solo.
 
 ### Candidatos de algoritmo nuevos, de la búsqueda ampliada del 24-ago (ninguno llegó a evaluarse contra datos — se descartaron antes, por diseño del modelo, no por desempeño)
@@ -158,6 +197,14 @@ Cambios aplicados en las 3 carpetas:
 - **Una sola implementación del modelo**: el script individual ya no duplica la lógica — llama a `Evaluar_vs_Kuopio_Avance(false)` y grafica exactamente las curvas que producen las estadísticas reportadas. Antes ambos duplicaban el cálculo y podían divergir en silencio.
 
 Resultado individual (los 6, modelo final): r_x entre 0.995 y 0.999, r_y entre 0.896 y 0.967. Ningún sujeto falla — el modelo generaliza en todo el rango de antropometría disponible.
+
+## 9-bis. Corrección de la figura de Ferber (26-ago-2026): no cambia ningún número
+
+Revisión de limpieza pedida por el usuario. `Evaluar_vs_Ferber_figura.png` se construyó el 24-ago-2026, **antes** de la corrección de §9 (no promediar sujetos de antropometría distinta) — se aplicó a las 3 figuras finales de Kuopio ese mismo día, pero nunca se retrocedió a corregir esta, que quedó con el estilo viejo (paneles superiores: media(real) vs media(predicho) de los 40 sujetos) hasta hoy.
+
+**Las estadísticas de la tabla (§1, §3, §4) siempre fueron correctas** — `r_x`, `rmse_x`, `r_y`, `rmse_y` en `Evaluar_vs_Ferber_resultados.csv` ya se calculaban sujeto por sujeto, nunca sobre la curva promedio. Solo la visualización de los paneles 1-2 mezclaba las 40 curvas en una sola media, el mismo problema de fondo que motivó la objeción del usuario en §9.
+
+**Corregido:** `Evaluar_vs_Ferber.m` ahora grafica cada sujeto pareado con su propia predicción (igual que `Kuopio/Evaluar_vs_Kuopio_Avance.m`), más curvas de error con banda media±SD — misma estructura de 3×2 paneles. Recorrido en MATLAB (26-ago-2026): **r_x=0.945, RMSE=4.29cm; r_y=0.791, RMSE=2.04cm — idéntico a lo ya reportado**, confirma que el cambio es solo de visualización, no de resultado.
 
 ## 10. Qué sigue
 

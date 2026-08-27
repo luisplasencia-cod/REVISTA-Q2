@@ -114,31 +114,46 @@ fprintf('Vertical   (Y): r medio=%.3f (SD=%.3f, rango [%.3f %.3f]), RMSE medio=%
 
 writetable(T, fullfile(carpeta, 'Evaluar_vs_Ferber_resultados.csv'));
 
-% --- Figura ---
-fig = figure('Name','Rodilla (posicion) vs Ferber 2024, N=40 sujetos reales','Position',[60 60 1300 800],'Color','w');
+% --- Figura (25-ago-2026: CORREGIDA para no promediar sujetos - mismo
+% principio ya aplicado en RODILLA/Kuopio/, TOBILLO/, INCLINACION_TIBIAL/,
+% ver CIERRE_RODILLA.md #9. Esta figura se construyo el 24-ago-2026, antes
+% de esa correccion, y quedo con el estilo viejo (media real vs media
+% predicha) hasta hoy - las estadisticas por sujeto (T.r_x, T.r_y, CSV)
+% siempre fueron correctas, solo la figura promediaba 40 antropometrias
+% distintas en una sola curva. Se reemplaza por pares por sujeto + curvas
+% de error, igual que Evaluar_vs_Kuopio_Avance.m.
+idx_ok = find(ok);
+n_ok = numel(idx_ok);
+col_x = [0.85 0.33 0.10]; col_y = [0.30 0.55 0.75];
 
-subplot(2,2,1); hold on; grid on; box on;
-h1 = plot(pct, X_real_all(ok,:), 'Color',[0.6 0.6 0.6], 'LineWidth',0.5);
-h2 = plot(pct, mean(X_real_all(ok,:),1), 'k-', 'LineWidth',3);
-h3 = plot(pct, mean(X_pred_all(ok,:),1), '-', 'Color',[0.85 0.33 0.10], 'LineWidth',2.5);
-xlabel('% ciclo'); ylabel('X horizontal, rel. cadera [cm] (rel. inicio ciclo)');
-title(sprintf('Horizontal (rel. cadera): real vs Koopman (r medio=%.2f)', mean(T.r_x)));
-legend([h1(1) h2 h3], {'sujetos individuales (n=40)','media REAL','Koopman (antropometria real)'},'Location','best');
+fig = figure('Name','Rodilla (posicion) vs Ferber 2024, N=40 sujetos reales','Position',[60 30 1300 1100],'Color','w');
 
-subplot(2,2,2); hold on; grid on; box on;
-plot(pct, Y_real_all(ok,:), 'Color',[0.6 0.6 0.6], 'LineWidth',0.5);
-plot(pct, mean(Y_real_all(ok,:),1), 'k-', 'LineWidth',3);
-plot(pct, mean(Y_pred_all(ok,:),1), '-', 'Color',[0.30 0.55 0.75], 'LineWidth',2.5);
-xlabel('% ciclo'); ylabel('Y vertical, rel. cadera [cm] (rel. inicio ciclo)');
-title(sprintf('Vertical (rel. cadera): real vs Koopman (r medio=%.2f)', mean(T.r_y)));
+subplot(3,2,1); hold on; grid on; box on;
+for k=1:n_ok, i=idx_ok(k); plot(pct, X_real_all(i,:), '-', 'Color',[0.55 0.55 0.55 0.6], 'LineWidth',0.9); end
+for k=1:n_ok, i=idx_ok(k); plot(pct, X_pred_all(i,:), '-', 'Color',[col_x 0.55], 'LineWidth',0.9); end
+xlabel('% ciclo'); ylabel('X horizontal, rel. cadera [cm]');
+title(sprintf('X: cada sujeto con SU prediccion (r=%.3f, RMSE=%.2fcm)', mean(T.r_x), mean(T.rmse_x)));
+legend({'real (por sujeto)','modelo (por sujeto)'},'Location','best');
 
-subplot(2,2,3); hold on; grid on; box on;
-histogram(T.r_x, 15, 'FaceColor',[0.85 0.33 0.10]);
+subplot(3,2,2); hold on; grid on; box on;
+for k=1:n_ok, i=idx_ok(k); plot(pct, Y_real_all(i,:), '-', 'Color',[0.55 0.55 0.55 0.6], 'LineWidth',0.9); end
+for k=1:n_ok, i=idx_ok(k); plot(pct, Y_pred_all(i,:), '-', 'Color',[col_y 0.55], 'LineWidth',0.9); end
+xlabel('% ciclo'); ylabel('Y vertical, rel. cadera [cm]');
+title(sprintf('Y: cada sujeto con SU prediccion (r=%.3f, RMSE=%.2fcm)', mean(T.r_y), mean(T.rmse_y)));
+legend({'real (por sujeto)','modelo (por sujeto)'},'Location','best');
+
+Ex = X_pred_all(idx_ok,:) - X_real_all(idx_ok,:);
+Ey = Y_pred_all(idx_ok,:) - Y_real_all(idx_ok,:);
+dibujar_error_ferber(subplot(3,2,3), pct, Ex, col_x, 'Error X (modelo - real) [cm]');
+dibujar_error_ferber(subplot(3,2,4), pct, Ey, col_y, 'Error Y (modelo - real) [cm]');
+
+subplot(3,2,5); hold on; grid on; box on;
+histogram(T.r_x, 15, 'FaceColor',col_x);
 xlabel('r (horizontal, por sujeto)'); ylabel('N sujetos'); xlim([-1 1]); xline(0,'k:');
 title('Distribucion de r horizontal, N=40');
 
-subplot(2,2,4); hold on; grid on; box on;
-histogram(T.r_y, 15, 'FaceColor',[0.30 0.55 0.75]);
+subplot(3,2,6); hold on; grid on; box on;
+histogram(T.r_y, 15, 'FaceColor',col_y);
 xlabel('r (vertical, por sujeto)'); ylabel('N sujetos'); xlim([-1 1]); xline(0,'k:');
 title('Distribucion de r vertical, N=40');
 
@@ -149,6 +164,20 @@ exportgraphics(fig, out_png, 'Resolution', 150);
 fprintf('\nFigura guardada en: %s\n', out_png);
 fprintf('Tabla guardada en: %s\n', fullfile(carpeta, 'Evaluar_vs_Ferber_resultados.csv'));
 
+end
+
+% ------------------------------------------------------------------------
+function dibujar_error_ferber(ax, pct, E, col, etiqueta)
+% Curvas de error por sujeto + banda media+-SD (mismo patron que
+% RODILLA/Kuopio/Evaluar_vs_Kuopio_Avance.m).
+axes(ax); hold on; grid on; box on; %#ok<LAXES>
+m = mean(E,1); s = std(E,0,1);
+fill([pct fliplr(pct)], [m+s fliplr(m-s)], col, 'FaceAlpha',0.18, 'EdgeColor','none');
+plot(pct, E', '-', 'Color',[0.55 0.55 0.55 0.5], 'LineWidth',0.6);
+plot(pct, m, '-', 'Color',col, 'LineWidth',2.5);
+yline(0,'k--');
+xlabel('% ciclo'); ylabel(etiqueta);
+title(sprintf('%s  |  media+-SD entre sujetos', etiqueta));
 end
 
 function out = ternary(cond, a, b)
