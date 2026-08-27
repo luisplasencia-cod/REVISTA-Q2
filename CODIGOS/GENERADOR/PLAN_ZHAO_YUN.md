@@ -80,7 +80,7 @@ Sin dependencias entre 1-4 (archivos de escritura distintos) → paralelizables.
 
 ## Progreso
 
-- [ ] Tarea 1 (TOBILLO/Zhao) — Agente A
+- [x] Tarea 1 (TOBILLO/Zhao) — Agente A — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (X r=0.974/RMSE=10.99cm, Y r=0.914/RMSE=2.51cm — peor que Koopman en ambos ejes, consistente con el defasaje de fase ya documentado; Zhao no competitivo con lado nativo)
 - [ ] Tarea 2 (TOBILLO/Yun) — Agente B
 - [x] Tarea 3 (INCLINACION_TIBIAL/Zhao) — Agente C — hecho 27-ago-2026, N=15, ver BITACORA_NOCHE.md (r crudo=-0.303, calibrado=0.303/RMSEnorm=3.39 — Zhao no viable para tibia con lado nativo, defasaje de fase, hallazgo reportado tal cual)
 - [ ] Tarea 4 (INCLINACION_TIBIAL/Yun) — Agente D
