@@ -74,6 +74,23 @@ Objeción del usuario, correcta: la figura de grupo comparaba `media(real)` cont
 
 Depende de `RODILLA/Kuopio/Cargar_Kuopio2024_Core.m` (extendido con `dx_tibia_cm`/`dy_tibia_cm`, y con `dx_muslo_cm`/`dy_muslo_cm` para la calibración del ángulo de muslo de `RODILLA/`).
 
+## 9. Zhao y Yun replicados con el mismo pipeline (27-ago-2026, tarea nocturna autónoma)
+
+Mismo método exacto (calibración afín LOSO), con la fuente de ángulo nativa de cada candidato: Zhao (`theta_tibia_rad = phi_cadera - phi_rodilla`, lado='izquierda' default) y Yun (`theta_tibia_via_tobillo_R_rad`, canal nativo R_) — sin el "truco de lado" de RODILLA/Maastricht. Ver `PLAN_ZHAO_YUN.md`/`BITACORA_NOCHE.md` para el detalle del proceso.
+
+| | Koopman (vigente) | Zhao | Yun |
+|---|---|---|---|
+| r crudo | 0.992 | -0.303 | -0.300 |
+| RMSEnorm crudo | 3.53 (Deficiente) | 11.93 (Deficiente) | 4.77 (Deficiente) |
+| Ganancia LOSO (calibración) | 0.811 | **-0.218** | **-0.742** |
+| r calibrado | 0.992 | 0.303 | 0.300 |
+| RMSE calibrado | 3.50° | 16.40° | 16.66° |
+| RMSEnorm calibrado | **0.92 (Excelente)** | 3.39 (Deficiente) | 4.42 (Deficiente) |
+
+**Koopman es el único candidato viable para el ángulo tibial.** Zhao y Yun tienen correlación cruda **negativa** en los 15 sujetos (ambos) — un defecto de forma/fase, no de escala. La calibración afín LOSO, que en Koopman corrige un sesgo sistemático real (RMSEnorm 3.53→0.92), en Zhao/Yun solo puede sacar una ganancia **negativa** que invierte el signo de `r` sin mejorar la relación real (r_cal = |r_crudo| exactamente, por la propiedad matemática de la transformación afín) — el RMSEnorm calibrado se queda en "Deficiente" para ambos. Esto es consistente con — y explica en parte — por qué Zhao/Yun también salen peor que Koopman en TOBILLO (`TOBILLO/CIERRE_TOBILLO.md` §11): el defecto de fase del ángulo tibial se propaga a la posición del tobillo vía `Cadena_Completa_Core`.
+
+**Esta pieza fue la que originalmente reveló el hallazgo de fase de §5-bis** (el mismo defecto de ~20% de sobreestimación de excursión que RODILLA/Maastricht encontró para Zhao/Yun) — aquí se confirma que, sin el "truco de lado", el defecto de fase del canal de rodilla/tibia es mucho más severo que un simple problema de escala (correlación negativa, no solo RMSE alto).
+
 ## 8. Qué sigue
 
-Con rodilla + tobillo + ángulo tibial resueltos, decidir cómo se juntan (y si esto reemplaza el plan de ensamble de 4 modelos, pregunta pospuesta desde el 24-ago) — pendiente, decisión del usuario.
+Con rodilla + tobillo + ángulo tibial resueltos para los 3 candidatos, decidir cómo se juntan (y si esto reemplaza el plan de ensamble de 4 modelos, pregunta pospuesta desde el 24-ago) — pendiente, decisión del usuario. Nueva pregunta abierta (27-ago-2026): si vale la pena probar el "truco de lado" de Zhao/Yun (que funcionó para RODILLA/Maastricht) también aquí — no se decidió en la tarea autónoma de esta noche, ver `TOBILLO/CIERRE_TOBILLO.md` §11 para el razonamiento completo de por qué no es automático que ayude.

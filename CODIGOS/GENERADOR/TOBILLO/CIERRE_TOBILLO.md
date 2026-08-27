@@ -177,6 +177,20 @@ Resultado individual (los 6, modelo final): r_x entre 0.996 y 0.999, r_y entre 0
 
 Depende de `CODIGOS/GENERADOR/RODILLA/Kuopio/Cargar_Kuopio2024_Core.m` (cargador compartido, ya extendido con campos de tobillo) — no duplicado aquí. También depende de `Cadena_Completa_Core.m` y `Obtener_Angulos_Candidato.m` (carpeta `CODIGOS/GENERADOR/`, construidos el 24-ago-2026, validados contra datos reales por primera vez en este documento).
 
+## 11. Zhao y Yun replicados con el mismo pipeline (27-ago-2026, tarea nocturna autónoma)
+
+Se construyó el mismo pipeline exacto (calibración afín LOSO de muslo+tibia, `Cadena_Completa_Core`, residuo de rockers, cierre de ciclo/zancada) para Zhao 2026 y Yun 2014, con su configuración **nativa** de cada modelo (Zhao: lado='izquierda', el default del paper; Yun: canal R_/vía tobillo, ya establecido) — **sin aplicar el "truco de lado"** encontrado el mismo día para RODILLA/Maastricht (`RODILLA/CIERRE_RODILLA.md` §1-ter), que sigue siendo una decisión de ingeniería pendiente, no resuelta aquí. Ver `PLAN_ZHAO_YUN.md` y `BITACORA_NOCHE.md` para el detalle completo del proceso.
+
+| | Koopman (vigente) | Zhao | Yun |
+|---|---|---|---|
+| X — r / RMSE | **0.998 / 2.90cm** | 0.974 / 10.99cm | 0.990 / 7.08cm |
+| Y — r / RMSE | **0.985 / 1.54cm** | 0.914 / 2.51cm | 0.831 / 3.39cm |
+| Ganancia de tibia (calibración LOSO) | 0.811 (positiva) | **-0.218 (negativa)** | **-0.692 (negativa)** |
+
+**Koopman sigue siendo claramente el mejor para el tobillo**, en las dos métricas y en los dos ejes — a diferencia de RODILLA/Maastricht, donde Zhao/Yun corregidos empataban o superaban a Koopman. La ganancia de tibia **negativa** en Zhao y Yun (mientras Koopman da positiva) es la misma señal de forma-invertida ya vista en el ángulo tibial puro (§ tabla de INCLINACION_TIBIAL) — con la configuración nativa, ninguno de los dos reproduce la forma correcta del ángulo tibial, y ese defecto se propaga a través de `Cadena_Completa_Core` hasta la posición del tobillo.
+
+**Pendiente, sin decidir:** ¿vale la pena probar el mismo "truco de lado" que funcionó en RODILLA/Maastricht (Zhao lado='derecha', Yun canal L_) también aquí? Dado que el truco corrige específicamente el canal de **rodilla/flexión nativa** (ver la causa raíz real en `RODILLA/CIERRE_RODILLA.md` §1-ter: es un defecto de fase del canal de rodilla, no del canal de cadera), y que TOBILLO depende de la calibración conjunta de **muslo Y tibia**, no está garantizado que ayude aquí de la misma forma — requiere una prueba real, no una suposición.
+
 ## 9. Qué sigue
 
-Pendiente: ángulo de inclinación tibial (puede no necesitar modelo propio, ya se deriva de cadera+rodilla+tobillo resueltos). Recién con rodilla+tobillo+tibia resueltos, decidir cómo se juntan y si esto reemplaza el plan de ensamble de 4 modelos (pregunta pospuesta desde el 24-ago).
+Con RODILLA + TOBILLO + INCLINACION_TIBIAL resueltos para los 3 candidatos, la pregunta de cómo se juntan (y si esto reemplaza el plan de ensamble de 4 modelos) sigue pospuesta. Nueva pregunta abierta (27-ago-2026): si vale la pena probar el "truco de lado" de Zhao/Yun también en TOBILLO/INCLINACION_TIBIAL antes de cerrar la comparación final de candidatos.
