@@ -39,6 +39,14 @@ dy_W = (W.rodilla_y_cm - W.cadera_y_cm) - (W.rodilla_y_cm(1) - W.cadera_y_cm(1))
 K = Koopman2014_Core(tempo0.velocidad_ms*3.6, antro.talla_m);
 m_K = deg2rad(K.cadera_flexext.angulo_deg); pct_K = linspace(0,100,numel(m_K));
 
+% NOTA 26-ago-2026: Winter no documenta que pierna se midio. Probado con
+% 'derecha' (mismo chequeo que se hizo para Maastricht/Control_Luis, ver
+% CIERRE_RODILLA.md) el r EMPEORA (0.613 -> -0.392) - a diferencia de los
+% otros dos casos. Esto confirma que el lado hay que verificarlo por
+% dataset, no asumir uno fijo para todo el proyecto - se mantiene
+% 'izquierda' (default del paper) por ser el que de hecho ajusta mejor
+% aqui, no por ser "el correcto" (el lado real del sujeto de Winter sigue
+% sin documentarse).
 Z = Zhao2026_Core(antro.long_muslo_m+antro.long_tibia_m, 1/tempo0.tiempo_ciclo_s);
 m_Z = Z.phi_cadera_rad; pct_Z = linspace(0,100,numel(m_Z));
 

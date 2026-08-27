@@ -12,6 +12,23 @@ function Evaluar_vs_Maastricht(antro_in)
 % treadmill in virtual reality). Hoja 'Rotation_RKneeFlex_comf' del
 % archivo 05_AgeGenderGroup_comf.xlsx: media+DE de flexion de rodilla
 % derecha, %ciclo 1-100, por grupo de edad/sexo.
+%
+% BUG REAL CORREGIDO 26-ago-2026 (encontrado al investigar por que Zhao/
+% Yun daban r negativo, a pedido del usuario): Zhao2026_Core.m modela
+% izquierda (Ec.1) y derecha (Ec.2, +j*pi de desfase por armonico) como
+% formulas DISTINTAS - el paper confirma a texto completo (PLOS ONE,
+% 10.1371/journal.pone.0338041) que el ciclo arranca en contacto de talon
+% (misma convencion que el proyecto, 0=heel strike), asi que NO es un
+% problema de direccion del tiempo. El problema real: esta funcion llamaba
+% a Zhao2026_Core SIN especificar 'lado' -> usaba el default 'izquierda',
+% comparado contra un dataset que es EXPLICITAMENTE 'RKneeFlex' (rodilla
+% DERECHA). Corregido a lado='derecha', consistente con el default de
+% Cargar_Ferber2024_Core.m ('R') y con que Yun2014_Wrapper.m solo expone
+% canales R_ en todo el proyecto. Efecto: Zhao pasa de r=-0.296 a
+% r=+0.982 - deja de estar descartado por esta prueba (ver CIERRE_RODILLA.md
+% para el efecto en la decision de modelo ganador). Yun no tiene este bug
+% (su wrapper ya expone solo R_, ver Obtener_Angulos_Candidato.m) - su r
+% negativo es un defecto de forma real, no de lado.
 
 addpath(fullfile(fileparts(mfilename('fullpath')), '..'));
 if nargin < 1 || isempty(antro_in)
@@ -33,11 +50,19 @@ sd_M   = cell2mat(C(idx,4)).';   % MEN SD
 K = Koopman2014_Core(tempo0.velocidad_ms*3.6, antro.talla_m);
 fk_K = K.rodilla_flexext.angulo_deg; pct_K = linspace(0,100,numel(fk_K));
 
-Z = Zhao2026_Core(antro.long_muslo_m+antro.long_tibia_m, 1/tempo0.tiempo_ciclo_s);
+Z = Zhao2026_Core(antro.long_muslo_m+antro.long_tibia_m, 1/tempo0.tiempo_ciclo_s, struct('lado','derecha'));
 fk_Z = rad2deg(Z.phi_rodilla_rad); pct_Z = linspace(0,100,numel(fk_Z));
 
+% NOTA 26-ago-2026: MISMO bug que Zhao (ver arriba), encontrado en la
+% misma investigacion. Yun2014_Wrapper.m calcula AMBOS lados (R_ y L_),
+% pero esta comparacion tomaba R_knee_flexion sin mas - contra Maastricht
+% (RKneeFlex, rodilla derecha) eso da r=-0.332. Con L_knee_flexion sube a
+% r=+0.955. Como con Zhao, esto NO se probo/aplico en Control_Luis ni
+% Winter (lado no documentado en esos datasets, y ahi L SI empeora el
+% ajuste para Yun - ver CIERRE_RODILLA.md #1-bis) - el cambio se limita a
+% esta comparacion, donde el lado del dataset real esta confirmado.
 Y = Yun2014_Wrapper(vector14_desde_antropometria(antro));
-fk_Y = Y.R_knee_flexion.mean; pct_Y = linspace(0,100,numel(fk_Y));
+fk_Y = Y.L_knee_flexion.mean; pct_Y = linspace(0,100,numel(fk_Y));
 
 nombres = {'Koopman','Zhao','Yun'};
 pcts = {pct_K, pct_Z, pct_Y};

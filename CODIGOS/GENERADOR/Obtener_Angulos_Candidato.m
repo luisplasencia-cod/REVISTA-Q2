@@ -33,11 +33,15 @@ switch lower(candidato)
         Y = Yun2014_Wrapper(vector14_desde_antropometria(antro));
         tempo.tiempo_ciclo_s = Y.periodo_s;
         m_full = deg2rad(Y.R_hip_extension.mean);
-        % via rodilla, consistente con el hallazgo de Koopman: se arma con
-        % los mismos canales (cadera + rodilla) via Reduccion_Winter_Core
-        red = Reduccion_Winter_Core(struct('theta_muslo_rad', m_full, ...
-                                           'phi_rodilla_rad', deg2rad(Y.R_knee_flexion.mean)));
-        t_full = red.theta_tibia_via_rodilla_rad;
+        % CORREGIDO 26-ago-2026 (el usuario detecto que esta figura daba un
+        % angulo tibial distinto al de Evaluar_Mejor_Modelo_Rodilla.m para
+        % el mismo candidato): la via_rodilla para Yun esta MARCADA COMO NO
+        % CONFIABLE por E2 (defasaje del pico de flexion de rodilla, ver
+        % Obtener_Theta_Tibia_Candidato.m) - esta funcion usaba via_rodilla
+        % de todos modos, inconsistente con la regla ya establecida. Se usa
+        % via_tobillo (Y.theta_tibia_via_tobillo_R_rad, ya calculado por el
+        % propio wrapper), igual que Obtener_Theta_Tibia_Candidato.m.
+        t_full = Y.theta_tibia_via_tobillo_R_rad;
 
     otherwise
         error('candidato debe ser Koopman, Zhao o Yun. Se recibio: %s', mat2str(candidato));

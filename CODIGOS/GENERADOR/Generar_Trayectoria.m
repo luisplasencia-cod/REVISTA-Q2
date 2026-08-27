@@ -126,53 +126,117 @@ if strcmpi(candidato, 'Combinado')
     % Segmento_Posicion_Core.m/Cadena_Cinematica_Core.m (0=vertical).
     theta_ap_rad  = atan2(-pos_ap.x_cm/100,  pos_ap.y_cm/100);
     theta_bal_rad = atan2(-pos_bal.x_cm/100, pos_bal.y_cm/100);
-else
-    % --- Correr el candidato y obtener theta_tibia por fase (regla E2) ---
-    % (24-ago-2026: extraido a Obtener_Theta_Tibia_Candidato.m para que
-    % Combinar_Candidatos_Core.m reuse la MISMA regla sin duplicarla - ver ese
-    % archivo para el detalle completo por candidato/fase)
-    [theta_apoyo, theta_balanceo, tempo] = Obtener_Theta_Tibia_Candidato(candidato, antro, tempo, n);
 
-    % Recortar/indexar cada theta a su ventana de %ciclo correspondiente
-    % (0 a frac_apoyo*100 para apoyo, frac_apoyo*100 a 100 para balanceo),
-    % remuestreado a n puntos cada uno - mismo patron que el CSV real
-    % (Desplazamientos.m: apoyo 0-60%, balanceo 60-100%).
+    tempo.tiempo_apoyo_s    = tempo.frac_apoyo * tempo.tiempo_ciclo_s;
+    tempo.tiempo_balanceo_s = (1 - tempo.frac_apoyo) * tempo.tiempo_ciclo_s;
+    t_ap  = linspace(0, tempo.tiempo_apoyo_s,    n);
+    t_bal = linspace(0, tempo.tiempo_balanceo_s, n);
+    pos_ap.x_cm  = pos_ap.x_cm  + tempo.velocidad_ms * 100 * t_ap;   % v en cm/s * t
+    pos_bal.x_cm = pos_bal.x_cm + tempo.velocidad_ms * 100 * t_bal;
+else
+    % --- theta_tibia por fase (E2, regla ya establecida por candidato -
+    % SIN CAMBIOS, ver Obtener_Theta_Tibia_Candidato.m) ---
+    [theta_apoyo, theta_balanceo, tempo] = Obtener_Theta_Tibia_Candidato(candidato, antro, tempo, n);
     pct_ciclo_completo = linspace(0, 100, numel(theta_apoyo));
     pct_corte = tempo.frac_apoyo * 100;
-
     pct_ap  = linspace(0, pct_corte, n);
     pct_bal = linspace(pct_corte, 100, n);
-
     theta_ap_rad  = interp1(pct_ciclo_completo, theta_apoyo,    pct_ap,  'pchip');
     theta_bal_rad = interp1(pct_ciclo_completo, theta_balanceo, pct_bal, 'pchip');
 
-    % --- E5: cadena cinematica (posicion del punto seguido, relativa a tobillo) ---
+    % --- theta_muslo por fase (NUEVO 26-ago-2026, solo para reconstruir el
+    % balanceo - ver comentario grande mas abajo). Se pide con
+    % Obtener_Angulos_Candidato.m pero se DESCARTA su theta_tibia (usa
+    % via_rodilla para Yun, que E2 marca como no confiable para ese
+    % candidato) - solo se usa su theta_muslo, que no depende de esa
+    % eleccion de "via".
+    [th_muslo_full, ~, ~] = Obtener_Angulos_Candidato(candidato, antro, tempo, n);
+    theta_muslo_ap_rad  = th_muslo_full.apoyo;
+    theta_muslo_bal_rad = th_muslo_full.balanceo;
+
+    tempo.tiempo_apoyo_s    = tempo.frac_apoyo * tempo.tiempo_ciclo_s;
+    tempo.tiempo_balanceo_s = (1 - tempo.frac_apoyo) * tempo.tiempo_ciclo_s;
+    t_ap  = linspace(0, tempo.tiempo_apoyo_s,    n);
+    t_bal = linspace(0, tempo.tiempo_balanceo_s, n);
+
+    % --- E5, APOYO: cadena de un segmento, tobillo pivote fijo + E6
+    % (traslacion horizontal). MAGNITUD CORREGIDA 26-ago-2026 (segundo
+    % hallazgo del usuario el mismo dia, comparando esta figura contra las
+    % de validacion de TOBILLO/ vs Kuopio): la version anterior aplicaba
+    % la traslacion a VELOCIDAD COMPLETA durante todo el apoyo (v*t_apoyo),
+    % dando ~90cm de avance para un punto cercano al tobillo - la realidad
+    % medida (Kuopio, N=15, Cargar_Kuopio2024_Core.m) es que el tobillo
+    % real solo avanza el 7.9% (SD 1.8%) de la zancada total durante el
+    % apoyo (media 8.16cm, SD 3.00, rango 3.07-13.04cm) - el resto del
+    % avance de la zancada ocurre en el balanceo, no en el apoyo (el pie
+    % esta practicamente plantado). Se reemplaza v*t_apoyo (que asumia que
+    % TODO el cuerpo rigido, incluido el "tobillo", viaja a la velocidad
+    % de marcha completa durante el apoyo) por esta fraccion, que SI tiene
+    % respaldo en datos reales (promedio de poblacion, no LOSO por sujeto -
+    % LOSO no aplica aqui, un sujeto nuevo del generador no tiene "los
+    % otros 14" de quien tomar el promedio; se usa el promedio de los 15
+    % como constante general, igual que Fr=0.25 en Estimar_Velocidad_
+    % Froude_Core.m es una constante poblacional, no ajustada por sujeto).
+    % NOTA: se mantiene NO-CERO (a diferencia de antes de la correccion
+    % del 24-ago) porque sin ninguna traslacion la rotacion sola podia
+    % hacer retroceder el X localmente - ver Test 15 y verificacion mas
+    % abajo de que la monotonia se mantiene con este valor mas chico.
+    FRAC_AVANCE_APOYO = 0.079;
+    zancada_total_cm = tempo.velocidad_ms * 100 * tempo.tiempo_ciclo_s;
+    trasl_apoyo_total_cm = FRAC_AVANCE_APOYO * zancada_total_cm;
+
     cc_opts = struct('punto_seguimiento_m', punto_seguimiento_m);
-    pos_ap  = Cadena_Cinematica_Core(theta_ap_rad,  L_tibia_m, cc_opts);
-    pos_bal = Cadena_Cinematica_Core(theta_bal_rad, L_tibia_m, cc_opts);
+    pos_ap  = Cadena_Cinematica_Core(theta_ap_rad, L_tibia_m, cc_opts);
+    pos_ap.x_cm = pos_ap.x_cm + trasl_apoyo_total_cm * (t_ap / tempo.tiempo_apoyo_s);
+
+    % --- E5, BALANCEO: CORREGIDO 26-ago-2026 (hallazgo del usuario: la
+    % rodilla "retrocedia" en X en tramos del ciclo generado por defecto,
+    % visible en docs/algoritmo/pipeline_koopman_kuopio/figuras/
+    % 05_generador_salida_koopman.png). Causa raiz: el balanceo usaba la
+    % MISMA rotacion-sobre-tobillo-fijo que el apoyo mas una traslacion
+    % lineal simple - la rotacion de la tibia sola puede localmente restar
+    % mas de lo que la traslacion constante suma, dando movimiento hacia
+    % atras (fisicamente implausible). Limitacion ya declarada y dejada
+    % pendiente el 24-ago-2026 en Obtener_Theta_Tibia_Candidato.m
+    % ("PENDIENTE, decision de modelado del usuario... falta la cadena de
+    % muslo completa"). Se resuelve replicando la formula de
+    % Cadena_Completa_Core.m (24-ago-2026, ya usada para validar tobillo
+    % contra Kuopio, CIERRE_TOBILLO.md #6) SIN llamar a esa funcion
+    % directamente, para no alterar su comportamiento ya validado (que no
+    % incluye la traslacion de apoyo E6, especifica de este generador): en
+    % balanceo la CADERA avanza a la velocidad estimada, y la cadena se
+    % construye HACIA ABAJO desde ahi (cadera->rodilla->tobillo) - el punto
+    % seguido ya no depende solo de la rotacion de un segmento, tambien de
+    % que la cadera avanza monotonamente, lo que elimina el retroceso.
+    %
+    % Se reconstruye la posicion de la cadera al final del apoyo (nunca
+    % calculada hasta ahora, porque el apoyo solo trackea el punto seguido
+    % sobre el segmento tibial) para que el balanceo arranque del lugar
+    % geometrico correcto: la MISMA traslacion de apoyo (E6) se le aplica
+    % a la rodilla (rod_ap_rot, aqui) porque es un cuerpo rigido en
+    % traslacion - luego cadera = rodilla - L_muslo*(sin,-cos), formula
+    % identica a la que usa Cadena_Completa_Core.m para su propio apoyo.
+    % La altura de cadera se mantiene constante durante el balanceo (misma
+    % simplificacion ya aceptada en Cadena_Completa_Core.m - el vaiven
+    % vertical real de cadera NO se modela aqui, se declara, no se inventa).
+    L_muslo_m = antro.long_muslo_m;
+    rod_ap_rot = Cadena_Cinematica_Core(theta_ap_rad, L_tibia_m, struct('punto_seguimiento_m', L_tibia_m));
+    rod_ap_x = rod_ap_rot.x_cm + trasl_apoyo_total_cm * (t_ap / tempo.tiempo_apoyo_s);   % misma traslacion reducida que arriba (E6)
+    rod_ap_y = rod_ap_rot.y_cm;
+    cad_ap_x_end = rod_ap_x(end) - L_muslo_m*100*sin(theta_muslo_ap_rad(end));
+    cad_ap_y_end = rod_ap_y(end) + L_muslo_m*100*cos(theta_muslo_ap_rad(end));
+
+    cad_bal_x = cad_ap_x_end + tempo.velocidad_ms * 100 * t_bal;
+    cad_bal_y = cad_ap_y_end * ones(1, n);
+    rod_bal_x = cad_bal_x + L_muslo_m*100*sin(theta_muslo_bal_rad);
+    rod_bal_y = cad_bal_y - L_muslo_m*100*cos(theta_muslo_bal_rad);
+    tob_bal_x = rod_bal_x + L_tibia_m*100*sin(theta_bal_rad);
+    tob_bal_y = rod_bal_y - L_tibia_m*100*cos(theta_bal_rad);
+
+    f_pt = punto_seguimiento_m / L_tibia_m;   % fraccion del segmento tibial: 0=tobillo, 1=rodilla (extremo)
+    pos_bal = struct('x_cm', tob_bal_x + f_pt*(rod_bal_x - tob_bal_x), ...
+                      'y_cm', tob_bal_y + f_pt*(rod_bal_y - tob_bal_y));
 end
-
-tempo.tiempo_apoyo_s    = tempo.frac_apoyo * tempo.tiempo_ciclo_s;
-tempo.tiempo_balanceo_s = (1 - tempo.frac_apoyo) * tempo.tiempo_ciclo_s;
-
-% --- E6: amplitud anatomica - traslacion horizontal (apoyo Y balanceo) ---
-% CORREGIDO 24-ago-2026 (verificado contra Camargo AB06 real, ver
-% Verificar_Pipeline_Completo_vs_Real.m): originalmente esta traslacion
-% solo se sumaba en balanceo, con el supuesto de que el tobillo esta
-% perfectamente fijo durante TODO el apoyo. Comparado contra el avance
-% real de rodilla/tobillo de Camargo, eso produce un X que NO avanza
-% monotono en apoyo (baja y vuelve a subir) - el avance real, aunque
-% chico al principio del apoyo, es continuo. Aproximacion simple elegida
-% (velocidad de marcha constante x tiempo, MISMA formula que ya usaba
-% balanceo) - decision del usuario: arreglo rapido con lo que ya existe,
-% no un modelo nuevo de avance de cadera (esa alternativa, "cadena de
-% muslo completa", queda anotada como pendiente mas riguroso, ver
-% Cadena_Cinematica_Core.m). Con esto el tobillo YA NO queda perfectamente
-% fijo en apoyo - se declara como cambio de supuesto, no se oculta.
-t_ap  = linspace(0, tempo.tiempo_apoyo_s,    n);
-t_bal = linspace(0, tempo.tiempo_balanceo_s, n);
-pos_ap.x_cm  = pos_ap.x_cm  + tempo.velocidad_ms * 100 * t_ap;   % v en cm/s * t
-pos_bal.x_cm = pos_bal.x_cm + tempo.velocidad_ms * 100 * t_bal;
 
 % --- Ensamblar salida ---
 % Apoyo: normalizado a (0,0) en su 1ra muestra (MISMA convencion que

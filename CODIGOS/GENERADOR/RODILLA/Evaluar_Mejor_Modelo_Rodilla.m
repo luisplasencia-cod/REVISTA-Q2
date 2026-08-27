@@ -48,6 +48,15 @@ K = Koopman2014_Core(tempo0.velocidad_ms*3.6, antro.talla_m);
 ang_K = K.theta_tibia_via_rodilla_deg;
 pct_K = linspace(0,100,numel(ang_K));
 
+% NOTA 26-ago-2026: Control_Luis no documenta que pierna se midio. Con
+% lado='izquierda' (default del paper, usado aqui) r=-0.210; probado con
+% 'derecha' (investigacion pedida por el usuario tras notar a Zhao/Yun
+% con r negativo) r sube a +0.560 - mejora real, pero sin confirmar la
+% pierna real del sujeto no se cambia el default solo porque ajusta mejor
+% (seria elegir el lado por el resultado, no por el dato) - a diferencia
+% de Evaluar_vs_Maastricht.m, donde el dataset SI declara explicitamente
+% 'RKneeFlex' y el cambio a 'derecha' esta justificado sin ambiguedad.
+% Ver CIERRE_RODILLA.md para el detalle completo del hallazgo.
 Z = Zhao2026_Core(antro.long_muslo_m+antro.long_tibia_m, 1/tempo0.tiempo_ciclo_s);
 ang_Z = rad2deg(Z.theta_tibia_rad);
 pct_Z = linspace(0,100,numel(ang_Z));
