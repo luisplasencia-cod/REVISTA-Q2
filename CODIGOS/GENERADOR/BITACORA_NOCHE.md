@@ -50,3 +50,25 @@
 - No se tocó ningún archivo de Koopman (`Evaluar_vs_Kuopio_Tobillo_Fases.m`, `Evaluar_Individual_Kuopio_Tobillo.m`) ni se re-ejecutaron en esta tarea.
 - Archivos: `Evaluar_vs_Kuopio_Tobillo_Fases_Zhao.m`, `Evaluar_vs_Kuopio_Tobillo_Fases_Zhao_resultados.csv`, `Evaluar_vs_Kuopio_Tobillo_Fases_Zhao_figura.png`, `Evaluar_Individual_Kuopio_Tobillo_Zhao.m`, `Evaluar_Individual_Kuopio_Tobillo_Zhao_resultados.csv`, `Evaluar_Individual_Kuopio_Tobillo_Zhao_figura.png` — los 6 en `CODIGOS/GENERADOR/TOBILLO/`.
 - Commit de git hecho con estos 6 archivos + esta entrada de bitácora + el checkbox de Tarea 1 en `PLAN_ZHAO_YUN.md`.
+
+## Nota: Agente B (TOBILLO/Yun) reportó "completed" prematuramente
+- La notificación de finalización de B llegó con el mensaje "Waiting for the background MATLAB job to complete. I'll resume verification, documentation, and commit once it finishes." — es decir, el turno del agente terminó ANTES de que MATLAB (que él mismo lanzó en background) terminara. El proceso MATLAB.exe sigue vivo y avanzando (confirmado con `tasklist` y el log `TOBILLO/yun_run_log.txt`: "Sujeto 1 OK (1/15)", procesando sujeto 2).
+- Mismo patrón probable en D (INCLINACION_TIBIAL/Yun, log `yun_grupo_log.txt` muestra el inicio de la primera regresión, sin notificación de fin todavía).
+- Decisión: NO relanzar ni matar estos procesos MATLAB — están corriendo correctamente, solo lentos (~15 sujetos x regresión GP completa cada uno). Se espera a que terminen (revisando los logs y los archivos de salida esperados) y, si el agente no vuelve a reportar, el coordinador (yo) verifica/documenta/commitea el resultado directamente en vez de relanzar un agente nuevo para esta tarea ya en curso.
+
+## Tarea 2 (TOBILLO/Yun) — resultado de GRUPO confirmado, individual en curso
+- Script de grupo (`Evaluar_vs_Kuopio_Tobillo_Fases_Yun.m`) terminó en MATLAB real: N=15, sin NaN, sin fallos de sujeto.
+- **Resultado (N=15, vía tobillo — regla ya corregida hoy, cadena completa vs Kuopio):**
+  - Calibración LOSO: muslo ganancia≈0.85 (rango 0.82-0.88), tibia ganancia≈-0.70 (rango -0.65 a -0.78, NEGATIVA en los 15 sujetos — mismo patrón de forma invertida ya visto en Zhao).
+  - X: r medio≈0.989 (rango 0.973-0.997), RMSE medio≈7.08cm (rango 4.30-10.49cm).
+  - Y: r medio≈0.831 (rango 0.724-0.907), RMSE medio≈3.39cm (rango 2.42-6.58cm).
+  - Comparado con Koopman (X r=0.998/RMSE=2.90cm, Y r=0.985/RMSE=1.54cm): Yun tiene correlación de forma razonable en X pero RMSE mucho peor (7.08 vs 2.90cm), y tanto r como RMSE claramente peores en Y. **Yun no es competitivo con Koopman para tobillo con su configuración nativa** — consistente con el patrón ya visto en Zhao y con el propio resultado de Yun en ángulo tibial puro (ver Tarea 4 abajo).
+- Script individual (`Evaluar_Individual_Kuopio_Tobillo_Yun.m`) lanzado, recorriendo los 15 sujetos de nuevo (mismo patrón "no duplicar lógica" que Koopman - el individual llama al de grupo con `hacer_figura=false`, que igual recalcula todo, solo omite graficar) - en curso, ~3/15 al momento de este registro. Se completará la Tarea 2 cuando termine.
+
+## Tarea 4 (INCLINACION_TIBIAL/Yun) — resultado de GRUPO confirmado, individual en curso
+- Script de grupo (`Evaluar_vs_Kuopio_AnguloTibial_Yun.m`) terminó en MATLAB real: N=15, sin NaN.
+- **Resultado (N=15, ángulo tibial nativo vía tobillo, Yun vs Kuopio 2024):**
+  - Sin calibrar: r crudo NEGATIVO en los 15 sujetos (rango -0.04 a -0.45, media≈-0.31), RMSE crudo 18-27°, RMSEnorm crudo 3.6-6.0 ("Deficiente").
+  - Calibrado (afín LOSO): ganancia SIEMPRE negativa (rango -0.69 a -0.86) — la calibración solo invierte el signo del error de fase sin corregirlo (r_cal = |r_crudo|, mismo mecanismo ya documentado para Zhao en esta misma pieza). RMSE calibrado 12-20°, RMSEnorm calibrado 3.1-5.9 — sigue "Deficiente" en la escala del proyecto (<1 sería "Excelente").
+- **Interpretación, igual que Zhao:** Yun tampoco reproduce la forma del ángulo tibial real con su configuración nativa (vía tobillo, canal R_) — el defecto es de fase/forma, no de escala, y la calibración afín no lo puede rescatar. **Yun no es un candidato viable para el ángulo tibial**, mismo veredicto que Zhao, por una razón de la misma naturaleza (aunque el mecanismo interno de cada modelo sea distinto).
+- Script individual lanzado, en curso (log `yun_individual_log.txt`, recorriendo los 15 sujetos de nuevo). Se completará la Tarea 4 cuando termine.
