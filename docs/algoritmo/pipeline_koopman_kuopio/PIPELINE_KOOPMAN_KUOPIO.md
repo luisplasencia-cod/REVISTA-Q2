@@ -145,6 +145,22 @@ Esta fue la pieza que reveló el hallazgo central (5.2): la forma ya era casi pe
 
 ![Ángulo tibial vs Kuopio, 6 sujetos individuales](figuras/11_angulo_tibial_vs_kuopio_individual.png)
 
+### 5.7 Zhao y Yun replicados con el mismo pipeline (27-ago-2026) — Koopman gana en TOBILLO e INCLINACION_TIBIAL, a diferencia de RODILLA/Maastricht
+
+Tarea nocturna autónoma: se construyó el mismo pipeline (calibración LOSO, `Cadena_Completa_Core`, rockers, cierre de ciclo/zancada) para Zhao 2026 y Yun 2014 en TOBILLO e INCLINACION_TIBIAL, usando la configuración **nativa** de cada modelo (sin el "truco de lado" de la sección 2, que ahí sí ayudó a Zhao/Yun en Maastricht). Detalle completo: `TOBILLO/CIERRE_TOBILLO.md` §11, `INCLINACION_TIBIAL/CIERRE_INCLINACION_TIBIAL.md` §9.
+
+| TOBILLO | Koopman | Zhao | Yun |
+|---|---|---|---|
+| X — r / RMSE | **0.998 / 2.90cm** | 0.974 / 10.99cm | 0.990 / 7.08cm |
+| Y — r / RMSE | **0.985 / 1.54cm** | 0.914 / 2.51cm | 0.831 / 3.39cm |
+
+| ÁNGULO TIBIAL | Koopman | Zhao | Yun |
+|---|---|---|---|
+| r crudo | 0.992 | -0.303 | -0.300 |
+| RMSEnorm calibrado | **0.92 (Excelente)** | 3.39 (Deficiente) | 4.42 (Deficiente) |
+
+**A diferencia de Maastricht (sección 2), aquí Koopman gana con claridad en los 3 candidatos, en ambas piezas.** La razón: el "truco de lado" que rescataba a Zhao/Yun en Maastricht corrige específicamente un defecto de fase del **canal de rodilla/flexión nativa** (`RODILLA/CIERRE_RODILLA.md` §1-ter) — pero TOBILLO e INCLINACION_TIBIAL dependen del ángulo **tibial** (cadera−rodilla combinados, o rodilla-vía-tobillo según el candidato), no de la flexión de rodilla aislada, así que no está garantizado que el mismo truco ayude de la misma forma. **No se probó** en esta tarea (decisión D2 de `DECISIONES.md`, deliberadamente no reabierta) — queda como la pregunta de mayor valor antes de cerrar la comparación final entre candidatos.
+
 ---
 
 ## 6. Mapa de atribución (qué viene de dónde)
@@ -165,4 +181,6 @@ Para que quede trazable al redactar Métodos:
 
 ## 8. Qué falta (fuera del alcance de este documento)
 
-Cómo se juntan rodilla+tobillo+ángulo tibial en un solo generador coherente, y si esto reemplaza o convive con el plan de ensamble de 4 modelos (`docs/planificacion/plan_ensamble_multimodelo.md`) — pregunta abierta, pospuesta por decisión explícita del usuario desde el 24-ago-2026, sin cerrar todavía.
+- Cómo se juntan rodilla+tobillo+ángulo tibial en un solo generador coherente, y si esto reemplaza o convive con el plan de ensamble de 4 modelos (`docs/planificacion/plan_ensamble_multimodelo.md`) — pregunta abierta, pospuesta por decisión explícita del usuario desde el 24-ago-2026, sin cerrar todavía.
+- **Si el "truco de lado" de Zhao/Yun (sección 2, sección 5.7) debe probarse también en TOBILLO/INCLINACION_TIBIAL** — no se decidió en la tarea autónoma del 27-ago-2026 (ver `TOBILLO/CIERRE_TOBILLO.md` §11), porque el truco corrige un canal distinto (rodilla/flexión nativa) del que usan estas dos piezas (ángulo tibial combinado).
+- Con Koopman ganando en 2 de 3 piezas (TOBILLO, INCLINACION_TIBIAL) y empatando/perdiendo en la tercera (RODILLA/Maastricht, sección 2), la elección final de "un solo modelo ganador" sigue sin cerrarse — Ferber y Kuopio para RODILLA todavía no se re-evaluaron con Zhao/Yun corregidos (ver `RODILLA/CIERRE_RODILLA.md` §1-ter).
