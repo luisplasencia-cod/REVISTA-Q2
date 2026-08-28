@@ -4,7 +4,7 @@ INICIO DEL LOOP: 2026-08-27 23:57:56 SAPST
 
 ## Fases
 - [x] Setup: branch `revision/2026-08-27`, `_REVISION/` creado — 23:57:56 → 23:59 (~1m)
-- [ ] Ronda 1 · A1 INVENTARIO
+- [x] Ronda 1 · A1 INVENTARIO — 23:57:56 → 00:18:40 (~21m). 543 filas (538 individuales + 5 dataset-agregado). 0 FALLA, 8 NO COMPROBABLE. Hallazgos: 140 archivos con hash duplicado (123 en `Articulo de conferencia/codigos y base original/` = copia casi completa de CODIGOS/PERSONA SANA/REFERENCIAS/SIMULADOR; 7 en CALIBRACION/EJEMPLO_PRUEBA); Sudeesh2024.pdf ahora SÍ tiene capa de texto (contradice bloqueo 403 documentado en CLAUDE.md — para A5); tensión interna en CLAUDE.md sobre revista JTEHM "vigente" vs "sin decidir" tras pivote (para A4); `CODIGOS/GENERADOR/RODILLA/Fukuchi/` nueva, sin gitignore.
 - [ ] Ronda 1 · A2 GRAFO
 - [ ] Ronda 2 · A3 CÓDIGO
 - [ ] Ronda 2 · A4 REDACCIÓN
