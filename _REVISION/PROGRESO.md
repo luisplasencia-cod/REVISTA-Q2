@@ -12,8 +12,12 @@ INICIO DEL LOOP: 2026-08-27 23:57:56 SAPST
 - [x] Ronda 2 · A6 DATOS — 02:21 → ~02:29 (~8m). 12 archivos revisados a fondo, 0 FALLA, 6/12 sin consumidor. Candidato fuerte a BORRAR: 3 logs yun_*.txt (CODIGOS/GENERADOR/GUIA... no, ver REPORTE_NOCHE.md:53 del propio equipo: "bórralos si ya no los necesitas", sin script que los produzca, resultados ya en CSV+PNG committeados). CSV DIAG_ladotrick_* de hoy bien formados, ganancia negativa explicada matemáticamente (no bug). chile_extract/*.csv = copia byte-idéntica de 2 archivos dentro de 22151474.zip (redundancia trivial ~24KB). Evaluar_vs_Fukuchi2018 le falta tobillo,Zhao por diseño (Zhao no modela tobillo, declarado en comentario).
 - [x] Ronda 3 · Justificación (07) — 02:31→02:37 (~6m). 543 filas (5 agregadas + 538 individuales), construidas mecánicamente vía script Python que junta 01_inventario.md + grado de entrada de 02_grafo.md + fórmula de puntuación visible. Niveles: 2 CRÍTICO, 13 ALTO, 67 MEDIO, 10 BAJO, 451 NULO. Veredictos: 415 JUSTIFICADO, 123 DUPLICADO (Articulo de conferencia/codigos y base original, copia estática sin vínculo de código — NO se recomienda borrar, ver nota de alcance cruzado), 3 OBSOLETO (logs yun_*.txt), 2 HUÉRFANO (GRF_Newton_ApoyoSimple_Core.m, Cargar_Sujetos_CSV.m). Nota: archivos duplicados dentro de Articulo de conferencia/ excluidos de recomendación de borrado porque A2 confirmó que los propios scripts de esa carpeta (Fig5_*.m) SÍ los usan internamente — borrar rompería ese proyecto separado.
 - [x] Ronda 3 · Hallazgos (08) — 17 hallazgos consolidados de A2-A6, por severidad (7 media/alta reales de código+redacción+fuentes, resto informativo/bajo).
-- [~] Ronda 3 · REVISION.md final — en curso
-- [ ] Commit final + FIN DEL LOOP
+- [x] Ronda 3 · REVISION.md final — 02:37:59 → 02:40:50 (~3m). 192 líneas. 0 candidatos en §5 Borrar (ningún archivo cumple los 6 criterios simultáneos, incl. antigüedad >7 días); 8 en §6 Dudosos; 10 preguntas en §4; 10 problemas en §7; 10 hallazgos de redacción en §8.
+- [x] Commit final + FIN DEL LOOP — ver abajo
+
+FIN DEL LOOP: 2026-08-28 02:40:50 SAPST
+INICIO DEL LOOP: 2026-08-27 23:57:56 SAPST
+DURACIÓN TOTAL: 2h 42m 54s
 
 ## Sub-tareas por carpeta de primer nivel (para A1/A2 y para checklist de cobertura)
 - [ ] Articulo de conferencia/  (proyecto separado, ver su propio CLAUDE.md — no mezclar argumentos con el Q2)
