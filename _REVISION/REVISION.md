@@ -111,34 +111,34 @@ Detalle de las 543 filas (una por archivo) en `detalle/07_justificacion.md`.
 ## 4. Preguntas — responder en la línea R
 
 P1. `CLAUDE.md:108` sigue diciendo JTEHM "vigente", pero `analisis_revistas_Q1_generador.md:53` (27-ago, sin trackear) dice "descartada por completo". ¿Corrijo `CLAUDE.md:108` con la tachadura estándar del documento?
-R1:
+R1: NO , jtehm ya no es viegente es busqueda d eotra 
 
 P2. `plan_ensamble_multimodelo.md` se autodescribe "CERRADA" pero fue pausado el mismo día a favor de "mejor modelo por segmento" (pregunta que el propio proyecto dejó abierta el 24-ago). ¿Sigue abierta, o ya la resolviste en otra sesión no reflejada en los documentos?
-R2:
+R2: es el mejor modelo , o combinar modelso para un resutlado mejor tenemos que entrenar o algo ?
 
 P3. `docs/DISCUSION_Q2.md` §6 (registro obligatorio de decisiones) no tiene filas desde el 23-ago. ¿Se completa con las sesiones 24/25/27-ago?
-R3:
+R3: ya se dejo ese .md debido ueque alli disctuia antes de que se mencioen que sera todo mediante base dde datso y algoritmos
 
 P4. `Combinar_Candidatos_Core.m` promedia el eje X de Romero-Sorozábal sin resolver la advertencia de signo que el propio módulo declara (H2). ¿Se invalida `candidato='Combinado'` hasta verificar, o ya se verificó en otro lado?
-R4:
+R4: no entendi esta pregunta pero dijimso que el promedio no era la mejor opcion ya que opeuden ser miu diferentes entre si pero es mejor escoger uno o juntar para tern mejores resutlados 
 
 P5. ¿Se borran los 3 logs `yun_*.txt` (ver §6)? El propio equipo ya lo pidió por escrito en `REPORTE_NOCHE.md`, pero son de menos de 7 días — el loop no los propone automáticamente por regla dura.
-R5:
+R5: si 
 
 P6. Los 123 archivos duplicados de `Articulo de conferencia/codigos y base original/` están en uso activo dentro de ese proyecto separado (confirmado, A2). ¿Se documenta como duplicación aceptada, o se investiga apuntar a la raíz en vez de mantener copia?
-R6:
+R6: lo de articulo de conferencia hay que dejarlo alli esa carpeta ya no se toca asi comoe sta esta bien
 
 P7. `manuscrito_JTEHM.tex:197-200` caracteriza a Marinelli2015 como "simplified sagittal-plane", pero otra fuente sugiere 6-DOF/3D (H9, sin PDF propio para confirmar). ¿Se consigue el PDF antes de fijar la frase, o se reformula con más cautela mientras tanto?
-R7:
+R7:pero ya se dejo el jtehm ya eso hay que brirarlo ya que estamos en otro enfoque 
 
 P8. `GRF_Newton_ApoyoSimple_Core.m`/`MasaSegmentaria_DeLeva1996_Core.m` (nuevos) no tienen `Test_*.m` ni `GUIA_INTERPRETACION.md`, rompiendo la convención propia del proyecto. ¿Se agregan antes de seguir construyendo encima, o es trabajo en curso que se completa después?
-R8:
+R8: hay que veriica si esta en curso o si ya se termino 
 
 P9. `mejor_modelo_rodilla.md`, `CIERRE_TOBILLO.md`, `CIERRE_INCLINACION_TIBIAL.md` y `JUSTIFICACION_MODELOS_Y_ESTADO_Q1.md` tienen contenido solapado (H7). ¿Se consolidan en un solo documento vigente?
-R9:
+R9: si puedes consolidar todo mejor 
 
 P10. `docs/ESTADO_Y_RUMBO.md` sigue con banner "no usar para planificar" desde el 19-ago, sin reemplazo del mismo alcance. ¿Se rehace, o se acepta que `CLAUDE.md`+`JUSTIFICACION_MODELOS_Y_ESTADO_Q1.md` cubren ese rol ahora?
-R10:
+R10: aqui analiza lo que es mjeor apra que tu enteidas 
 
 ## 5. Borrar — recomendado
 
@@ -148,44 +148,44 @@ Ninguno cumple los 6 criterios simultáneos esta noche (huérfano/duplicado/obso
 
 | # | Archivo | Nivel | Duda | Qué falta saber | Detalle | DECISIÓN |
 |---|---|---|---|---|---|---|
-| 1 | `CODIGOS/GENERADOR/TOBILLO/yun_run_log.txt` | NULO | Log de depuración, el propio equipo pidió borrarlo (`REPORTE_NOCHE.md:53`) | Nada — evidencia ya completa, solo espera fuera de la ventana de 7 días | `detalle/06_datos.md` | ? |
-| 2 | `CODIGOS/GENERADOR/INCLINACION_TIBIAL/yun_grupo_log.txt` | NULO | Mismo caso que #1 | Nada | `detalle/06_datos.md` | ? |
-| 3 | `CODIGOS/GENERADOR/INCLINACION_TIBIAL/yun_individual_log.txt` | NULO | Mismo caso que #1 | Nada | `detalle/06_datos.md` | ? |
-| 4 | `CODIGOS/GENERADOR/GRF_Newton_ApoyoSimple_Core.m` | NULO | Huérfano de hoy, sin llamador ni mención documental | Si es trabajo en curso o se abandonó | `detalle/02_grafo.md` §3, `detalle/03_codigo.md` | ? |
-| 5 | `CODIGOS/MULTISUJETO/Cargar_Sujetos_CSV.m` | NULO | Huérfano, pero documentado como infraestructura pendiente intencional | Si sigue vigente el plan de usarlo | `detalle/02_grafo.md` §3 | ? |
-| 6 | `docs/literatura/pdfs/chile_extract/*.csv` (2 archivos) | BAJO | Copia byte-idéntica de contenido dentro de `22151474.zip` | Si conviene quedarse solo con el `.zip` | `detalle/06_datos.md` | ? |
-| 7 | `Articulo de conferencia/codigos y base original/` (123 archivos) | — (excluido de puntaje por ser de otro proyecto) | Duplicación completa de `CODIGOS/PERSONA SANA/REFERENCIAS/SIMULADOR`, en uso activo dentro de su propio proyecto | Si se puede compartir en vez de duplicar sin romper `Articulo de conferencia/` | `detalle/01_inventario.md` §Perfil, `detalle/02_grafo.md` §5(a) | ? |
-| 8 | `references.bib` entradas `Clinical_electrocardiography`/`clustering` | — (dentro de archivo de bibliografía, no tocable por regla dura de este loop) | Huérfanas de citación, ya documentadas como resto intencional de plantilla | Confirmar que se dejan así | `detalle/05_fuentes.md` §2 | ? |
+| 1 | `CODIGOS/GENERADOR/TOBILLO/yun_run_log.txt` | NULO | Log de depuración, el propio equipo pidió borrarlo (`REPORTE_NOCHE.md:53`) | Nada — evidencia ya completa, solo espera fuera de la ventana de 7 días | `detalle/06_datos.md` | BORRAR (R5: sí) |
+| 2 | `CODIGOS/GENERADOR/INCLINACION_TIBIAL/yun_grupo_log.txt` | NULO | Mismo caso que #1 | Nada | `detalle/06_datos.md` | BORRAR (R5: sí) |
+| 3 | `CODIGOS/GENERADOR/INCLINACION_TIBIAL/yun_individual_log.txt` | NULO | Mismo caso que #1 | Nada | `detalle/06_datos.md` | BORRAR (R5: sí) |
+| 4 | `CODIGOS/GENERADOR/GRF_Newton_ApoyoSimple_Core.m` | NULO | Huérfano de hoy, sin llamador ni mención documental | Si es trabajo en curso o se abandonó | `detalle/02_grafo.md` §3, `detalle/03_codigo.md` | CONSERVAR (es código real, no basura; R8 pide verificar estado — ver plan) |
+| 5 | `CODIGOS/MULTISUJETO/Cargar_Sujetos_CSV.m` | NULO | Huérfano, pero documentado como infraestructura pendiente intencional | Si sigue vigente el plan de usarlo | `detalle/02_grafo.md` §3 | CONSERVAR (inofensivo dejarlo, infraestructura ya documentada como intencional) |
+| 6 | `docs/literatura/pdfs/chile_extract/*.csv` (2 archivos) | BAJO | Copia byte-idéntica de contenido dentro de `22151474.zip` | Si conviene quedarse solo con el `.zip` | `detalle/06_datos.md` | CONSERVAR (redundancia trivial ~24KB, inofensiva) |
+| 7 | `Articulo de conferencia/codigos y base original/` (123 archivos) | — (excluido de puntaje por ser de otro proyecto) | Duplicación completa de `CODIGOS/PERSONA SANA/REFERENCIAS/SIMULADOR`, en uso activo dentro de su propio proyecto | Si se puede compartir en vez de duplicar sin romper `Articulo de conferencia/` | `detalle/01_inventario.md` §Perfil, `detalle/02_grafo.md` §5(a) | CONSERVAR (R6: no tocar esa carpeta) |
+| 8 | `references.bib` entradas `Clinical_electrocardiography`/`clustering` | — (dentro de archivo de bibliografía, no tocable por regla dura de este loop) | Huérfanas de citación, ya documentadas como resto intencional de plantilla | Confirmar que se dejan así | `detalle/05_fuentes.md` §2 | CONSERVAR (regla dura: nunca se toca bibliografía) |
 
 ## 7. Problemas (top 10: código, datos, comprobaciones falladas)
 
 | # | Severidad | Dónde | Qué pasa | Detalle | ARREGLAR |
 |---|---|---|---|---|---|
-| 1 | Alta | `Combinar_Candidatos_Core.m:108-124` | Ignora advertencia de signo de X de Romero-Sorozábal, propia del módulo | `detalle/03_codigo.md` (H2) | NO |
-| 2 | Alta | `Cadena_Cinematica_Core.m:100-111`, `GUIA_INTERPRETACION.md:121` | Documentan regla E2 anterior al 24-ago, código real ya cambió | `detalle/03_codigo.md` (H6) | NO |
-| 3 | Media | `Generar_Trayectoria.m:139,153`, `GRF_Newton_ApoyoSimple_Core.m:125,133` | Modelo del candidato se corre 2× por llamada; caro para Yun (30 archivos I/O) | `detalle/03_codigo.md` (H8) | NO |
-| 4 | Media | `Obtener_Angulos_Candidato.m:38-44` | Riesgo de desincronización de regla E2 entre múltiples consumidores | `detalle/03_codigo.md` | NO |
-| 5 | Media | `Calcular_Metricas_Curva.m:1`, `Procesar_Multisujeto_Core.m:128` | Función en minúsculas vs. archivo PascalCase — riesgo en Mac/Linux | `detalle/03_codigo.md` (H13) | NO |
-| 6 | Media | `Test_Generador_Trayectoria.m:144` | Ruta absoluta `C:\articuloq2\...` hardcodeada, no portable | `detalle/03_codigo.md`, `detalle/02_grafo.md` §4 (H14) | NO |
-| 7 | Media | `GRF_Newton_ApoyoSimple_Core.m`, `MasaSegmentaria_DeLeva1996_Core.m` | Archivos nuevos sin `Test_*.m` ni `GUIA_INTERPRETACION.md` — rompe convención propia | `detalle/03_codigo.md` (H16) | NO |
-| 8 | Baja | `Test_Calibracion_Offset.m:18` | Ruta de scratchpad de sesión antigua, con nombre de proyecto obsoleto "GAITSIM" | `detalle/03_codigo.md` (H15) | NO |
-| 9 | Media | `docs/literatura/pdfs/koomap.pdf` (Koopman) | Símbolo `±` sigue extrayéndose corrupto en tablas vía `pdftotext` | `detalle/05_fuentes.md` §1 | NO |
-| 10 | Baja | `manuscrito_JTEHM.tex:397` | `\includegraphics` roto apuntando a figura inexistente, dentro de bloque comentado (inactivo) | `detalle/02_grafo.md` §4 (H17) | NO |
+| 1 | Alta | `Combinar_Candidatos_Core.m:108-124` | Ignora advertencia de signo de X de Romero-Sorozábal, propia del módulo | `detalle/03_codigo.md` (H2) | SI (guardia/warning explícito, no invento el signo — ver plan) |
+| 2 | Alta | `Cadena_Cinematica_Core.m:100-111`, `GUIA_INTERPRETACION.md:121` | Documentan regla E2 anterior al 24-ago, código real ya cambió | `detalle/03_codigo.md` (H6) | SI |
+| 3 | Media | `Generar_Trayectoria.m:139,153`, `GRF_Newton_ApoyoSimple_Core.m:125,133` | Modelo del candidato se corre 2× por llamada; caro para Yun (30 archivos I/O) | `detalle/03_codigo.md` (H8) | NO (refactor de 3 archivos, no un diff simple — mejor con verificación dedicada) |
+| 4 | Media | `Obtener_Angulos_Candidato.m:38-44` | Riesgo de desincronización de regla E2 entre múltiples consumidores | `detalle/03_codigo.md` | NO (mismo motivo que #3, atado a la misma refactorización) |
+| 5 | Media | `Calcular_Metricas_Curva.m:1`, `Procesar_Multisujeto_Core.m:128` | Función en minúsculas vs. archivo PascalCase — riesgo en Mac/Linux | `detalle/03_codigo.md` (H13) | SI |
+| 6 | Media | `Test_Generador_Trayectoria.m:144` | Ruta absoluta `C:\articuloq2\...` hardcodeada, no portable | `detalle/03_codigo.md`, `detalle/02_grafo.md` §4 (H14) | SI |
+| 7 | Media | `GRF_Newton_ApoyoSimple_Core.m`, `MasaSegmentaria_DeLeva1996_Core.m` | Archivos nuevos sin `Test_*.m` ni `GUIA_INTERPRETACION.md` — rompe convención propia | `detalle/03_codigo.md` (H16) | NO (pendiente de R8: verificar si sigue en curso antes de escribir tests) |
+| 8 | Baja | `Test_Calibracion_Offset.m:18` | Ruta de scratchpad de sesión antigua, con nombre de proyecto obsoleto "GAITSIM" | `detalle/03_codigo.md` (H15) | SI |
+| 9 | Media | `docs/literatura/pdfs/koomap.pdf` (Koopman) | Símbolo `±` sigue extrayéndose corrupto en tablas vía `pdftotext` | `detalle/05_fuentes.md` §1 | NO (no es defecto del repo, es limitación de la herramienta de extracción — ya migrado a pdfplumber) |
+| 10 | Baja | `manuscrito_JTEHM.tex:397` | `\includegraphics` roto apuntando a figura inexistente, dentro de bloque comentado (inactivo) | `detalle/02_grafo.md` §4 (H17) | NO (inactivo, sin riesgo mientras siga comentado) |
 
 ## 8. Redacción y referencias: lo que no cierra (top 10)
 
 | # | Documento | Qué falla | Veredicto | Detalle | ARREGLAR |
 |---|---|---|---|---|---|
-| 1 | `CLAUDE.md:108` | JTEHM "vigente" contradice `analisis_revistas_Q1_generador.md:53` (27-ago, "descartada") | CONTRADICTORIO | `detalle/04_redaccion.md` (H1) | NO |
-| 2 | `plan_ensamble_multimodelo.md` | Se autodescribe "CERRADA" sin banner de la pausa del mismo día | INCOMPLETO | `detalle/04_redaccion.md` (H3) | NO |
-| 3 | `docs/DISCUSION_Q2.md` §6 | Registro obligatorio detenido desde el 23-ago, faltan 3 sesiones | INCOMPLETO | `detalle/04_redaccion.md` (H4) | NO |
-| 4 | `manuscrito_JTEHM.tex` + borrador | 0% de contenido del generador incorporado pese al pivote del 19-ago | INCOMPLETO | `detalle/04_redaccion.md` (H5) | NO |
-| 5 | `mejor_modelo_rodilla.md:41-43` | Describe como pendiente un trabajo (tobillo, tibia) ya cerrado en otros 2 archivos | INCOMPLETO | `detalle/04_redaccion.md` (H7) | NO |
-| 6 | `manuscrito_JTEHM.tex:197-200` | Marinelli2015 caracterizado como "simplificado", posible discrepancia sin PDF propio para verificar | NO VERIFICABLE | `detalle/05_fuentes.md` (H9, F11) | NO |
-| 7 | `CIERRE_TOBILLO.md`, `CIERRE_INCLINACION_TIBIAL.md` | Numeración de encabezados duplicada/invertida | ESTRUCTURA | `detalle/04_redaccion.md` (H10) | NO |
-| 8 | `analisis_escalamiento_Q1_generador_trayectorias.md:546` | Cita "§6" cuando el tablero real está en §9 | INDETERMINADO | `detalle/04_redaccion.md` (H11) | NO |
-| 9 | `analisis_escalamiento_Q1_generador_trayectorias.md:138` | Sigue recomendando IEEE TNSRE, ya descartada (mismo patrón que #1) | SALTO LÓGICO | `detalle/04_redaccion.md` (H12) | NO |
-| 10 | `docs/ESTADO_Y_RUMBO.md:3` | Banner "no usar para planificar" desde 19-ago, sin documento maestro reemplazante | INCOMPLETO | `detalle/04_redaccion.md` | NO |
+| 1 | `CLAUDE.md:108` | JTEHM "vigente" contradice `analisis_revistas_Q1_generador.md:53` (27-ago, "descartada") | CONTRADICTORIO | `detalle/04_redaccion.md` (H1) | SI (R1: JTEHM ya no vigente, en búsqueda de otra revista) |
+| 2 | `plan_ensamble_multimodelo.md` | Se autodescribe "CERRADA" sin banner de la pausa del mismo día | INCOMPLETO | `detalle/04_redaccion.md` (H3) | PENDIENTE (R2 reabre la pregunta de fondo — ver plan, se conversa antes de tocar el archivo) |
+| 3 | `docs/DISCUSION_Q2.md` §6 | Registro obligatorio detenido desde el 23-ago, faltan 3 sesiones | INCOMPLETO | `detalle/04_redaccion.md` (H4) | SI (R3: reinterpretado — banner de "documento pausado", no completar filas) |
+| 4 | `manuscrito_JTEHM.tex` + borrador | 0% de contenido del generador incorporado pese al pivote del 19-ago | INCOMPLETO | `detalle/04_redaccion.md` (H5) | PENDIENTE (ligado a #6, R7 — se conversa antes) |
+| 5 | `mejor_modelo_rodilla.md:41-43` | Describe como pendiente un trabajo (tobillo, tibia) ya cerrado en otros 2 archivos | INCOMPLETO | `detalle/04_redaccion.md` (H7) | SI (R9: consolidar) |
+| 6 | `manuscrito_JTEHM.tex:197-200` | Marinelli2015 caracterizado como "simplificado", posible discrepancia sin PDF propio para verificar | NO VERIFICABLE | `detalle/05_fuentes.md` (H9, F11) | PENDIENTE (R7 ambiguo sobre alcance real — ver plan) |
+| 7 | `CIERRE_TOBILLO.md`, `CIERRE_INCLINACION_TIBIAL.md` | Numeración de encabezados duplicada/invertida | ESTRUCTURA | `detalle/04_redaccion.md` (H10) | SI |
+| 8 | `analisis_escalamiento_Q1_generador_trayectorias.md:546` | Cita "§6" cuando el tablero real está en §9 | INDETERMINADO | `detalle/04_redaccion.md` (H11) | SI |
+| 9 | `analisis_escalamiento_Q1_generador_trayectorias.md:138` | Sigue recomendando IEEE TNSRE, ya descartada (mismo patrón que #1) | SALTO LÓGICO | `detalle/04_redaccion.md` (H12) | SI |
+| 10 | `docs/ESTADO_Y_RUMBO.md:3` | Banner "no usar para planificar" desde 19-ago, sin documento maestro reemplazante | INCOMPLETO | `detalle/04_redaccion.md` | SI (R10: delegado — se deja CLAUDE.md+JUSTIFICACION como reemplazo vigente) |
 
 ## 9. Órdenes libres
 
