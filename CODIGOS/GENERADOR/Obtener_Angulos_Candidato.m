@@ -1,4 +1,4 @@
-function [th_muslo, th_tibia, tempo] = Obtener_Angulos_Candidato(candidato, antro, tempo, n)
+function [th_muslo, th_tibia, tempo] = Obtener_Angulos_Candidato(candidato, antro, tempo, n, opciones)
 % OBTENER_ANGULOS_CANDIDATO  Devuelve theta_muslo Y theta_tibia (rad) por
 %                   fase, para cualquiera de los candidatos - insumo de
 %                   Cadena_Completa_Core.m (24-ago-2026).
@@ -16,6 +16,12 @@ function [th_muslo, th_tibia, tempo] = Obtener_Angulos_Candidato(candidato, antr
 % SALIDA: th_muslo y th_tibia son structs con .apoyo y .balanceo [1 x n]
 
 if nargin < 4 || isempty(n), n = 101; end
+if nargin < 5 || isempty(opciones), opciones = struct(); end
+if ~isfield(opciones,'calibrar_koopman'), opciones.calibrar_koopman = false; end
+if opciones.calibrar_koopman && ~strcmpi(candidato,'koopman')
+    warning('Obtener_Angulos_Candidato:calibracionNoAplicable', ...
+        'opciones.calibrar_koopman=true pedido con candidato=''%s'' - se ignora, ver Calibracion_Koopman_Kuopio_Core.m.', candidato);
+end
 
 switch lower(candidato)
     case 'koopman'
@@ -57,6 +63,19 @@ th_muslo = struct('apoyo',    interp1(pct_nat, m_full, pct_ap,  'pchip'), ...
                   'balanceo', interp1(pct_nat, m_full, pct_bal, 'pchip'));
 th_tibia = struct('apoyo',    interp1(pct_nat, t_full, pct_ap,  'pchip'), ...
                   'balanceo', interp1(pct_nat, t_full, pct_bal, 'pchip'));
+
+% --- Calibracion afin, SOLO Koopman, SOLO si se pide - ver Calibracion_
+% Koopman_Kuopio_Core.m y el mismo bloque en Obtener_Theta_Tibia_Candidato.m
+% (misma logica, duplicada porque son 2 funciones con distinta forma de
+% salida - struct.apoyo/.balanceo aqui vs. arrays sueltos alla). Default
+% sin cambios (calibrar_koopman=false). ---
+if opciones.calibrar_koopman && strcmpi(candidato,'koopman')
+    cal = Calibracion_Koopman_Kuopio_Core();
+    th_muslo.apoyo    = deg2rad(cal.off_muslo_deg) + cal.gan_muslo * th_muslo.apoyo;
+    th_muslo.balanceo = deg2rad(cal.off_muslo_deg) + cal.gan_muslo * th_muslo.balanceo;
+    th_tibia.apoyo    = deg2rad(cal.off_tibia_deg) + cal.gan_tibia * th_tibia.apoyo;
+    th_tibia.balanceo = deg2rad(cal.off_tibia_deg) + cal.gan_tibia * th_tibia.balanceo;
+end
 
 end
 

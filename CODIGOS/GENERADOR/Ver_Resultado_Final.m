@@ -50,6 +50,21 @@ L_cm = antro.long_tibia_m * 100;
 tob_x = rod_x + L_cm * sind(ang);
 tob_y = rod_y - L_cm * cosd(ang);
 
+% OFFSET DE VISUALIZACION (pedido del usuario, revision del informe):
+% la trayectoria exportada sigue normalizada a (0,0) en el primer punto
+% (no se toca nada de eso, Desplazamientos.m/normalizeDisp sin cambios) -
+% esto es SOLO para que los paneles de Y muestren una altura sobre el
+% suelo anatomicamente plausible en vez de un origen arbitrario. Se usa
+% la fraccion de Drillis & Contini ya documentada en el Paso 1 del
+% informe (altura de rodilla = 0.285*H sobre el suelo) como offset
+% constante - por construccion (0.285-0.039=0.246=fraccion de tibia), el
+% mismo offset deja tambien al tobillo cerca de su altura real
+% (0.039*H), sin necesidad de un segundo ajuste independiente.
+FRAC_ALTURA_RODILLA = 0.285;   % Drillis & Contini 1966, ver Paso 1 del informe
+y_offset_cm = FRAC_ALTURA_RODILLA * antro.talla_m * 100;
+rod_y_vis = rod_y + y_offset_cm;
+tob_y_vis = tob_y + y_offset_cm;
+
 fig = figure('Name','Resultado final: rodilla, tobillo y angulo tibial', ...
     'Position',[80 60 1400 800], 'Color','w');
 c_rod = [0.85 0.33 0.10];
@@ -64,25 +79,29 @@ xlabel('% ciclo de marcha'); ylabel('X [cm] (avance)');
 title('X (avance) - rodilla y tobillo');
 legend({'rodilla','tobillo'}, 'Location','best');
 
-% --- Panel 2: Y (altura) vs %ciclo ---
+% --- Panel 2: Y (altura) vs %ciclo --- altura sobre el suelo (offset de
+% visualizacion, ver nota arriba), NO la Y normalizada que exporta el CSV
 subplot(2,2,2); hold on; grid on; box on;
-plot(pct, rod_y, '-', 'Color', c_rod, 'LineWidth', 2.5);
-plot(pct, tob_y, '-', 'Color', c_tob, 'LineWidth', 2.5);
+plot(pct, rod_y_vis, '-', 'Color', c_rod, 'LineWidth', 2.5);
+plot(pct, tob_y_vis, '-', 'Color', c_tob, 'LineWidth', 2.5);
+yline(0, ':', 'suelo');
 xline(tempo.frac_apoyo*100, ':k', 'apoyo|balanceo');
-xlabel('% ciclo de marcha'); ylabel('Y [cm] (altura)');
-title('Y (altura) - rodilla y tobillo');
+xlabel('% ciclo de marcha'); ylabel('Y [cm] (altura sobre el suelo, estimada)');
+title('Y (altura sobre el suelo) - rodilla y tobillo');
 legend({'rodilla','tobillo'}, 'Location','best');
 
 % --- Panel 3: vista sagital (X vs Y), la trayectoria en el plano ---
+% altura sobre el suelo (offset de visualizacion, ver nota arriba)
 subplot(2,2,3); hold on; grid on; box on; axis equal;
-plot(rod_x, rod_y, '-', 'Color', c_rod, 'LineWidth', 2.5);
-plot(tob_x, tob_y, '-', 'Color', c_tob, 'LineWidth', 2.5);
+plot(rod_x, rod_y_vis, '-', 'Color', c_rod, 'LineWidth', 2.5);
+plot(tob_x, tob_y_vis, '-', 'Color', c_tob, 'LineWidth', 2.5);
+yline(0, ':', 'suelo');
 % dibujar el segmento tibial cada 10% de ciclo, para ver la postura
 idx_post = round(linspace(1, numel(pct), 11));
 for k = idx_post
-    plot([tob_x(k) rod_x(k)], [tob_y(k) rod_y(k)], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
+    plot([tob_x(k) rod_x(k)], [tob_y_vis(k) rod_y_vis(k)], '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
 end
-xlabel('X [cm] (avance)'); ylabel('Y [cm] (altura)');
+xlabel('X [cm] (avance)'); ylabel('Y [cm] (altura sobre el suelo, estimada)');
 title('Vista sagital - trayectoria + segmento tibial cada 10% del ciclo');
 legend({'rodilla','tobillo'}, 'Location','best');
 
@@ -94,8 +113,20 @@ xline(tempo.frac_apoyo*100, ':k', 'apoyo|balanceo');
 xlabel('% ciclo de marcha'); ylabel('\theta_{tibia} [deg] (0 = vertical)');
 title('Angulo de inclinacion tibial');
 
-sgtitle(sprintf('%s -- talla=%.2f m, masa=%.0f kg, v=%.2f m/s, tibia=%.1f cm', ...
-    candidato, antro.talla_m, antro.masa_kg, tempo.velocidad_ms, L_cm), 'FontWeight','bold');
+% CORREGIDO (observacion del usuario, revision del informe): masa_kg no
+% se usa en ningun calculo de este pipeline (Generar_Trayectoria.m no la
+% consume para posicion/angulo, ver docs/algoritmo/informe_tecnico_
+% generador.tex, "Trazabilidad de las 3 entradas") - mostrarla en el
+% titulo sugeria falsamente que influye en el resultado. Se quita, y se
+% marca explicitamente si v es medida o estimada por Froude
+% (tempo.fuente_velocidad, Temporizacion_Core.m).
+if strcmp(tempo.fuente_velocidad, 'medida')
+    v_txt = sprintf('v=%.2f m/s (medida)', tempo.velocidad_ms);
+else
+    v_txt = sprintf('v=%.2f m/s (estimada, Froude)', tempo.velocidad_ms);
+end
+sgtitle(sprintf('%s -- talla=%.2f m, %s, tibia=%.1f cm (estimada, Drillis-Contini)', ...
+    candidato, antro.talla_m, v_txt, L_cm), 'FontWeight','bold');
 
 out_png = fullfile(fileparts(mfilename('fullpath')), 'Ver_Resultado_Final_figura.png');
 try

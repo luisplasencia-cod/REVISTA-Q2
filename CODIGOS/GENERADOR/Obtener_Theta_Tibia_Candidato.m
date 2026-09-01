@@ -1,4 +1,4 @@
-function [theta_apoyo_rad, theta_balanceo_rad, tempo] = Obtener_Theta_Tibia_Candidato(candidato, antro, tempo, n)
+function [theta_apoyo_rad, theta_balanceo_rad, tempo, theta_muslo_apoyo_rad, theta_muslo_balanceo_rad] = Obtener_Theta_Tibia_Candidato(candidato, antro, tempo, n, opciones)
 % OBTENER_THETA_TIBIA_CANDIDATO  Corre UN candidato (Koopman/Zhao/Yun) y
 %                     devuelve theta_tibia(t) por fase, aplicando la regla
 %                     E2 de que "camino" usar por candidato y por fase
@@ -30,6 +30,15 @@ function [theta_apoyo_rad, theta_balanceo_rad, tempo] = Obtener_Theta_Tibia_Cand
 %                     eso lo sigue haciendo el llamador, igual que antes)
 %   tempo             tempo de entrada, con .tiempo_ciclo_s posiblemente
 %                     actualizado al valor propio del candidato
+%   theta_muslo_apoyo_rad, theta_muslo_balanceo_rad   (NUEVO 28-ago-2026,
+%                     opcionales - un llamador con nargout<=3 no los recibe
+%                     y no paga costo extra) angulo de cadera/muslo, misma
+%                     fuente y "via" que usa Obtener_Angulos_Candidato.m,
+%                     extraido del MISMO K/Z/Y ya calculado para la tibia -
+%                     evita la 2da llamada al modelo del candidato que
+%                     GRF_Newton_ApoyoSimple_Core.m necesitaba antes (H8,
+%                     _REVISION/detalle/03_codigo.md, 28-ago-2026). SIN
+%                     recortar a fase, igual que los otros dos.
 %
 % Fuente: misma logica exacta que tenia el switch-case de
 % Generar_Trayectoria.m (E2 de plan_100_generador.md) - solo se movio de
@@ -38,6 +47,12 @@ function [theta_apoyo_rad, theta_balanceo_rad, tempo] = Obtener_Theta_Tibia_Cand
 
 if ~any(strcmpi(candidato, {'Koopman','Yun','Zhao'}))
     error('candidato debe ser ''Koopman'', ''Yun'' o ''Zhao''. Se recibio: %s', mat2str(candidato));
+end
+if nargin < 5 || isempty(opciones), opciones = struct(); end
+if ~isfield(opciones,'calibrar_koopman'), opciones.calibrar_koopman = false; end
+if opciones.calibrar_koopman && ~strcmpi(candidato,'koopman')
+    warning('Obtener_Theta_Tibia_Candidato:calibracionNoAplicable', ...
+        'opciones.calibrar_koopman=true pedido con candidato=''%s'' - la calibracion afin (Calibracion_Koopman_Kuopio_Core.m) solo se derivo para Koopman, se ignora para este candidato.', candidato);
 end
 
 switch lower(candidato)
@@ -87,12 +102,14 @@ switch lower(candidato)
         theta_apoyo_rad    = K.theta_tibia_via_rodilla_rad;
         theta_balanceo_rad = K.theta_tibia_via_rodilla_rad;
         tempo.tiempo_ciclo_s = K.tiempo_ciclo_s;  % usa el propio de Koopman (consistente)
+        m_full = deg2rad(K.cadera_flexext.angulo_deg);  % ver nota theta_muslo_* abajo
 
     case 'zhao'
         f_zancada = 1 / tempo.tiempo_ciclo_s;
         Z = Zhao2026_Core(antro.long_muslo_m + antro.long_tibia_m, f_zancada, struct('nMuestras', n));
         theta_apoyo_rad    = Z.theta_tibia_rad;
         theta_balanceo_rad = Z.theta_tibia_rad;
+        m_full = Z.phi_cadera_rad;
 
     case 'yun'
         p14 = vector14_desde_antropometria(antro);
@@ -100,6 +117,37 @@ switch lower(candidato)
         theta_apoyo_rad    = Y.theta_tibia_via_tobillo_R_rad;
         theta_balanceo_rad = Y.theta_tibia_via_tobillo_R_rad;  % via_rodilla marcada no confiable, E2
         tempo.tiempo_ciclo_s = Y.periodo_s;  % periodo propio del toolbox
+        m_full = deg2rad(Y.R_hip_extension.mean);
+end
+
+% theta_muslo_apoyo_rad/theta_muslo_balanceo_rad (NUEVO 28-ago-2026, H8 de
+% _REVISION/detalle/03_codigo.md): mismo angulo de cadera/muslo que ya
+% calcula Obtener_Angulos_Candidato.m (identica fuente por candidato:
+% K.cadera_flexext.angulo_deg / Z.phi_cadera_rad / Y.R_hip_extension.mean),
+% extraido aqui del MISMO K/Z/Y ya calculado arriba para theta_tibia - CERO
+% llamadas nuevas al modelo del candidato. Se devuelve SIN recortar a fase
+% (mismo patron que theta_apoyo_rad/theta_balanceo_rad de esta funcion: el
+% llamador recorta con su propio pct_ap/pct_bal). Un llamador que solo pide
+% los primeros 3 outputs (todo el codigo existente antes de hoy) no paga
+% ningun costo extra - estas 2 lineas ya se ejecutaban para theta_tibia,
+% solo se expone tambien el dato de muslo que ya estaba en memoria.
+theta_muslo_apoyo_rad    = m_full;
+theta_muslo_balanceo_rad = m_full;
+
+% --- Calibracion afin LOSO->agrupada, SOLO Koopman, SOLO si se pide
+% (28-ago-2026, ver Calibracion_Koopman_Kuopio_Core.m para la trazabilidad
+% completa) - se aplica DESPUES de fijar theta_apoyo/balanceo/muslo, sobre
+% el angulo (no la posicion), consistente con el hallazgo de PIPELINE_
+% KOOPMAN_KUOPIO.md Sec.5.2. Comportamiento DEFAULT sin cambios (calibrar_
+% koopman=false) - los scripts de evaluacion existentes (TOBILLO/RODILLA/
+% INCLINACION_TIBIAL, que hacen su PROPIA calibracion LOSO para validar)
+% siguen recibiendo el angulo crudo tal como antes, sin doble-calibrar.
+if opciones.calibrar_koopman && strcmpi(candidato,'koopman')
+    cal = Calibracion_Koopman_Kuopio_Core();
+    theta_apoyo_rad    = deg2rad(cal.off_tibia_deg) + cal.gan_tibia * theta_apoyo_rad;
+    theta_balanceo_rad = deg2rad(cal.off_tibia_deg) + cal.gan_tibia * theta_balanceo_rad;
+    theta_muslo_apoyo_rad    = deg2rad(cal.off_muslo_deg) + cal.gan_muslo * theta_muslo_apoyo_rad;
+    theta_muslo_balanceo_rad = deg2rad(cal.off_muslo_deg) + cal.gan_muslo * theta_muslo_balanceo_rad;
 end
 
 end

@@ -1,0 +1,286 @@
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+regression start ...
+saving Figure for Pelvis X Disp. to 1.png
+saving Figure for Pelvis Y Disp. to 2.png
+saving Figure for Pelvis Z Disp. to 3.png
+saving Figure for Pelvis Rot. to 4.png
+saving Figure for R. Hip Adduction to 5.png
+saving Figure for R. Hip Extension to 6.png
+saving Figure for R. Hip Medial Rot. to 7.png
+saving Figure for R. Knee Flexion to 8.png
+saving Figure for R. Ankle P.flex. to 9.png
+saving Figure for L. Hip Abduction. to 10.png
+saving Figure for L. Hip Extension to 11.png
+saving Figure for L. Hip Lateral Rot. to 12.png
+saving Figure for L. Knee Flexion to 13.png
+saving Figure for L. Ankle P. Flex. to 14.png
+saving Figure for Gait Period to 15.png
+regression end
+
+=== ANGULO TIBIAL (YUN 2014) vs Kuopio 2024, N=15 ===
+SIN calibrar:  r=-0.300, RMSE=22.43 grados, RMSEnorm=4.768
+CALIBRADO (afin LOSO): r=0.300, RMSE=16.66 grados, RMSEnorm=4.417
+Coeficientes de calibracion (media entre sujetos): ganancia=-0.742, offset=-20.89 grados
+Tabla: C:\ARTICULOQ2\CODIGOS\GENERADOR\INCLINACION_TIBIAL\Evaluar_vs_Kuopio_AnguloTibial_Yun_resultados.csv
+Figura: C:\ARTICULOQ2\CODIGOS\GENERADOR\INCLINACION_TIBIAL\Evaluar_vs_Kuopio_AnguloTibial_Yun_figura.png
+
+ans =
+
+  1512 table
+
+    sub_id    sexo    talla_cm    masa_kg     r_crudo     rmse_crudo    rmsenorm_crudo    ganancia_b    offset_a     r_cal      rmse_cal    rmsenorm_cal
+    ______    ____    ________    _______    _________    __________    ______________    __________    ________    ________    ________    ____________
+
+       1      "M"        175      75.528      -0.33581      24.765          4.9685         -0.71841       -20.6      0.33581     18.981        4.4688   
+       4      "M"      183.5      68.753      -0.30605      22.173           4.751          -0.7338     -20.965      0.30605     16.253        4.4916   
+       8      "F"      171.6      75.606      -0.17427      17.408          3.7089          -0.7597     -20.955      0.17427     13.021        3.6623   
+      11      "F"      170.1      68.839      -0.17148      23.492          4.6582         -0.75186     -20.887      0.17148     19.235        5.0926   
+      13      "F"        178      73.155      -0.26835      24.604           4.945         -0.72856     -20.746      0.26835      19.01        4.7917   
+      19      "F"        169      63.235     -0.041714      19.398          4.2255         -0.78595     -21.139     0.041714     15.485        4.4131   
+      22      "M"      184.5      85.819      -0.44874      20.209          4.6124         -0.71963     -20.677      0.44874     12.307        3.1429   
+      25      "M"        178      80.189      -0.29089       19.85          4.4888         -0.74708     -20.708      0.29089      13.29        3.3775   
+      28      "M"      172.5      103.59       -0.4354      26.977          5.5338         -0.69132     -20.402       0.4354     20.426        4.6984   
+      31      "M"        183       80.58      -0.39983      27.372            5.85         -0.70147     -20.321      0.39983     19.668        4.4524   
+      37      "M"      186.6      90.378      -0.36451      20.207          4.4044         -0.72921      -20.78      0.36451     12.996        3.7283   
+      40      "M"      183.6      136.14      -0.43489      24.667          5.9917         -0.86003     -22.233      0.43489     17.387        5.8617   
+      43      "M"        179      61.023      -0.23792      25.319          5.2332         -0.74432     -21.092      0.23792     20.355        5.4341   
+      46      "F"        165       64.61      -0.23294      22.076          4.5902         -0.74345     -20.895      0.23294      17.39        4.5216   
+      49      "M"      174.5      80.633      -0.35623      17.996          3.5538         -0.71812     -20.947      0.35623     14.023         4.119   
+

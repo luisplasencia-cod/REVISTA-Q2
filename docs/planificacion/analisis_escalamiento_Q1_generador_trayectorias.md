@@ -543,7 +543,7 @@ Toda sección que se agregue de aquí en adelante cierra con su **estado cuantif
 
 **Palanca de mayor retorno inmediata:** cerrar la fila 3 (correr Nivel A/B real con AB06/AB09) no depende de nadie más que de escribir el script comparador (reusa `Calcular_Metricas_Curva.m`/`SPM1D_Core.m`, ya construidos) — sube esa fila de 25% a ~70% y el total a ~57/100, sin esperar a Mecatrónica, a una decisión de revista, ni a ningún acceso bloqueado.
 
-**Historial de recálculos (post-pivote):** 23-ago-2026 → 46.25/100 (línea base de esta tabla) · 23-ago-2026 (mismo día, más tarde, `Segmento_Posicion_Core.m`) → 47.75/100.
+**Historial de recálculos (post-pivote):** 23-ago-2026 → 46.25/100 (línea base de esta tabla) · 23-ago-2026 (mismo día, más tarde, `Segmento_Posicion_Core.m`) → 47.75/100 · **27-ago-2026 → ~55/100, recalculado con dimensiones actualizadas en `docs/algoritmo/JUSTIFICACION_MODELOS_Y_ESTADO_Q1.md` §6 (documento único de referencia para la comparación completa de los 3 candidatos, sus figuras, y el estado hacia Q1 — léase ese archivo primero, este §13.5 queda como historial).**
 
 ---
 

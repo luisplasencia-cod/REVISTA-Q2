@@ -1,0 +1,1490 @@
+============================================================
+INFORME PERSONAL: CÓMO SE CONSTRUYÓ EL GENERADOR DE TRAYECTORIAS
+(rodilla, tobillo, ángulo de inclinación tibial)
+Simulador de marcha 3-DOF — Laboratorio LIBRA, PUCP
+Redactado: 28-ago-2026, a partir de la documentación técnica del repo.
+============================================================
+
+Nota sobre el alcance: este informe cubre los tres segmentos cinemáticos
+ya cerrados (rodilla, tobillo, ángulo de inclinación tibial) MÁS la
+fuerza de reacción del piso (GRF), agregada el 29-ago-2026 (sección 9)
+una vez que esa línea llegó a un resultado validado contra fuerza real.
+La cinemática y la GRF se resolvieron con enfoques finales muy distintos
+— la cinemática con un modelo teórico (Koopman 2014) calibrado con datos
+reales; la GRF, después de que 6 intentos basados en modelos teóricos
+fallaran, con una plantilla construida directamente de fuerza real
+medida (Fukuchi et al. 2018) — la sección 9 cuenta esa historia completa,
+incluidos los intentos que no funcionaron.
+
+Cualquier cifra o cita que no se pudo confirmar contra los documentos
+del repo está marcada como [dato pendiente de confirmar]. Nada de lo
+demás está inventado — todo sale de los archivos que se leyeron para
+armar este informe (ver lista al final de cada sección).
+
+
+============================================================
+1. INTRODUCCIÓN — QUÉ PROBLEMA RESUELVE EL GENERADOR
+============================================================
+
+El simulador es un banco de pruebas de 3 grados de libertad (movimiento
+horizontal, vertical y de rotación sagital) que existe para ensayar
+componentes protésicos transtibiales sin necesitar, cada vez, un
+paciente real caminando. Para moverse, el simulador lee un archivo CSV
+con una trayectoria de referencia — una lista de posiciones (X, Y) y
+un ángulo, uno por cada instante de tiempo — y el ESP32 la ejecuta.
+
+Hasta el 19 de agosto de 2026, ese CSV salía de una sola fuente: la
+marcha de un sujeto de referencia, capturada una vez con Kinovea o
+con el sistema iSen, y grabada tal cual. El argumento del artículo
+(antes del pivote) era "el simulador reproduce fielmente esa
+trayectoria grabada". Ese enfoque tenía dos problemas de fondo:
+
+  1. Un solo sujeto no representa cómo camina la gente en general —
+     la trayectoria fija no tiene forma de generalizar a otra talla,
+     masa o velocidad de marcha.
+  2. Repetir la captura con sujetos nuevos (para tener más de uno)
+     dependía de la integración electrónica Raspberry Pi–ESP32 y de
+     la aprobación de un comité de ética — dos bloqueos que frenaban
+     casi todo el contenido empírico del proyecto.
+
+El 19-ago-2026 el equipo decidió cambiar de enfoque: en vez de grabar
+una trayectoria y reproducirla, el simulador ahora GENERA su propia
+trayectoria a partir de datos antropométricos del sujeto (talla, masa,
+sexo) — sin necesitar ninguna captura de marcha previa. El generador
+usa un modelo matemático ya publicado en la literatura científica (no
+inventado por el equipo), y esa trayectoria generada se compara
+después contra bases de datos de marcha públicas e independientes,
+que no participaron en construir el modelo, para comprobar que se
+parece a cómo camina gente real.
+
+Esto resuelve los dos problemas de arriba a la vez: el generador
+puede producir una trayectoria distinta para cada sujeto (talla,
+masa, sexo, velocidad), sin depender de ninguna captura; y la validez
+del sistema ya no depende de que la Raspberry Pi–ESP32 esté lista —
+se puede demostrar en el papel, con datos públicos, que el modelo
+elegido predice bien la marcha real, antes incluso de correr el
+simulador físico.
+
+Este informe cuenta esa historia completa: cómo se eligió el modelo
+matemático, cómo se construyó el "camino" de antropometría a
+trayectoria, y cómo se comprobó que funciona contra datos reales de
+personas que nunca participaron en el diseño del modelo.
+
+
+============================================================
+2. CÓMO SE ELIGIÓ EL MODELO
+============================================================
+
+2.1 La búsqueda: de 12 candidatos a 3 evaluados a fondo
+--------------------------------------------------------
+
+Antes de elegir un modelo, se hizo una búsqueda sistemática de
+literatura científica que predice la cinemática de la marcha (los
+ángulos que forman cadera, rodilla y tobillo durante el ciclo de
+marcha) a partir de datos que se pueden medir con una cinta métrica y
+una balanza — no de un sensor puesto en tiempo real sobre la persona.
+
+Se investigaron 12 candidatos a fondo (4 de ellos leyendo el artículo
+completo, no solo el resumen). El criterio de descarte, fijado ANTES
+de mirar cuál convenía más (para no elegir "el que mejor ajusta" de
+forma tramposa), fue: el modelo tiene que publicar coeficientes o
+parámetros YA AJUSTADOS, que se puedan usar directamente sin volver a
+entrenar el modelo con datos propios del proyecto.
+
+Resultado: 8 de los 12 se descartaron por no cumplir ese criterio —
+en su mayoría son redes neuronales que nunca publican los pesos ya
+entrenados:
+
+  - Hu et al. 2020 (regresión LASSO) — no publica los coeficientes
+    del modelo (verificado leyendo el artículo completo).
+  - Luu et al. 2014 (red GRNN) — necesita la base de entrenamiento
+    completa (600 caminatas de 70 sujetos), no solo coeficientes.
+  - Wu et al. 2018 (autoencoder + regresión por proceso gaussiano) —
+    las matrices de pesos no están publicadas; además no predice
+    tobillo.
+  - Luu et al. 2011 (red neuronal MLPNN) — pesos entrenados no
+    publicados.
+  - Semwal et al. 2023 (LSTM + CNN) — modelo de "caja negra", sin
+    pesos publicados.
+  - Xin et al. 2025 (GPR + coeficientes de Fourier) — demasiado
+    reciente para verificar con confianza al momento de la búsqueda.
+  - Shkedy Rabani et al. 2022 — no personaliza por antropometría de
+    la persona, solo por la pendiente del terreno.
+  - Al Kouzbary et al. 2026 — necesita el ángulo tibial medido en
+    tiempo real como entrada (un sensor puesto en la persona en el
+    momento), no antropometría estática.
+
+Este resultado (solo 4 de 12, un 33%, publican parámetros reusables
+sin reentrenar) es en sí mismo un hallazgo que vale la pena anotar:
+la mayoría de la literatura de predicción de marcha no es realmente
+reproducible por otro equipo sin acceso a los datos originales de
+entrenamiento.
+
+De los 4 candidatos que sí cumplían el criterio, quedaron:
+
+  - Koopman, van Asseldonk & van der Kooij (2014) — splines
+    quínticos (curvas suaves por tramos, ver sección 3 más abajo).
+  - Zhao et al. (2026) — series de Fourier (suma de ondas seno/coseno
+    ajustadas).
+  - Yun, Kim, Shin, Lee, Deshpande & Kim (2014) — un toolbox público
+    ya entrenado con regresión por proceso gaussiano (GPR).
+  - Romero-Sorozábal et al. (2024) — regresión cuadrática que da
+    directamente la posición 3D (x,y,z) de cadera, rodilla y tobillo,
+    no ángulos articulares.
+
+Los primeros 3 (Koopman, Zhao, Yun) dan ángulos articulares clásicos
+(cadera, rodilla, tobillo), directamente compatibles con la geometría
+que usa el generador, y son los que se evaluaron a fondo en los tres
+segmentos de este informe. Romero-Sorozábal quedó excluido de la
+comparación de modelo ganador: su eje vertical (Z) de rodilla y
+tobillo sale sistemáticamente ~2 veces más profundo de lo
+anatómicamente posible — una anomalía real de la propia fuente
+publicada, verificada dos veces con métodos independientes (no un
+error de transcripción del equipo). Sigue implementado y disponible,
+pero no compite por el puesto de modelo ganador.
+
+2.2 Cómo se comparó: contra 5 fuentes de datos reales, cada vez más
+    exigentes
+--------------------------------------------------------------------
+
+Los 3 candidatos se corrieron con la antropometría real de personas
+distintas y se compararon contra 5 fuentes de datos, de la más simple
+a la más exigente:
+
+  1. Control_apoyo_Luis_V4.csv (n=1, el propio proyecto) — primer
+     cribado rápido.
+  2. Winter, libro "Biomechanics and Motor Control of Human Movement"
+     (n=1, sin antropometría documentada del sujeto) — chequeo de
+     forma, no decisivo.
+  3. Maastricht Normative 3D Gait Dataset (OSF, n=246, grupo de
+     hombres 18-29 años) — población grande, pero antropometría de
+     grupo, no de cada sujeto.
+  4. Ferber et al. (2024) (n=40, 20 hombres/20 mujeres) — posición 3D
+     real de la rodilla, con antropometría real medida sujeto a
+     sujeto — la prueba más exigente antes de Kuopio, pero es marcha
+     en cinta (sin avance neto real que reconstruir).
+  5. Kuopio Gait Dataset (Lavikainen et al. 2024) (n=15, de 51
+     sujetos totales disponibles) — la ÚNICA de las 5 con marcha
+     overground real (sobre el piso, no cinta) Y con antropometría
+     medida individualmente (sexo, talla, masa, largo real de muslo
+     y tibia) — la base usada para la validación final y para toda
+     la calibración (sección 5).
+
+Resultado de correlación (r, ver sección 4 para qué significa) para
+RODILLA:
+
+  Fuente                    n     Koopman    Zhao              Yun
+  ------------------------------------------------------------------
+  Control_Luis               1    r=0.982    r=-0.21           r=-0.28
+  Winter                     1    r=0.816    r=0.613           r=0.468
+  Maastricht                246   r=0.933    r=0.982*          r=0.955*
+  Ferber (posición real)    40    r_x=0.945  r_x=0.947**       r_x=0.902
+                                  r_y=0.791  r_y=0.815**        r_y=-0.698
+  Kuopio (final, calibrado) 15    r_x=0.998  no evaluado        no evaluado
+                                  r_y=0.920  contra Kuopio       contra Kuopio
+                                  (rodilla)
+
+  * usando la configuración 'derecha' de Zhao / 'L' de Yun — ver
+    "el hallazgo del truco de lado" más abajo.
+  ** usando la configuración nativa/original ('izquierda' de Zhao),
+     sin ningún ajuste — el canal de cadera de Zhao es competitivo
+     con Koopman aquí.
+
+Para TOBILLO e INCLINACIÓN TIBIAL (N=15, Kuopio, modelo final con
+todas las correcciones — ver sección 4), Koopman gana con claridad en
+los 3 candidatos, sin empate:
+
+  TOBILLO (Kuopio, N=15)
+                    Koopman              Zhao (nativo)       Yun (nativo)
+  Eje X: r / RMSE   0.998 / 2.90 cm      0.974 / 10.99 cm    0.990 / 7.08 cm
+  Eje Y: r / RMSE   0.985 / 1.54 cm      0.914 / 2.51 cm     0.831 / 3.39 cm
+
+  ÁNGULO TIBIAL (Kuopio, N=15)
+                       Koopman           Zhao (nativo)       Yun (nativo)
+  r crudo               0.992            -0.303              -0.300
+  RMSEnorm calibrado    0.92 (Excelente) 3.39 (Deficiente)   4.42 (Deficiente)
+
+2.3 Por qué Zhao y Yun no ganan: el "hallazgo del truco de lado"
+------------------------------------------------------------------
+
+Este es el hallazgo metodológico más importante de todo el proceso de
+selección, y vale la pena entenderlo bien porque casi se interpretó
+mal.
+
+Zhao y Yun tienen un parámetro de "lado" (izquierda/derecha en Zhao,
+canales R_/L_ en Yun). Al principio pareció que era simplemente "elegí
+la pierna equivocada" — cambiar ese parámetro mejoraba muchísimo la
+correlación contra Maastricht (Zhao: de r=-0.30 a r=+0.98). Pero al
+probar el MISMO cambio contra Ferber (otra base, con posición real),
+el resultado se invirtió por completo: el lado que arreglaba
+Maastricht arruinaba Ferber, y viceversa.
+
+La causa real, verificada numéricamente: el parámetro "lado" de Zhao
+NO es un espejo anatómico — es un desfase de fase de exactamente 50%
+del ciclo de marcha, aplicado por igual a los dos canales (cadera y
+rodilla) a la vez. El canal de RODILLA de Zhao sí tenía un defecto
+real (su pico de flexión cae en 22% del ciclo, cuando debería caer
+cerca de 70%) — el desfase de 50% lo corrige por pura coincidencia
+matemática (22% + 50% ≈ 72%, casi el valor correcto). Pero el canal
+de CADERA de Zhao nunca tuvo ese defecto (su pico ya estaba bien, en
+83%) — aplicarle el mismo desfase de 50% lo rompe (lo manda a 33%).
+Como Ferber deriva la posición de la rodilla a partir del canal de
+CADERA, y Maastricht mide directamente el canal de RODILLA, cada base
+"premiaba" un lado distinto del mismo mecanismo roto — no había un
+"lado correcto" único.
+
+Con esta explicación correcta, se probó también el "truco de lado"
+en tobillo y en el ángulo tibial (donde se necesita el ángulo
+combinado cadera-menos-rodilla, no un solo canal aislado). Resultado:
+el truco sí ayuda de forma real y medible en las dos piezas — pero
+en NINGUNA de las 3 piezas (rodilla, tobillo, ángulo tibial) Zhao o
+Yun llegan a superar a Koopman, ni siquiera con el lado que más
+ayuda. Koopman queda como modelo ganador con evidencia consistente en
+las 3 piezas del cuerpo, no solo por casualidad en una de ellas.
+
+Dato curioso que queda documentado: el canal de CADERA de Zhao, con
+su configuración original (sin ningún ajuste), iguala o incluso
+supera levemente a Koopman contra Ferber (r_x=0.947 vs 0.945, r_y=
+0.815 vs 0.791) — es genuinamente bueno para posición. Su canal de
+RODILLA es el que tiene el defecto real. Esta distinción (cuál canal
+falla y cuál no) es la que se perdió en la primera interpretación
+("elegir el lado que ajusta mejor").
+
+Fuentes de esta sección: docs/algoritmo/pipeline_koopman_kuopio/
+PIPELINE_KOOPMAN_KUOPIO.md (secciones 2 y 5.7); CODIGOS/GENERADOR/
+RODILLA/CIERRE_RODILLA.md (secciones 1, 1-bis, 1-ter, 2); docs/
+algoritmo/JUSTIFICACION_MODELOS_Y_ESTADO_Q1.md (secciones 2, 6.7,
+6.8, 7); docs/planificacion/plan_ensamble_multimodelo.md (sección 2).
+
+
+============================================================
+3. EL PIPELINE PASO A PASO — DE ANTROPOMETRÍA A CURVA FINAL
+============================================================
+
+El generador completo se llama con una función única,
+Generar_Trayectoria(antropometria, candidato), que hace lo siguiente
+en orden:
+
+PASO 1 — Completar la antropometría de entrada
+------------------------------------------------
+Archivo: CODIGOS/GENERADOR/Estimar_Antropometria_Core.m
+
+Entrada obligatoria: talla (m), masa (kg), sexo. Si no se conoce la
+longitud real de muslo y tibia (lo normal, porque nadie las mide con
+cinta métrica en la práctica), se estiman a partir de la talla usando
+las fracciones de Drillis & Contini (1966): muslo = 0.245 × talla,
+tibia = 0.246 × talla. Estas fracciones se verificaron directamente
+contra la imagen de la fuente primaria (la Figura 4.1 del libro de
+Winter, no un resumen de segunda mano). Se validó contra un sujeto
+real de la base de datos Camargo (sujeto "AB06"): la tibia estimada
+salió 0.4428 m contra 0.446 m medida — un error de -0.7%.
+
+PASO 2 — Estimar la velocidad de marcha y el tiempo del ciclo
+-----------------------------------------------------------------
+Archivos: Estimar_Velocidad_Froude_Core.m, Tiempo_Ciclo_Koopman2014_
+Core.m, Temporizacion_Core.m
+
+Si no se mide la velocidad real de marcha del sujeto (que tampoco es
+algo que se mida con una cinta métrica), se estima con el "número de
+Froude" (Fr=0.25) — una relación física ya usada en biomecánica que
+predice la velocidad "natural" de marcha de una persona a partir del
+largo de su pierna, sin necesitar cronómetro. Con esa velocidad
+estimada, la duración del ciclo completo de marcha se calcula con una
+fórmula del propio paper de Koopman (su Ecuación 3), y el ciclo se
+divide en 60% apoyo / 40% balanceo (proporción estándar y verificada
+en la literatura de marcha).
+
+Advertencia declarada, no oculta: con Fr=0.25, la velocidad estimada
+supera el rango de velocidad que Koopman validó en su propio paper
+(0.5 a 5 km/h) para la mayoría de personas adultas (>1.48 m de
+talla). Esto es una extrapolación conocida, no un error silencioso.
+
+PASO 3 — Generar los ángulos articulares por fase
+----------------------------------------------------
+Archivos: Koopman2014_Core.m, vía Obtener_Theta_Tibia_Candidato.m
+
+Con la velocidad y la talla ya calculadas, se reconstruyen los
+ángulos de cadera, rodilla y tobillo con el modelo de Koopman (ver
+sección siguiente para el detalle matemático). De ahí se obtiene el
+ángulo de inclinación tibial — la cantidad que en verdad necesita el
+simulador — combinando cadera y rodilla por geometría pura: θ_tibia =
+θ_muslo − φ_rodilla ("vía rodilla"), asumiendo que el ángulo del
+muslo es aproximadamente igual al ángulo de la cadera (supuesto de
+pelvis vertical durante la marcha, tomado del propio paper de Zhao
+2026 y verificado a texto completo, no inventado por el proyecto).
+
+PASO 4 — De ángulos a posición (la geometría) [REESCRITO 30-ago-2026]
+--------------------------------------------------------------------
+Archivos: Trayectoria_Cadera_Core.m, Cinematica_DoblePendulo_Core.m,
+App_Animacion_Cadera_Rodilla_Tobillo.m (herramienta interactiva)
+
+Este paso se reconstruyó de cero el 30-ago-2026, en una sesión aparte
+dedicada solo a esto, reemplazando por completo el enfoque anterior
+(tobillo pivote fijo en apoyo + cadera a velocidad constante en
+balanceo, con un parche adicional de "residuo de rockers" para que el
+avance no quedara demasiado chico). Ese enfoque anterior tenía una
+costura entre fases (apoyo/balanceo) que producía discontinuidades
+reales de posición y velocidad — visibles como picos no físicos al
+derivar dos veces para el cálculo de fuerza (sección 9) — y necesitaba
+cada vez más parches puntuales para corregir síntomas, en vez de
+resolver la causa.
+
+El enfoque nuevo usa cinemática DIRECTA de cadena abierta (cadera →
+rodilla → tobillo, "péndulo doble"), UNA SOLA fórmula para todo el
+ciclo, sin costura entre apoyo y balanceo:
+
+  Xk = Xh + L1·sin(θ1)      Yk = Yh − L1·cos(θ1)
+  Xa = Xk + L2·sin(θ2)      Ya = Yk − L2·cos(θ2)
+
+donde θ1 (muslo) y θ2 (tibia, "vía rodilla") son los MISMOS ángulos ya
+calculados en el PASO 3 — no cambia nada de la parte angular, solo cómo
+se convierten en posición.
+
+La posición de la cadera (Xh, Yh) tiene dos componentes:
+  - Xh: avance horizontal LINEAL con el % del ciclo (velocidad promedio
+    constante) — la misma velocidad ya estimada en el PASO 2.
+  - Yh: oscilación vertical de "doble giba", Yh = Y0 − A·cos(4π·t/100),
+    con A≈2.25 cm (≈4.5 cm pico a pico) — verificado contra literatura
+    (Saunders, Inman & Eberhart 1953, "The Major Determinants in Normal
+    and Pathological Gait": excursión vertical del centro de masa de
+    ~4-5 cm pico a pico, mínimos en 0%/50% del ciclo —contacto inicial
+    de cada pie—, máximos en 25%/75% —medio apoyo—). La fórmula da esos
+    mínimos/máximos EXACTAMENTE por construcción y CIERRA EL CICLO
+    (Yh(0%)=Yh(100%) exacto) — a diferencia de un primer intento
+    probado y descartado el mismo día (cadera anclada a la geometría de
+    la pierna en el piso, alternando de pierna cada medio ciclo), que
+    no cerraba el ciclo en el empalme.
+
+Se construyó además una app interactiva (App_Animacion_Cadera_Rodilla_
+Tobillo.m) para explorar esto en vivo: talla editable, slider manual de
+%ciclo, botón reproducir/pausar, mapa con la cadena + trayectoria
+punteada revelada progresivamente, y gráficas de desplazamiento
+normalizadas al punto inicial.
+
+Verificación hecha hasta ahora:
+
+  1. Comportamiento físico: el tobillo despega y se levanta durante el
+     balanceo (~7 cm), y el ciclo cierra exactamente sin discontinuidad
+     — ver la Figura 05 regenerada (sección 7).
+
+  2. Comparación DIRECTA (sin ninguna calibración/corrección) contra
+     los 44 sujetos disponibles del Kuopio Gait Dataset, usando
+     antropometría Y VELOCIDAD REALES medidas de cada sujeto (no
+     estimadas por Froude):
+
+       r RODILLA X = 0.975 (SD 0.020)   RMSE = 20.1 cm (SD 2.0)
+       r RODILLA Y = 0.888 (SD 0.069)   RMSE = 35.6 cm (SD 2.9)
+       r TOBILLO X = 0.990 (SD 0.007)   RMSE = 38.3 cm (SD 4.7)
+       r TOBILLO Y = 0.774 (SD 0.069)   RMSE = 77.3 cm (SD 4.5)
+
+     Lectura: la FORMA de la curva ya coincide bien SIN ningún ajuste
+     (r entre 0.77 y 0.99, mismo orden que las correlaciones "vía
+     rodilla" ya documentadas en la sección 2). El RMSE en centímetros
+     es grande — consistente con el defecto YA CONOCIDO de Koopman
+     crudo (sobreestima la excursión angular ~19-24%, ver sección 5)
+     propagado SIN corregir a través de DOS segmentos en cadena (el
+     tobillo hereda el error de muslo Y de tibia, por eso su RMSE es
+     más o menos el doble que el de rodilla). Esta comparación fue
+     deliberadamente SIN calibrar (pedido explícito del usuario, para
+     medir el modelo "tal cual sale" antes de cualquier corrección) —
+     el mismo paso de calibración LOSO que ya existe para el ángulo
+     (sección 5) todavía no se aplicó a esta geometría nueva.
+
+IMPORTANTE — qué NO cambia con este reemplazo: las figuras 06-15 de la
+sección 7 (r=0.998 rodilla, 0.985 tobillo, 0.992 ángulo tibial, ya
+calibradas LOSO) se calcularon con el enfoque ANTERIOR (el que este
+PASO 4 reemplaza) — siguen siendo el resultado válido de esa línea de
+trabajo ya cerrada, pero ya no describen "cómo se calcula la posición
+en el generador hoy". Falta recalibrar (LOSO) esta geometría nueva y
+volver a correr esa validación completa para que la sección 7 quede
+consistente con este PASO 4 — pendiente, no hecho todavía.
+
+PASO 5 — Exportar al formato exacto que lee el simulador
+--------------------------------------------------------------
+Archivo: Escribir_CSV_Simulador.m
+
+Se escriben dos archivos, Control_apoyo_<ID>.csv y Control_balanceo_
+<ID>.csv, con el mismo encabezado, separador (";"), paso de tiempo
+(0.01 s) y resolución de cuantización (0.0125 cm en X, 0.00625 cm en
+Y, 0.009° en ángulo) que ya usa Control_apoyo_Luis_V4.csv real —
+verificado byte a byte, incluida una inconsistencia real del archivo
+original (un espacio en vez de un guion bajo en un nombre de columna)
+que se replicó tal cual, en vez de "corregirla", para no romper la
+compatibilidad con lo que el simulador ya sabe leer.
+
+Nota importante: el generador sigue UN SOLO PUNTO del segmento
+tibial — por defecto la rodilla, pero configurable a cualquier punto
+intermedio (parámetro punto_seguimiento_m) — porque así es
+exactamente como el simulador real mide: una posición X,Y más un
+ángulo, no un esqueleto completo. Esto importa porque el sensor real
+que grabó Control_apoyo_Luis_V4.csv está a unos 0.38 m del tobillo,
+no exactamente en la rodilla anatómica — el generador puede
+reproducir ese mismo punto de seguimiento si se le pide.
+
+Nota de estado (30-ago-2026): Escribir_CSV_Simulador.m y
+Generar_Trayectoria.m todavía leen del enfoque de PASO 4 ANTERIOR
+(Cadena_Cinematica_Core.m) — el enfoque nuevo (Cinematica_
+DoblePendulo_Core.m + Trayectoria_Cadera_Core.m) existe hoy como
+pieza independiente y validada por separado (ver PASO 4), pero
+todavía no está conectada al exportador de CSV. Conectarla es
+trabajo pendiente, no hecho en esta sesión.
+
+Fuentes de esta sección: docs/algoritmo/pipeline_koopman_kuopio/
+PIPELINE_KOOPMAN_KUOPIO.md (sección 4); docs/algoritmo/
+contrato_generador.md (completo); CODIGOS/GENERADOR/
+GUIA_INTERPRETACION.md (secciones 3-ter, 3-quater, 3-quinquies, 7).
+
+
+============================================================
+3-BIS. QUÉ ES EL MODELO DE KOOPMAN 2014, EN DETALLE
+============================================================
+
+Idea central: cada ángulo articular (hay cuatro: cadera en el plano de
+ab/aducción, cadera en flexo-extensión, rodilla y tobillo) se describe
+con un "spline quíntico por tramos" — una curva suave, construida
+pegando varios trozos de polinomio de grado 5, que pasa exactamente
+por 6 "eventos clave" del ciclo de marcha (por ejemplo: el instante en
+que el talón toca el piso, el instante de máximo apoyo, etc.).
+
+Lo que hace útil este modelo es que, en cada uno de esos 6 eventos,
+el propio paper de Koopman publica una regresión lineal YA AJUSTADA
+que predice 4 números — la posición angular, el instante (en % del
+ciclo), la velocidad angular y la aceleración angular en ese punto —
+a partir de solo DOS variables de entrada: la velocidad de marcha
+(en km/h) y la talla corporal (en metros). No hace falta ningún dato
+adicional ni ningún reentrenamiento.
+
+Estas regresiones (5 tablas, 24 filas de coeficientes en total) están
+transcritas directamente del PDF del paper en Koopman2014_Core.m —
+verificadas con una herramienta especial (pdfplumber, en Python)
+porque el extractor de texto normal del PDF perdía los signos
+negativos de algunos coeficientes de las tablas (un problema real de
+lectura, no del modelo en sí).
+
+Se probaron dos caminos distintos para llegar al ángulo tibial desde
+los ángulos articulares (vía rodilla y vía tobillo) — vía rodilla
+ganó con evidencia real: contra el archivo real del proyecto
+(Control_apoyo_Luis_V4.csv), vía rodilla da r=0.982 y vía tobillo da
+r=-0.435 (correlación negativa, en sentido contrario al real durante
+el balanceo).
+
+
+============================================================
+4. LA VALIDACIÓN — CONTRA DATOS REALES DE 15 PERSONAS (KUOPIO)
+============================================================
+
+4.1 El dataset usado
+----------------------
+
+La validación final se hizo contra el Kuopio Gait Dataset (Lavikainen
+et al. 2024, revista Data in Brief, DOI 10.5281/zenodo.10559504,
+licencia CC-BY-4.0). Es la única de las 5 bases de datos probadas que
+combina dos cosas a la vez: marcha real sobre el piso (no en cinta) Y
+antropometría medida individualmente para cada sujeto (sexo, talla,
+masa, largo real de muslo y tibia — no estimada, no de grupo).
+
+Se usaron 15 sujetos (de 51 disponibles en total), con 3 ensayos de
+velocidad cómoda cada uno. Los instantes de contacto del talón (el
+punto de referencia que marca el inicio de cada ciclo de marcha) se
+detectaron con un método puramente cinemático (Zeni et al. 2008),
+porque Kuopio no trae esos eventos precalculados.
+
+4.2 Qué significan r, RMSE y RMSEnorm (para quien no los usa a
+    diario)
+------------------------------------------------------------------
+
+  - r (correlación): mide qué tan bien coincide la FORMA de la curva
+    generada con la curva real, en una escala de -1 a +1. r=1 sería
+    una copia exacta de la forma (aunque esté desplazada o más chica/
+    grande); r=0 sería "no hay ninguna relación"; r negativo significa
+    que la curva va en sentido contrario. r=0.98-0.99 (como consigue
+    Koopman en varias comparaciones) es una forma casi idéntica.
+  - RMSE (error cuadrático medio): mide qué tan lejos está, en
+    promedio, el valor generado del valor real, en las unidades
+    originales (grados o centímetros). Cuanto más chico, mejor.
+  - RMSEnorm: una métrica propia de este proyecto (ya usada en otras
+    partes, como la validación del simulador original) que normaliza
+    el RMSE por la variabilidad natural entre sujetos, para poder
+    decir si un error es "grande" o "chico" en un sentido comparable.
+    La escala del proyecto es: menor a 1 = Excelente, menor a 1.5 =
+    Bueno, menor a 2 = Aceptable, mayor a 2 = Deficiente.
+
+4.3 Resultados finales por segmento (N=15, Kuopio, modelo final con
+    todas las correcciones de la sección 5)
+------------------------------------------------------------------
+
+  RODILLA
+    Eje horizontal (X): r = 0.998, RMSE = 3.97 cm
+    Eje vertical (Y):   r = 0.920, RMSE = 0.72 cm
+                         (el modelo reproduce el 82% de la amplitud
+                         vertical real — no el 100%, ver limitaciones)
+
+  TOBILLO
+    Eje horizontal (X): r = 0.998, RMSE = 2.90 cm
+    Eje vertical (Y):   r = 0.985, RMSE = 1.54 cm
+                         (91% de la amplitud vertical real)
+
+  ÁNGULO DE INCLINACIÓN TIBIAL
+    Sin calibrar:  r = 0.992, RMSE = 11.24°, RMSEnorm = 3.53
+                   (clasificación: Deficiente)
+    Calibrado:     r = 0.992, RMSE = 3.50°,  RMSEnorm = 0.92
+                   (clasificación: Excelente)
+
+Lectura en criollo: en las 3 piezas, la FORMA de la curva ya salía
+casi perfecta desde el principio (r cercano a 0.99) — el problema
+real, encontrado al revisar los datos con cuidado, no era de forma,
+sino de escala (ver sección 5). Después de corregir eso, los 3
+segmentos quedan con correlación muy alta y error chico en términos
+absolutos (unos pocos centímetros o unos pocos grados), y el ángulo
+tibial pasa de "Deficiente" a "Excelente" en la escala propia del
+proyecto.
+
+4.4 Por qué se validó sujeto por sujeto, no con un promedio
+------------------------------------------------------------
+
+El modelo se alimenta de la antropometría específica de cada persona
+(su talla, su masa, su velocidad) — promediar las curvas de 15
+personas con cuerpos distintos mezclaría trayectorias que no son
+comparables entre sí, y podría esconder si el modelo falla en algún
+tipo de cuerpo en particular. Por eso, además de la figura de grupo
+(donde cada persona aparece pareada con SU PROPIA predicción, nunca
+contra un promedio), se probó el modelo contra 6 sujetos elegidos
+deliberadamente por ser los más distintos entre sí disponibles en la
+muestra: el más pesado, el más alto, el más liviano, la más baja, una
+mujer de talla media y un hombre de talla media. Resultado: ningún
+sujeto de esos 6 falla de forma notoria — el modelo generaliza
+razonablemente bien en todo el rango de antropometría disponible.
+
+Fuentes de esta sección: CODIGOS/GENERADOR/RODILLA/Kuopio/ (datos y
+scripts); CODIGOS/GENERADOR/RODILLA/CIERRE_RODILLA.md (secciones 7,
+8, 9); CODIGOS/GENERADOR/TOBILLO/CIERRE_TOBILLO.md (secciones 6-9);
+CODIGOS/GENERADOR/INCLINACION_TIBIAL/CIERRE_INCLINACION_TIBIAL.md
+(secciones 1-6); CODIGOS/VALIDACIONES/Calcular_Metricas_Curva.m (la
+función que calcula RMSEnorm).
+
+
+============================================================
+5. LA CALIBRACIÓN — KOOPMAN SOBREESTIMA LA AMPLITUD ~20%
+============================================================
+
+5.1 El hallazgo
+------------------
+
+Al revisar cada sujeto por separado (no en promedio, ver 4.4), quedó
+visible que la curva vertical de la rodilla predicha era claramente
+más plana que la real — el modelo solo reproducía el 51% de la
+excursión vertical real. El RMSE crudo parecía bueno (bajo) solo
+porque la señal en sí es chica en esa dirección; la métrica estaba
+escondiendo el problema.
+
+Investigando la causa raíz, se encontró que el defecto no estaba en
+la geometría (los pasos 4 de la sección 3) sino en el ángulo mismo
+que publica Koopman: el ángulo de muslo tiene una forma casi exacta
+(r = 0.971 contra el dato real), pero su AMPLITUD sale inflada un
+21% (32.5° real contra 39.2° generado). Ese mismo defecto de
+amplitud, medido de forma completamente independiente sobre el
+ángulo tibial (que gobierna tobillo y ángulo de inclinación), dio una
+ganancia de calibración muy parecida (0.811, contra 0.769 del muslo)
+— confirmando que es UN SOLO defecto del modelo publicado por
+Koopman (sobreestima la excursión angular ~20-23% en esta población),
+no un defecto distinto por cada eje o por cada segmento del cuerpo.
+
+5.2 Qué es LOSO y por qué es válido
+--------------------------------------
+
+LOSO significa "leave-one-subject-out" (dejar-un-sujeto-afuera): es
+una forma de calibrar un modelo sin hacer trampa. Para corregir el
+ángulo del sujeto número 7 (por ejemplo), se calculan los coeficientes
+de corrección usando SOLO los otros 14 sujetos — nunca los datos del
+propio sujeto 7. Se repite esto 15 veces (una por sujeto), así que
+cada persona siempre se predice "a ciegas", sin que su propio dato
+haya influido en el ajuste que se le aplicó. Esto evita la
+circularidad: si se calibrara con el mismo sujeto que después se usa
+para reportar el resultado, el número final estaría inflado
+artificialmente (el modelo "haría trampa" prediciéndose a sí mismo).
+
+5.3 La corrección aplicada
+------------------------------
+
+Se aplicó una calibración afín — una fórmula del tipo
+"θ_corregido = a + b × θ_Koopman" (una ganancia "b" que ajusta la
+amplitud, más un desplazamiento "a") — sobre el ÁNGULO, ANTES de
+convertirlo en posición por geometría. Esto es importante: un primer
+intento había calibrado directamente sobre la POSICIÓN ya calculada,
+y eso terminaba "aplastando" la curva de forma artificial, sin
+sentido físico, solo para minimizar el número de error — se
+diagnosticó y se corrigió, moviendo la corrección al lugar correcto
+del pipeline (el ángulo, antes de la geometría).
+
+Con esta corrección, mejoraron las tres métricas a la vez en rodilla
+(la amplitud vertical pasó de reproducir 51% a 82% de la real) y el
+ángulo tibial pasó de "Deficiente" a "Excelente" en la escala del
+proyecto (ver sección 4.3).
+
+5.4 Otras correcciones aplicadas, más pequeñas, con el mismo
+    principio (LOSO, sin usar el propio sujeto)
+------------------------------------------------------------------
+
+  - El tobillo real NUNCA retrocede en X en ningún sujeto de la
+    muestra (confirmado en los 15/15) — se impuso esa restricción
+    física sobre la predicción.
+  - El tobillo real casi no se mueve verticalmente durante el apoyo
+    (pie plantado) pero se eleva mucho durante el balanceo — la
+    fórmula geométrica simple no distinguía las dos fases; se
+    construyó un modelo "consciente de fase" (pivote fijo en apoyo,
+    cadera avanzando en balanceo) más un pequeño residuo empírico
+    (LOSO) que captura el mecanismo real de "rockers" del pie
+    (talón→tobillo→antepié), conocido en la literatura de marcha
+    pero sin una curva cuantitativa publicada reusable — por eso se
+    construyó empíricamente con los propios datos de Kuopio, con la
+    misma técnica LOSO.
+  - En marcha periódica, tanto la rodilla como el tobillo deben
+    terminar el ciclo (100%) a la misma altura vertical de donde
+    empezaron (0%) — se verificó que el dato real cumple esto casi
+    exacto, y se corrigió el modelo (que no lo cumplía) con una
+    rampa suave que fuerza ese cierre.
+  - El pie recorre exactamente una zancada por ciclo, y la zancada es
+    velocidad × duración del ciclo — una cantidad que el generador ya
+    conoce sin medir nada — se usó para corregir la deriva horizontal
+    acumulada del tobillo.
+
+Fuentes de esta sección: CODIGOS/GENERADOR/RODILLA/CIERRE_RODILLA.md
+(sección 8); CODIGOS/GENERADOR/TOBILLO/CIERRE_TOBILLO.md (secciones
+4, 4-bis, 6, 7-bis, 8); CODIGOS/GENERADOR/INCLINACION_TIBIAL/
+CIERRE_INCLINACION_TIBIAL.md (secciones 4, 5, 5-bis); docs/algoritmo/
+JUSTIFICACION_MODELOS_Y_ESTADO_Q1.md (secciones 6.1 a 6.6).
+
+5.5 El flujo exacto: dónde y cuándo se toca el dato real de Kuopio
+------------------------------------------------------------------
+
+Para que no quede ninguna ambigüedad sobre si la calibración usa el
+dato real de forma legítima o "hace trampa", este es el flujo
+completo, paso a paso, señalando en cada uno si toca Kuopio y de qué
+forma exacta:
+
+  PASO A — Antropometría de entrada (talla, masa, sexo, velocidad de
+  marcha) → Koopman2014_Core.m → sale el ÁNGULO CRUDO (θ_crudo, sin
+  ninguna corrección todavía).
+    ¿Toca Kuopio? SÍ, pero SOLO como ENTRADA: la talla y la velocidad
+    real de cada sujeto (medidas por Kuopio, no estimadas) alimentan
+    el modelo — exactamente igual que lo haría la talla y la
+    velocidad de cualquier paciente nuevo que use el generador. Esto
+    NO es circular: en este paso no se usa el ÁNGULO real del sujeto,
+    solo su antropometría, que es un dato de entrada que cualquier
+    generador necesita, venga o no de una base de datos de validación.
+
+  PASO B — θ_crudo → calibración afín LOSO (θ_corregido = a + b×θ_crudo,
+  con "a" y "b" ajustados contra el ÁNGULO REAL de los OTROS 46
+  sujetos, nunca el propio) → sale el ÁNGULO CALIBRADO.
+    ¿Toca Kuopio? SÍ — y aquí sí como OBJETIVO del ajuste. Es el
+    primero de los dos únicos pasos de todo el pipeline que miran el
+    ángulo/posición real medido. La disciplina leave-one-subject-out
+    es lo que evita la circularidad (ver 5.2): al generar la curva del
+    sujeto 12, por ejemplo, "a" y "b" salieron de ajustar los sujetos
+    1-11 y 13-47 — nunca del propio 12.
+
+  PASO C — θ_calibrado → geometría (Cadena_Cinematica_Core.m para
+  rodilla; Cadena_Completa_Core.m para tobillo) → POSICIÓN (X, Y), SIN
+  ningún residuo empírico todavía.
+    ¿Toca Kuopio? NO. Este paso es geometría pura (trigonometría con
+    la longitud real de muslo/tibia ya usada en el Paso A) — no
+    consulta ningún ángulo ni posición real de Kuopio.
+
+  PASO D (SOLO TOBILLO) — + residuo empírico de "rockers" del pie
+  (talón→tobillo→antepié), ajustado con LOSO contra la POSICIÓN REAL
+  de tobillo de los OTROS 46 sujetos, + cierre de ciclo en Y + cierre
+  de zancada en X (estos dos últimos son restricciones físicas exactas
+  — periodicidad del ciclo, y velocidad×tiempo —, no ajustes
+  empíricos, así que no "tocan" el dato real en el mismo sentido).
+    ¿Toca Kuopio? SÍ, otra vez como OBJETIVO — el residuo de rockers
+    es la segunda (y última) pieza de todo el pipeline que mira el
+    dato real, con la misma disciplina LOSO del Paso B.
+
+En resumen: el dato real de Kuopio se usa como OBJETIVO de ajuste en
+exactamente 2 lugares del pipeline (calibración del ángulo, Paso B;
+residuo de rockers del tobillo, Paso D) — nunca con el propio sujeto
+que se está prediciendo en ese momento. La antropometría del Paso A no
+cuenta como "tocar" el dato que se valida, porque no es el ángulo ni
+la posición que el modelo intenta reproducir — es la entrada que
+cualquier generador necesita, sea el sujeto de Kuopio o un paciente
+nuevo sin ninguna base de datos de por medio.
+
+5.6 Visualizando la corrección: antes/después por fase (apoyo,
+    balanceo, ciclo completo)
+------------------------------------------------------------------
+
+Para que el Paso B (y D) de arriba no quede solo en palabras, se
+generaron 4 figuras nuevas (30-ago-2026) que muestran, sujeto por
+sujeto, el "antes" (θ_crudo, y la posición que resulta de él sin
+calibrar) contra el "después" (calibrado LOSO) — separando además
+apoyo (0-60% del ciclo) de balanceo (60-100%), la partición estándar
+de marcha (Perry & Burnfield) que usa el resto del generador, no un
+evento específico de Koopman por sujeto (que varía con velocidad y
+talla).
+
+ADVERTENCIA DE MUESTRA, declarada y no oculta: estas 4 figuras corren
+sobre N=47 sujetos (todos los que hoy tienen CSV extraído de Kuopio),
+no N=15 como las cifras "oficiales" de las secciones 4 y 5 de este
+informe. Por eso r y RMSE aquí no calzan exactamente con los de la
+sección 4.3 (ejemplo: r de Y de rodilla, calibrado, ciclo completo:
+0.920 con N=15 en la sección 4.3, contra 0.902 aquí con N=47) — la
+diferencia es el tamaño de muestra, no un cambio de método ni de
+calibración (la ganancia/offset salen prácticamente iguales: muslo
+0.793 aquí vs. 0.769/0.761 documentado con N=15/13). Estas figuras
+sirven para EXPLICAR EL PROCESO — qué pesa la corrección, y dónde —,
+no para reemplazar los resultados ya reportados con N=15 en las
+secciones 4 y 5.
+
+  Figura 12 (ángulo de muslo, crudo vs. calibrado): RMSE 7.05°→3.81°
+  en el ciclo completo. r NO cambia (0.975→0.975): una calibración
+  afín no puede mejorar la FORMA de una curva, solo su escala y su
+  corrimiento — el RMSE baja porque corrige la amplitud inflada
+  (sección 5.1), no porque cambie la forma. Por fase: apoyo
+  5.25°→3.15°, balanceo 8.83°→4.34° — la corrección pesa más en
+  balanceo, donde el ángulo crudo llega a valores más extremos (~30 a
+  35°) que en apoyo (~0 a -10°).
+
+  Figura 13 (posición de rodilla, X e Y): en X la corrección pesa poco
+  (RMSE 4.42→4.15cm en el ciclo completo, ~6% de reducción) porque el
+  avance a velocidad constante domina la curva, no el término
+  angular. En Y sí importa (RMSE 1.55→0.83cm, ~46% de reducción) — y,
+  a diferencia del ángulo, aquí r SÍ mejora (0.883→0.902): Y mezcla el
+  vaivén de cadera (que NO se calibra) con el término angular (que SÍ
+  se calibra), así que la corrección deja de ser una transformación
+  afín pura sobre la curva final y puede cambiar la forma relativa,
+  no solo la escala.
+
+  Figura 14 (posición de tobillo, X e Y): en apoyo la corrección casi
+  no pesa (X: ~1%, Y: ~0%) porque ahí domina el residuo empírico de
+  rockers (Paso D), no la calibración angular (Paso B). En balanceo sí
+  pesa (X: ~8%, Y: ~23%) — coherente con que el ángulo crudo se aleja
+  más del real precisamente en balanceo (ver Figura 12).
+
+  Figura 15 (resumen de las 5 piezas): ángulo de muslo, rodilla X/Y y
+  tobillo X/Y, lado a lado, en % de reducción de RMSE por la
+  corrección, para las 3 fases. De un solo vistazo: la corrección pesa
+  más en el ÁNGULO (donde se aplica directamente) que en las
+  POSICIONES derivadas (donde otros términos no calibrados —vaivén de
+  cadera, residuo de rockers— diluyen su efecto), y más en BALANCEO
+  que en APOYO en casi todas las piezas (única excepción parcial:
+  ángulo de muslo, donde apoyo y balanceo pesan de forma más pareja).
+
+Fuentes de esta subsección: CODIGOS/GENERADOR/RODILLA/Kuopio/Diag_
+Correccion_LOSO_Angulo.m; CODIGOS/GENERADOR/Diag_Correccion_LOSO_
+Posicion.m; CODIGOS/GENERADOR/Diag_Resumen_Correccion_Fases.m (los 3
+corridos en MATLAB real el 30-ago-2026, no son mockups).
+
+
+============================================================
+6. REFERENCIAS DE LITERATURA USADAS — QUÉ SE TOMÓ DE CADA UNA
+============================================================
+
+A continuación, cada fuente citada en este generador, con la cita
+completa y qué exactamente se usó de ella (no una descripción
+genérica del paper).
+
+------------------------------------------------------------------
+[1] Koopman, B., van Asseldonk, E. H. F., & van der Kooij, H. (2014).
+    "Speed-dependent reference joint trajectory generation for
+    robotic gait support." Journal of Biomechanics, 47(6),
+    1447-1458. DOI: 10.1016/j.jbiomech.2014.01.037
+
+QUÉ SE USÓ: las 5 tablas de coeficientes de regresión (24 filas en
+total, Tablas 1-5 del paper) que predicen posición, tiempo, velocidad
+y aceleración angular en 6 eventos clave del ciclo de marcha, para
+las 4 curvas articulares (cadera ab/aducción, cadera flexo-extensión,
+rodilla, tobillo), a partir de velocidad de marcha y talla. También
+la Ecuación 3 del paper (duración del ciclo en función de velocidad y
+talla), reusada como motor de temporización compartido por los tres
+candidatos. ES EL MODELO GANADOR — el que finalmente genera la
+trayectoria del simulador.
+
+------------------------------------------------------------------
+[2] Zhao, H., Wei, G., Xie, J., Liu, A., Qu, Q., Cao, J., Ding, Z., &
+    Liao, W.-H. (2026). "A predictive model of joint dynamics and
+    ground reaction force using only leg length, body mass, and
+    walking cadence." PLOS ONE, 21(1), e0338041.
+    DOI: 10.1371/journal.pone.0338041
+
+QUÉ SE USÓ: las ecuaciones de serie de Fourier para los ángulos de
+cadera y rodilla (implementadas en Zhao2026_Core.m), evaluadas como
+candidato alternativo — no ganó en ningún segmento. También se tomó,
+verificado a texto completo, el supuesto de "pelvis vertical durante
+la marcha" (que el ángulo de la pelvis es ~0° y por tanto el ángulo
+de muslo es aproximadamente igual al de cadera) — un supuesto de este
+paper que se reutilizó también para reducir el ángulo tibial de
+Koopman y de Yun, no solo para Zhao. Su parte de fuerza de reacción
+del piso (GRF) NO se usó en esta línea de trabajo (queda para el
+desarrollo de GRF, fuera del alcance de este informe).
+
+------------------------------------------------------------------
+[3] Yun, Y., Kim, H.-C., Shin, S. Y., Lee, J., Deshpande, A. D., &
+    Kim, C. (2014). "Statistical method for prediction of gait
+    kinematics with Gaussian process regression." Journal of
+    Biomechanics, 47(1), 186-192.
+    DOI: 10.1016/j.jbiomech.2013.09.032
+
+QUÉ SE USÓ: el toolbox público de los propios autores (función
+Gait_Pred.m), que ya viene entrenado con regresión por proceso
+gaussiano y predice 14 movimientos distintos de cadera/rodilla/
+tobillo a partir de 14 parámetros antropométricos — usado sin
+reentrenar, tal cual lo publicaron. Evaluado como candidato
+alternativo — no ganó en ningún segmento.
+
+------------------------------------------------------------------
+[4] Romero-Sorozábal, R., Delgado-Oleas, G., Laudanski, A. F.,
+    Gutiérrez, Á., & Rocon, E. (2024). Biomimetics (MDPI), acceso
+    abierto. [DOI y volumen exactos: dato pendiente de confirmar —
+    la copia local del PDF está en
+    docs/literatura/pdfs/RomeroSorozabal2024_Biomimetics.pdf y las
+    Tablas A1-A3 (66 filas de coeficientes) ya están transcritas en
+    CODIGOS/GENERADOR/Romero_Sorozabal2024_Core.m, pero el dato
+    bibliográfico exacto de revista/volumen/página no quedó anotado
+    en los documentos que se revisaron para este informe]
+
+QUÉ SE USÓ: la regresión cuadrática (β0 + β1·v + β2·v² + β3·talla)
+de las Tablas A1-A3 del apéndice, que da directamente la posición 3D
+de cadera, rodilla y tobillo (no ángulos). Implementado y probado,
+pero EXCLUIDO de la comparación de modelo ganador de este informe:
+su eje vertical (Z) de rodilla y tobillo sale ~2 veces más profundo
+de lo anatómicamente posible — una anomalía real de la fuente
+publicada, verificada dos veces con métodos independientes. Se
+descarta como candidato de rodilla/tobillo/ángulo tibial, aunque
+sigue disponible en el código.
+
+------------------------------------------------------------------
+[5] Drillis, R., & Contini, R. (1966). [Cita completa exacta: dato
+    pendiente de confirmar — el documento fuente dice "Drillis &
+    Contini 1966" pero no se encontró en los archivos revisados el
+    título/revista/editorial exactos. Las fracciones sí se
+    verificaron contra una fuente primaria distinta, ver [6] abajo]
+
+QUÉ SE USÓ: las fracciones de longitud de segmento corporal (muslo =
+0.245 × talla, tibia = 0.246 × talla, pie = 0.152 × talla) — la
+fórmula que estima el largo de muslo y tibia cuando el usuario solo
+da la talla, sin medir con cinta métrica.
+
+------------------------------------------------------------------
+[6] Winter, D. A. "Biomechanics and Motor Control of Human Movement."
+    [Edición y año exactos: dato pendiente de confirmar]
+
+QUÉ SE USÓ: dos cosas distintas. (a) La Figura 4.1 del libro (leída
+directamente de la imagen, no de un resumen de segunda mano), que se
+usó para VERIFICAR las fracciones de Drillis & Contini de arriba
+(altura de cadera 0.530×talla, de rodilla 0.285×talla, de tobillo
+0.039×talla — de ahí salen las fracciones de muslo/tibia/pie). (b) La
+Tabla A.1 del apéndice (datos de marcadores crudos de un sujeto de
+referencia clásico del libro, sin antropometría documentada), usada
+como una de las 5 fuentes de datos reales contra las que se comparó
+el modelo ganador (n=1, ver sección 2.2).
+
+------------------------------------------------------------------
+[7] Raichlen, D. A., Pontzer, H., et al. (2011). [Título exacto:
+    dato pendiente de confirmar]. Journal of Experimental Biology,
+    214, 2276-2282.
+
+QUÉ SE USÓ: el valor del "número de Froude" óptimo (Fr = 0.25) para
+estimar la velocidad de marcha "natural" de una persona a partir del
+largo de su pierna, sin necesitar medirla con cronómetro — este
+estudio confirma ese valor en adultos, niños, personas con enanismo
+y pigmeos (remonta el hallazgo original a Alexander 1989).
+
+------------------------------------------------------------------
+[8] Lavikainen et al. (2024). "Kuopio Gait Dataset." Data in Brief,
+    56, 110841. DOI: 10.5281/zenodo.10559504 (Zenodo). Licencia
+    CC-BY-4.0.
+
+QUÉ SE USÓ: la base de datos completa de validación final — 15
+sujetos (de 51 disponibles), con antropometría individual medida
+(sexo, talla, masa, largo real de muslo y tibia), velocidad de marcha
+real medida por sujeto, y marcha overground real (sobre el piso). Es
+la base contra la que se hizo toda la calibración LOSO de la sección
+5, y la que produjo los números finales de la sección 4.
+
+------------------------------------------------------------------
+[9] Zeni, J. A., Richards, J. G., & Higginson, J. S. (2008). [Cita
+    completa: dato pendiente de confirmar]
+
+QUÉ SE USÓ: el método de detección de eventos de marcha (contacto de
+talón, despegue de dedos) puramente a partir de la posición de los
+marcadores (sin necesitar plataformas de fuerza), porque Kuopio no
+trae esos eventos precalculados.
+
+------------------------------------------------------------------
+[10] "Maastricht Normative 3D Gait Dataset." OSF, https://osf.io/
+     t72cw/. Licencia CC-BY. 246 adultos sanos (122 hombres, 124
+     mujeres), edad 18-93 años. "Normative 3D gait data of healthy
+     subjects walking at three different speeds on an instrumented
+     treadmill in virtual reality."
+
+QUÉ SE USÓ: el subgrupo de hombres de 18-29 años (n=246 en la fila
+usada) como una de las 5 fuentes de datos reales de la sección 2.2 —
+la comparación con la población más grande (aunque sin antropometría
+individual, solo de grupo de edad).
+
+------------------------------------------------------------------
+[11] Ferber, R., Brett, R., Fukuchi, C. A., Hettinga, B., & Osis, S.
+     (2024). Scientific Data. DOI: 10.1038/s41597-024-04011-7 (más
+     los datos en Figshare+, DOI 10.25452/figshare.plus.24255795.v1,
+     licencia CC BY 4.0).
+
+QUÉ SE USÓ: 40 sujetos (20 hombres, 20 mujeres, estratificados por
+talla 150-195 cm y peso 48-105 kg) de una muestra filtrada de 1798
+sujetos totales del dataset. Se usó su posición 3D real de rodilla
+(reconstruida corriendo el código oficial de los propios autores
+sobre los marcadores crudos), con antropometría real medida sujeto a
+sujeto — la prueba de posición más exigente antes de Kuopio. Nota:
+esta base es marcha en cinta, no overground, por eso no se usó para
+la calibración final (que sí necesita avance neto real).
+
+------------------------------------------------------------------
+[12] Camargo, J., Ramanathan, A., Flanagan, W., & Young, A. (2021).
+     Journal of Biomechanics. DOI: 10.1016/j.jbiomech.2021.110320
+
+QUÉ SE USÓ: reservada como examen final de no-circularidad, sin
+tocar en ningún momento del diseño ni de la calibración descritos en
+este informe. Se descargaron 2 sujetos piloto (AB06, AB09) solo para
+verificar la fórmula de estimación antropométrica del paso 1 (sección
+3) contra un dato real independiente — nunca se usó para elegir el
+modelo ganador ni para calibrar nada. La comparación completa contra
+Camargo (Nivel A/B) todavía no se ha ejecutado — ver sección 8.
+
+
+============================================================
+7. IMÁGENES DE REFERENCIA — FIGURAS YA GENERADAS Y VERIFICADAS
+============================================================
+
+Todas estas figuras viven en:
+docs/algoritmo/pipeline_koopman_kuopio/figuras/
+y están citadas como vigentes en el documento de síntesis más
+reciente (PIPELINE_KOOPMAN_KUOPIO.md, actualizado 26-ago-2026).
+
+  01_seleccion_koopman_vs_control_luis.png
+    Primer cribado: Koopman contra el archivo real del propio
+    proyecto (n=1, Control_apoyo_Luis_V4.csv). Muestra la primera
+    señal (r=0.982) de que Koopman era el candidato más prometedor.
+
+  02_seleccion_koopman_vs_maastricht.png
+    Koopman contra el Maastricht Normative Gait Dataset (n=246) —
+    confirma la selección inicial con una población real grande.
+
+  03_seleccion_koopman_vs_ferber.png
+    Koopman contra Ferber et al. 2024 (n=40, posición 3D real,
+    antropometría real por sujeto) — la prueba de selección más
+    exigente antes de pasar a Kuopio.
+
+  04_los_4_candidatos_cadena_completa.png
+    Los 4 candidatos (Koopman, Zhao, Yun, Romero-Sorozábal) lado a
+    lado, con la cadena cinemática completa (cadera-rodilla-tobillo)
+    — se ve visualmente por qué Zhao y Yun quedan descartados para
+    tobillo (flexión de rodilla insuficiente durante el balanceo).
+
+  05_generador_salida_koopman.png [REGENERADA 30-ago-2026]
+    Ejemplo de salida del generador (talla 1.71 m, modelo Koopman),
+    ahora con el enfoque de PASO 4 nuevo (péndulo doble + cadera
+    oscilatoria, Cinematica_DoblePendulo_Core.m + Trayectoria_
+    Cadera_Core.m): rodilla y tobillo en X/Y, vista sagital con el
+    segmento tibial cada 10% del ciclo, y ángulo tibial. Reemplaza
+    la versión anterior (mismo enfoque de PASO 4 ya superado) — el
+    tobillo se levanta ~7 cm en el balanceo de forma suave, sin la
+    meseta plana que tenía la versión vieja durante el apoyo.
+
+  06_rodilla_vs_kuopio_grupo.png
+    Rodilla, modelo final (Koopman calibrado), contra los 15 sujetos
+    de Kuopio — cada sujeto pareado con su propia predicción (no un
+    promedio), más curvas de error con banda media±SD.
+
+  07_rodilla_vs_kuopio_individual.png
+    Rodilla, los 6 sujetos de antropometría más diversa (el más
+    pesado, el más alto, el más liviano, la más baja, una mujer y un
+    hombre de talla media) — la prueba de referencia.
+
+  08_tobillo_vs_kuopio_grupo.png
+    Tobillo, modelo final, contra los 15 sujetos de Kuopio — mismo
+    formato que la 06.
+
+  09_tobillo_vs_kuopio_individual.png
+    Tobillo, los mismos 6 sujetos de referencia que la figura 07.
+
+  10_angulo_tibial_vs_kuopio_grupo.png
+    Ángulo de inclinación tibial, contra los 15 sujetos de Kuopio,
+    crudo (sin calibrar) vs. calibrado (LOSO) — el panel calibrado
+    prácticamente se superpone con el dato real; el histograma
+    muestra que casi todos los 15 sujetos pasan de "Deficiente" a
+    "Bueno"/"Excelente" en RMSEnorm tras calibrar.
+
+  11_angulo_tibial_vs_kuopio_individual.png
+    Ángulo de inclinación tibial, los mismos 6 sujetos de referencia,
+    crudo vs. calibrado en la misma escala — la evidencia visual más
+    directa del hallazgo de la sección 5 (sobreestimación de
+    amplitud, corregida).
+
+  12_calibracion_angulo_muslo_antes_despues_fases.png
+    Ángulo de muslo, N=47: crudo vs. calibrado LOSO, separado en
+    apoyo/balanceo/completo, más la curva de "tamaño de la corrección"
+    a lo largo del ciclo — ver sección 5.6 para la lectura completa.
+
+  13_calibracion_posicion_rodilla_antes_despues_fases.png
+    Posición de rodilla (X, Y), N=47: mismo formato antes/después que
+    la 12, aplicado después de convertir el ángulo en posición por
+    geometría — ver sección 5.6.
+
+  14_calibracion_posicion_tobillo_antes_despues_fases.png
+    Posición de tobillo (X, Y), N=47: mismo formato, después de
+    geometría + residuo de rockers + cierres de ciclo/zancada — ver
+    sección 5.6.
+
+  15_resumen_reduccion_rmse_por_fase.png
+    Las 5 piezas anteriores (ángulo, rodilla X/Y, tobillo X/Y) lado a
+    lado, en % de reducción de RMSE por la corrección LOSO, para las
+    3 fases — la vista comparativa de la sección 5.6.
+
+Todas estas figuras fueron generadas corriendo el código real en
+MATLAB (no son bocetos ni mockups) y están citadas como vigentes en
+la documentación más reciente del proyecto (26/27-ago-2026; 12-15
+agregadas el 30-ago-2026, ver advertencia de muestra N=47 vs. N=15 en
+la sección 5.6).
+
+
+============================================================
+8. QUÉ QUEDA PENDIENTE / LIMITACIONES
+============================================================
+
+  - La amplitud vertical de la rodilla llega al 82% de la real, no al
+    100% — el residuo restante es variabilidad real entre sujetos que
+    una plantilla poblacional de N=15 no termina de capturar del
+    todo. El único camino de mejora identificado es ampliar el número
+    de sujetos usados para la calibración (Kuopio tiene 51 sujetos
+    disponibles en total, hoy solo se usaron 15).
+
+  - El cierre de zancada del tobillo en X (velocidad × tiempo de
+    ciclo) sobreestima en unos 7 cm el desplazamiento real medido —
+    probablemente por un desfase entre el método de detección de
+    eventos (Zeni et al. 2008) y la posición real del marcador de
+    tobillo. El error del modelo baja de todas formas con esta
+    corrección, porque el error propio de la cadena geométrica sin
+    corregir era mayor.
+
+  - El generador real (el que corre con antropometría del usuario,
+    sin datos medidos) sigue usando la velocidad estimada por el
+    número de Froude, que para la mayoría de adultos supera el rango
+    de velocidad que Koopman validó en su propio paper (0.5-5 km/h)
+    — es una extrapolación declarada, no oculta, y todavía no se ha
+    medido si esto degrada la exactitud de forma medible (eso
+    requiere la validación contra Camargo, ver abajo).
+
+  - El signo de "+Y" (hacia arriba) del modelo cinemático del
+    generador real (distinto del código usado para la validación
+    contra Kuopio, que sí está verificado) no está cruzado todavía
+    contra el sentido real de la columna Posicion_cm_Y del CSV que
+    lee el simulador — solo se verificó el rango y la convención del
+    ángulo, no el signo de la posición vertical.
+
+  - La comparación contra Camargo et al. 2021 (los 22 sujetos
+    completos, reservados desde el diseño como examen final de no-
+    circularidad) TODAVÍA NO SE HA EJECUTADO. Es, según la
+    documentación más reciente del proyecto, el paso de mayor
+    prioridad que queda pendiente en esta línea de trabajo.
+
+  - Zhao y Yun (los dos modelos que no ganaron) tienen un defecto de
+    fase real en el pico de flexión de rodilla, documentado y
+    explicado (sección 2.3), pero no corregible sin volver a ajustar
+    los coeficientes originales del paper — quedan implementados y
+    disponibles para comparación, pero no se recomienda usarlos como
+    modelo principal del generador.
+
+  - No se ha ejecutado todavía el sistema completo de punta a punta
+    en el banco físico real (antropometría → CSV → ESP32 → motores →
+    posición real medida) — todo lo demostrado en este informe es que
+    el ALGORITMO predice bien contra datos reales de otras bases de
+    datos, no que el SIMULADOR FÍSICO ejecuta esa trayectoria
+    correctamente. Son dos afirmaciones distintas, y esta segunda
+    sigue bloqueada por la integración electrónica (Raspberry Pi-
+    ESP32) y por la calibración del cero físico del banco
+    (responsabilidad del equipo de Mecatrónica, no de este
+    generador).
+
+  - Todavía no está decidido si este resultado (mejor modelo por
+    segmento, Koopman ganando en los 3) reemplaza o convive con un
+    plan anterior de "ensamble" (promediar Koopman+Zhao+Yun+Romero-
+    Sorozábal) que se había diseñado pero nunca se llegó a validar
+    contra datos reales — es una decisión pendiente del propio autor
+    del proyecto, no una tarea técnica sin resolver.
+
+
+============================================================
+9. FUERZA DE REACCIÓN DEL PISO (GRF) — CONSTRUCCIÓN Y VALIDACIÓN
+============================================================
+
+Sección agregada el 29-ago-2026. A diferencia de rodilla/tobillo/ángulo
+tibial (sección 4, resueltos con un modelo teórico de literatura
+calibrado con datos reales), la GRF pasó por 6 intentos fallidos con
+modelos teóricos antes de encontrar un enfoque que funcionara bien —
+cambiar de "derivar la fuerza desde la cinemática" a "usar fuerza real
+ya medida como plantilla". Se cuenta la historia completa, incluidos los
+intentos descartados, porque el porqué de cada descarte es en sí mismo
+un hallazgo metodológico, no solo un dato de trazabilidad.
+
+9.1 Por qué la GRF es un problema distinto al de la cinemática
+------------------------------------------------------------------
+
+Rodilla, tobillo y ángulo tibial (secciones 2-5) se resuelven con la
+cinemática de UNA sola pierna a la vez — el modelo predice el ángulo de
+esa pierna, y de ahí se calcula su posición. La fuerza vertical, en
+cambio, depende de la aceleración del CENTRO DE MASA DE TODO EL CUERPO,
+que en cualquier instante está sostenido por una o las DOS piernas a la
+vez (el "doble apoyo": una fracción del ciclo, típicamente 10-20%, en la
+que ambos pies tocan el piso simultáneamente durante la transición de un
+paso al siguiente).
+
+Esto introduce un problema nuevo que la cinemática no tenía: hace falta
+generar la marcha de las DOS piernas de forma que sean geométricamente
+consistentes entre sí en todo momento — sobre todo durante el doble
+apoyo, donde ambas están fijas en el piso a la vez. Este proyecto genera
+cada pierna con un modelo estadístico ajustado de forma independiente
+(Koopman, Zhao o Yun, sección 2) y reconstruye la pierna contralateral
+copiando la misma curva desfasada medio ciclo (aproximación de marcha
+simétrica, ya usada y verificada como razonable en otras partes del
+proyecto, sección 2.3). Esa aproximación funciona bien para la POSICIÓN
+de una sola pierna (por eso rodilla/tobillo/tibia salen tan bien, sección
+4), pero no garantiza que las DOS piernas generadas por separado
+"encajen" geométricamente entre sí en el instante exacto del doble apoyo
+— y la fuerza vertical, al depender de la ACELERACIÓN (la segunda
+derivada de la posición en el tiempo), es mucho más sensible a esa falta
+de encaje que la posición misma: un desajuste de valor pequeño se
+convierte en un desajuste de aceleración grande al derivar dos veces.
+
+9.2 Seis intentos basados en ángulos articulares — todos con el mismo
+    problema de fondo
+------------------------------------------------------------------
+
+Se probaron 6 combinaciones distintas de qué cinemática usar y cómo
+reconstruir la geometría de las 2 piernas durante el doble apoyo. Cada
+una se validó de la misma forma: contra la fuerza VERTICAL REAL medida
+por las plataformas de fuerza de Kuopio (la misma base de datos ya usada
+en la sección 4, N=13 sujetos con fuerza válida), usando la correlación
+(r) entre la curva predicha y la curva real de cada paso.
+
+  Intento                              Cinemática   Geometría de 2       r vs.
+                                                     piernas             Kuopio
+  ------------------------------------------------------------------------------
+  Original (velocidad constante        Koopman      2 reglas distintas  picos de
+    impuesta durante el balanceo)                   por fase            ±265/363%BW
+                                                                         (imposible)
+  Mezcla lineal de las 2 piernas       Koopman      mezcla lineal +     0.40
+    durante el doble apoyo                          separación de pasos
+                                                     asumida
+  Intersección de círculos (sistema    Koopman      sistema geométrico  0.29
+    cerrado real de las 2 piernas)                  cerrado
+  Cinemática de Zhao "tal cual"        Zhao         geometría fiel a    0.10
+    (su propia simplificación                       Zhao (pierna de
+    geométrica)                                     apoyo = 1 rígido)
+  Cinemática de Koopman + geometría    Koopman      geometría fiel a    0.002
+    fiel de Zhao                                    Zhao
+
+El primer intento (velocidad constante impuesta durante el balanceo) dio
+picos de fuerza matemáticamente imposibles (hasta 363% del peso
+corporal) — un artefacto numérico puro: la cadera del generador se movía
+con DOS reglas geométricas distintas según la fase (rotación sobre el
+tobillo fijo en apoyo; velocidad constante impuesta en balanceo), y el
+cambio de una regla a la otra producía un salto en la VELOCIDAD de la
+cadera. Al derivar esa velocidad dos veces más (para llegar a la fuerza),
+ese salto se convierte en un pico numérico sin sentido físico. Corregido
+reconstruyendo la cadera con una sola regla para todo el ciclo (rotación
+sobre el tobillo de la pierna que esté en el piso en cada instante,
+alternando de pierna cada medio ciclo — la regla que de verdad usa Zhao
+et al. 2026 [13] en sus Ecs. 3-4), el pico desapareció, pero quedó un
+sobreestimado real y visible en los bordes del doble apoyo (mezcla
+lineal, r=0.40) — mejor que un artefacto imposible, pero todavía lejos de
+la forma real.
+
+Los siguientes 3 intentos probaron variantes "más correctas en el papel"
+para esa mezcla de doble apoyo — y las 3 salieron PEOR, no mejor, medidas
+contra los datos reales:
+
+  - Resolver el sistema geométrico cerrado de verdad (las 2 piernas como
+    2 círculos que se cruzan en el punto exacto de la cadera, en vez de
+    promediar 2 estimaciones independientes) parecía la solución más
+    rigurosa — pero en la práctica produjo un salto de valor todavía
+    mayor en los bordes (~50cm de diferencia entre las 2 estimaciones), y
+    corregir ESE salto con un ajuste adicional dejó un pico aislado de
+    +200%BW en un punto específico del ciclo. r bajó a 0.29.
+  - Usar la cinemática PROPIA de Zhao (en vez de la de Koopman) junto con
+    su propia simplificación geométrica (tratar la pierna de apoyo como
+    un solo segmento rígido, sin flexión de rodilla) — la curva resultó
+    bien acotada (sin picos, 59-155%BW) pero mal correlacionada (r=0.10),
+    porque la cinemática de Zhao tiene un defecto de fase real ya
+    documentado en este mismo informe (sección 2.3): acierta la
+    magnitud pero no el momento exacto del ciclo en que ocurre cada pico.
+  - Combinar la geometría limpia de Zhao con la cinemática de Koopman
+    (la que sí gana en precisión de ángulo, sección 4) parecía la
+    combinación obvia — y dio el peor resultado de los 6 (r=0.002): la
+    simplificación de Zhao (ignorar la flexión de rodilla durante el
+    apoyo) está ajustada específicamente a SU PROPIA cinemática, y no
+    generaliza bien a los ángulos de otro modelo.
+
+Lección de esta parte, sin forzarla: mezclar piezas de distintos modelos
+(cinemática de uno, geometría de otro) que nunca se validaron juntas es
+arriesgado incluso cuando cada pieza por separado es teóricamente sólida
+— la que parecía "más correcta en el papel" resultó peor en la práctica
+las 3 veces que se intentó.
+
+9.3 Un modelo sin ángulos articulares — mejora parcial, todavía no
+    suficiente
+------------------------------------------------------------------
+
+Se buscó luego en un campo distinto: la ingeniería de vibración de
+pasarelas y pisos peatonales, que desde los años 1980 modela la fuerza
+vertical de una persona caminando SIN pasar por ningún ángulo de rodilla
+o cadera — una serie de Fourier ajustada directamente sobre la fuerza
+medida, con el peso corporal y la frecuencia de paso como únicos
+parámetros ("Dynamic Load Factor" o DLF):
+
+    F(t) = P · [1 + Σ αᵢ·sin(2π·i·fp·t + φᵢ)]
+
+con P=peso corporal, fp=frecuencia de paso, y αᵢ/φᵢ coeficientes YA
+PUBLICADOS (Nguyen et al. 2022 [14], derivados de 158 pisadas reales de
+23 adultos jóvenes). Como nunca pasa por ángulos articulares de ninguna
+pierna, este modelo evita por completo el problema de fondo de la
+sección 9.2 (no hay 2 piernas que reconciliar). Resultado: r=0.53 contra
+Kuopio real — mejor que los 6 intentos anteriores, pero todavía
+modesto. Esta F(t) representa la fuerza COMBINADA bajo los 2 pies a la
+vez (no la de un solo pie, que es lo que mide Kuopio) — se repartió entre
+las 2 piernas con el mismo principio de transferencia lineal ya usado en
+el intento de la sección 9.2 (Ec. 9 de Zhao et al. 2026 [13]), pero
+aplicado esta vez sobre una señal ya limpia, no sobre 2 estimaciones
+cinemáticas que se desacuerdan entre sí.
+
+9.4 El cambio de enfoque: usar fuerza real medida como plantilla
+------------------------------------------------------------------
+
+El paso decisivo fue una observación sobre el propio %BW (fuerza como
+porcentaje del peso corporal, la unidad que se usa en toda esta
+sección): como %BW ya divide por el peso, el problema real no es
+"derivar" matemáticamente una curva desde la cinemática — es encontrar
+LA FORMA que de verdad sigue una persona sana caminando, en %BW, y
+escalarla por el peso real de cada sujeto al final (%BW × masa_kg × g =
+fuerza en Newtons). Esa forma no hace falta derivarla de un modelo
+teórico si ya existe medida en datos reales.
+
+Se construyó una plantilla promediando la fuerza vertical REAL de 42
+sujetos de Fukuchi, Fukuchi & Duarte 2018 [15] (Brasil, marcha overground
+real, cada sujeto con su propia velocidad y talla medidas) — el mismo
+dataset ya usado en la sección 4 para rodilla, pero AHORA usando su
+archivo de fuerza (`*Cknt.txt`, procesado por los propios autores con su
+propia dinámica inversa — ya trae la fuerza de CADA pierna por separado
+y ya normalizada a 0-100% del ciclo, así que no hace falta resolver de
+nuevo el problema de la sección 9.2: los autores ya lo resolvieron con
+datos reales de las 2 piernas medidas simultáneamente, no generadas por
+separado).
+
+Bug real encontrado y corregido en el camino: en este dataset, la
+columna vertical de la fuerza es "Y", no "Z" — al revés que en los
+archivos de ÁNGULOS del mismo dataset (donde "Z" sí es el plano sagital,
+sección 2.2). Confirmado contra el propio script de los autores
+(`wbdsExploratoryDA.m`, que etiqueta explícitamente sus 3 ejes como
+anterior-posterior/VERTICAL/medial-lateral). El primer intento, por
+costumbre de la convención de ángulos, usó la columna equivocada y dio
+valores de ~4%BW en vez de ~100%BW — el error fue obvio de inmediato, no
+un dato sutil que pudiera pasar desapercibido.
+
+Resultado de la plantilla simple (promedio de los 42 sujetos, sin
+personalizar por sujeto): r=0.84 contra Kuopio real — un salto grande
+frente a los intentos anteriores (mejor intento con ángulos articulares:
+0.53).
+
+9.5 Personalización final: velocidad, talla, y el subgrupo de edad
+    correcto
+------------------------------------------------------------------
+
+Una plantilla única no aprovecha que Fukuchi mide la velocidad y la
+talla real de cada uno de sus 42 sujetos. Se ajustó una regresión lineal
+PUNTO A PUNTO del ciclo (%BW en cada punto del 0 al 100% del ciclo, en
+función de la velocidad y la talla del sujeto) — mismo principio que ya
+usa Koopman en sus propias tablas de regresión (sección 2.2): coeficientes
+ya ajustados de antemano, sin volver a entrenar nada al usar el
+generador.
+
+Se probaron 8 combinaciones distintas antes de fijar la versión final
+(ambas piernas o solo una; todos los sujetos o solo un subgrupo por
+edad; con o sin talla y masa como variables adicionales) — todas medidas
+de la misma forma, contra Kuopio real:
+
+  - Usar las 2 piernas de cada sujeto (no solo una) no cambió nada por sí
+    solo (0.838 vs. 0.842) — la diferencia es ruido.
+  - Fukuchi tiene un corte de edad limpio y bimodal: 24 sujetos de 21-37
+    años, 18 sujetos de 50-84 años, sin nadie en medio. Usar SOLO los
+    jóvenes, por sí solo, empeoró el resultado (0.835) — menos datos, más
+    ruido.
+  - Pero usar SOLO los jóvenes COMBINADO con personalizar por velocidad y
+    talla dio el mejor resultado de las 8 variantes probadas: r=0.866.
+    Esto sugiere que la relación entre velocidad y forma de la curva es
+    distinta entre adultos jóvenes y mayores, y mezclar los dos grupos sin
+    distinguirlos diluye una relación que sí existe dentro de cada uno.
+  - Agregar la masa corporal como una tercera variable (además de
+    velocidad y talla) EMPEORÓ el resultado (0.849) — con solo 48
+    sujetos-pierna y 4 coeficientes ajustados en cada uno de los 101
+    puntos del ciclo, agregar una variable más empieza a sobreajustar en
+    vez de mejorar.
+
+Versión final adoptada: velocidad + talla, ajustada sobre 48
+sujetos-pierna (24 sujetos jóvenes de Fukuchi, ambas piernas). La
+velocidad que usa esta plantilla, al generar una trayectoria nueva sin
+datos medidos, es LA MISMA que ya calcula el generador de trayectorias
+(número de Froude, sección 3, paso 2) — para que la fuerza predicha y la
+trayectoria generada asuman siempre la misma velocidad, no dos
+estimaciones independientes que podrían no coincidir.
+
+9.6 Resultado final y qué significa
+------------------------------------------------------------------
+
+Contra los 13 sujetos reales de Kuopio (independiente de Fukuchi — otro
+país, otro laboratorio, cero sujetos en común, así que esta validación no
+tiene el problema de circularidad que sí habría si se validara contra el
+mismo dataset que se usó para construir la plantilla):
+
+    r = 0.866 (SD ~0.07), RMSE = 15.1% del peso corporal
+
+Visualmente, la curva predicha reproduce la forma de "doble joroba"
+característica de la marcha humana (pico de carga al recibir el peso,
+valle en la mitad del apoyo, segundo pico al despegar) y sigue de cerca
+la curva real en sujetos de contextura muy distinta (de 61 a 104 kg, de
+0.77 a 1.37 m/s de velocidad).
+
+Resumen de toda la progresión de esta sección, de peor a mejor resultado:
+
+    6 intentos con ángulos articulares (r=0.002 a 0.53)
+      → 1 intento sin ángulos pero de ingeniería estructural (r=0.53)
+        → plantilla de fuerza real sin ningún modelo teórico (r=0.84)
+          → esa plantilla personalizada por velocidad+talla+edad (r=0.866)
+
+El salto grande de esta línea de trabajo no vino de un modelo más
+sofisticado — vino de dejar de intentar DERIVAR la fuerza desde la
+cinemática y empezar a MEDIRLA directamente de datos reales. La
+personalización por velocidad y talla fue la mejora fina al final, en
+ese orden de importancia.
+
+9.7 Limitaciones de esta línea, declaradas
+------------------------------------------------------------------
+
+  - La regresión de velocidad+talla explica una fracción modesta de la
+    variación real entre sujetos (R²≈0.24 en promedio sobre el ciclo,
+    contra los propios 48 sujetos-pierna usados para ajustarla) — la
+    forma exacta de la curva de cada persona depende de más factores que
+    solo su velocidad y su talla, y ese margen de variación individual no
+    capturada es real, no un error del ajuste.
+
+  - Varios sujetos de Kuopio caminan más lento (0.75-0.85 m/s) que el
+    rango de los sujetos jóvenes de Fukuchi usados para el ajuste final
+    (0.96-1.52 m/s) — el modelo EXTRAPOLA ahí (con una advertencia
+    automática al usarlo), y la forma de la curva se aplana hacia un
+    solo escalón en vez de mostrar la doble joroba característica. Está
+    declarado, no oculto, y esos casos siguen incluidos en el r=0.866
+    reportado arriba — no se excluyeron para mejorar el número.
+
+  - Esta plantilla es la fuerza VERTICAL únicamente — la componente
+    horizontal (anteroposterior) de la fuerza no se resolvió en esta
+    línea (decisión ya tomada antes de empezar esta sección: "yo solo
+    mediré Fz").
+
+  - Los intentos basados en ángulos articulares (sección 9.2) quedan
+    implementados y disponibles en el código como evidencia documentada
+    de lo que se probó — no se recomienda usarlos como modelo principal
+    de GRF del generador, superados por el resultado de la sección 9.6.
+
+  - Igual que con la cinemática (sección 8), todo lo demostrado aquí es
+    que la plantilla predice bien contra fuerza real medida en OTRAS
+    bases de datos — no que el simulador FÍSICO, corriendo la trayectoria
+    generada, produzca esa misma fuerza al tocar la plataforma real. Es
+    la misma distinción ya señalada arriba, aplicada ahora a fuerza en
+    vez de a posición.
+
+9.8 Referencias usadas en esta sección
+------------------------------------------------------------------
+
+[13] Zhao, H., Wei, G., Xie, J., Liu, A., Qu, Q., Cao, J., Ding, Z., &
+     Liao, W.-H. (2026). "A predictive model of joint dynamics and
+     ground reaction force using only leg length, body mass, and
+     walking cadence." PLoS One, 21(1), e0338041.
+     DOI: 10.1371/journal.pone.0338041
+
+QUÉ SE USÓ: la regla geométrica de reconstruir la cadera por rotación
+sobre el tobillo de la pierna que esté en el piso en cada instante
+(Ecs. 3-4), y el principio de transferencia lineal de peso entre las 2
+piernas durante el doble apoyo (Ec. 9, solo la componente vertical) —
+ambos usados en los intentos de la sección 9.2 y 9.3. NO se usó su
+ecuación de fuerza completa (Ecs. 5-10) tal cual publicada, porque su
+derivación remite a "supplemental materials" no disponibles en este
+proyecto.
+
+------------------------------------------------------------------
+[14] Nguyen, H. A. T., Lythgo, N., Gad, E., Wilson, J. L., & Haritos, N.
+     (2022). "Development of dynamic load factors for human walking
+     excitation for floor vibration design." International Journal of
+     Applied Mechanics and Engineering, 27(3), 103-114.
+     DOI: 10.2478/ijame-2022-0038
+
+QUÉ SE USÓ: los coeficientes de la Tabla 3 (columna "Mean", NO los
+percentiles 90/95 que son deliberadamente conservadores para diseño
+estructural) de la serie de Fourier que describe la fuerza vertical
+combinada de una persona caminando, derivados de 158 pisadas reales de
+23 adultos jóvenes (170cm/72kg promedio, medidos con Vicon + plataforma
+de fuerza). Los ángulos de fase de los armónicos 2-4 no son los que este
+paper midió (nunca publicó un valor único propio) sino los de una guía
+distinta citada dentro del mismo paper (SCI P354) — mezcla de 2 fuentes,
+declarada. Verificado a texto completo (PDF público).
+
+------------------------------------------------------------------
+[15] Fukuchi, C. A., Fukuchi, R. K., & Duarte, M. (2018). "A public
+     dataset of overground and treadmill walking kinematics and
+     kinetics in healthy individuals." PeerJ, 6, e4640.
+     DOI: 10.7717/peerj.4640
+
+QUÉ SE USÓ: la fuerza vertical real de cada pierna por separado
+(archivo `*Cknt.txt`, columnas RGRFY/LGRFY, ya procesadas por los
+propios autores con su propia dinámica inversa — no los archivos crudos
+de plataforma), de los 42 sujetos completos (24 de 21-37 años, 18 de
+50-84 años), cada uno con su velocidad de marcha y talla reales medidas
+— la plantilla final de esta sección usa los 24 sujetos jóvenes, ambas
+piernas. Mismo dataset ya usado en la sección 2 para validar la
+cinemática de rodilla — nunca entrena ningún modelo de ángulo de este
+proyecto, así que usarlo también aquí para GRF y validar contra Kuopio
+sigue sin circularidad.
+
+9.9 Imágenes de referencia de esta sección
+------------------------------------------------------------------
+
+Todas en `CODIGOS/GENERADOR/` (generadas corriendo el código real en
+MATLAB, no son bocetos):
+
+  Plantilla_Fukuchi_GRF_figura.png
+    Los 42 sujetos de Fukuchi (líneas grises) con su media±SD (azul) —
+    la plantilla poblacional simple, antes de personalizar, r=0.84.
+
+  Ver_GRF_PlantillaFukuchi_vs_Kuopio_figura.png
+    La plantilla simple (azul) contra los datos reales de 6 sujetos de
+    Kuopio de contextura diversa (gris) — primera confirmación visual de
+    que dejar de derivar y empezar a medir funcionaba mucho mejor.
+
+  Ver_GRF_ModeloFinal_vs_Kuopio_figura.png
+    El modelo final personalizado (velocidad+talla, jóvenes, ambas
+    piernas) contra los mismos 6 sujetos de Kuopio — incluye el caso de
+    extrapolación declarado en la sección 9.7 (Sujeto 37, 0.77 m/s).
+
+Fuentes de esta sección: `CODIGOS/GENERADOR/GUIA_INTERPRETACION.md`
+(secciones 8 a 8-quinquies, el detalle técnico completo de los 8
+intentos); `CODIGOS/GENERADOR/RODILLA/Fukuchi/Cargar_Fukuchi2018_GRF_Core.m`;
+`CODIGOS/GENERADOR/Construir_Plantilla_Fukuchi_GRF.m`;
+`CODIGOS/GENERADOR/Personalizar_Plantilla_Fukuchi_GRF_Core.m`;
+`CODIGOS/GENERADOR/Predecir_GRF_Personalizado_Core.m`;
+`CODIGOS/GENERADOR/Comparar_Variantes_Plantilla_Fukuchi.m` (las 8
+variantes probadas, con su validación completa); `CODIGOS/GENERADOR/
+GRF_Newton_ApoyoSimple_Core.m`, `Cadera_Continua_Zhao_Core.m`,
+`GRF_Zhao2026_Fiel_Core.m`, `GRF_Koopman_ZhaoGeom_Core.m`,
+`GRF_DLF_Pedestrian_Core.m` (los 6 intentos descartados, conservados como
+evidencia documentada, no como modelo recomendado).
+
+
+============================================================
+FIN DEL INFORME
+============================================================

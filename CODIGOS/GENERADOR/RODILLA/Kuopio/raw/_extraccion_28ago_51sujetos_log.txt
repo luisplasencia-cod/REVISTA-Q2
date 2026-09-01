@@ -1,0 +1,159 @@
+Guardado C:\articuloq2\CODIGOS\GENERADOR\RODILLA\Kuopio\raw\subjects_meta.csv
+--- Abriendo https://zenodo.org/records/10559504/files/measurement_data_1_to_17.zip?download=1 para sujetos [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] ---
+  OK 01/mocap/l_comf_01.c3d -> 268 frames validos @ 100.0Hz
+  OK 01/mocap/l_comf_02.c3d -> 312 frames validos @ 100.0Hz
+  OK 01/mocap/l_comf_03.c3d -> 329 frames validos @ 100.0Hz
+  FALLO 02/mocap/l_comf_02.c3d: 02/mocap/l_comf_02.c3d: muy pocos frames validos (1)
+  FALLO 02/mocap/l_comf_03.c3d: 02/mocap/l_comf_03.c3d: muy pocos frames validos (0)
+  OK 02/mocap/l_comf_04.c3d -> 306 frames validos @ 100.0Hz
+  OK 03/mocap/l_comf_01.c3d -> 553 frames validos @ 100.0Hz
+  OK 03/mocap/l_comf_02.c3d -> 500 frames validos @ 100.0Hz
+  OK 03/mocap/l_comf_03.c3d -> 490 frames validos @ 100.0Hz
+  OK 04/mocap/l_comf_01.c3d -> 331 frames validos @ 100.0Hz
+  OK 04/mocap/l_comf_02.c3d -> 342 frames validos @ 100.0Hz
+  OK 04/mocap/l_comf_03.c3d -> 444 frames validos @ 100.0Hz
+  OK 05/mocap/l_comf_01.c3d -> 414 frames validos @ 100.0Hz
+  OK 05/mocap/l_comf_03.c3d -> 385 frames validos @ 100.0Hz
+  OK 05/mocap/l_comf_04.c3d -> 396 frames validos @ 100.0Hz
+  OK 06/mocap/l_comf_01.c3d -> 408 frames validos @ 100.0Hz
+  OK 06/mocap/l_comf_03.c3d -> 411 frames validos @ 100.0Hz
+  OK 06/mocap/l_comf_04.c3d -> 354 frames validos @ 100.0Hz
+  FALLO 07/mocap/l_comf_02.c3d: 07/mocap/l_comf_02.c3d: falta el punto RTibia_RFoot_score
+  FALLO 07/mocap/l_comf_03.c3d: 07/mocap/l_comf_03.c3d: falta el punto RTibia_RFoot_score
+  FALLO 07/mocap/l_comf_04.c3d: 07/mocap/l_comf_04.c3d: falta el punto RTibia_RFoot_score
+  OK 08/mocap/l_comf_01.c3d -> 488 frames validos @ 100.0Hz
+  OK 08/mocap/l_comf_02.c3d -> 413 frames validos @ 100.0Hz
+  OK 08/mocap/l_comf_03.c3d -> 439 frames validos @ 100.0Hz
+  FALLO 09/mocap/l_comf_01.c3d: 09/mocap/l_comf_01.c3d: falta el punto RTibia_RFoot_score
+  FALLO 09/mocap/l_comf_02.c3d: 09/mocap/l_comf_02.c3d: falta el punto RTibia_RFoot_score
+  FALLO 09/mocap/l_comf_03.c3d: 09/mocap/l_comf_03.c3d: falta el punto RTibia_RFoot_score
+  FALLO 10/mocap/l_comf_01.c3d: 10/mocap/l_comf_01.c3d: falta el punto RTibia_RFoot_score
+  FALLO 10/mocap/l_comf_02.c3d: 10/mocap/l_comf_02.c3d: falta el punto RTibia_RFoot_score
+  FALLO 10/mocap/l_comf_03.c3d: 10/mocap/l_comf_03.c3d: falta el punto RTibia_RFoot_score
+  OK 11/mocap/l_comf_01.c3d -> 358 frames validos @ 100.0Hz
+  OK 11/mocap/l_comf_02.c3d -> 303 frames validos @ 100.0Hz
+  OK 11/mocap/l_comf_03.c3d -> 358 frames validos @ 100.0Hz
+  OK 12/mocap/l_comf_01.c3d -> 467 frames validos @ 100.0Hz
+  OK 12/mocap/l_comf_02.c3d -> 413 frames validos @ 100.0Hz
+  OK 12/mocap/l_comf_03.c3d -> 432 frames validos @ 100.0Hz
+  OK 13/mocap/l_comf_01.c3d -> 311 frames validos @ 100.0Hz
+  OK 13/mocap/l_comf_02.c3d -> 318 frames validos @ 100.0Hz
+  OK 13/mocap/l_comf_03.c3d -> 328 frames validos @ 100.0Hz
+  OK 14/mocap/l_comf_01.c3d -> 232 frames validos @ 100.0Hz
+  OK 14/mocap/l_comf_02.c3d -> 228 frames validos @ 100.0Hz
+  OK 14/mocap/l_comf_03.c3d -> 227 frames validos @ 100.0Hz
+  OK 15/mocap/l_comf_01.c3d -> 299 frames validos @ 100.0Hz
+  OK 15/mocap/l_comf_02.c3d -> 292 frames validos @ 100.0Hz
+  OK 15/mocap/l_comf_03.c3d -> 291 frames validos @ 100.0Hz
+  OK 16/mocap/l_comf_01.c3d -> 239 frames validos @ 100.0Hz
+  OK 16/mocap/l_comf_02.c3d -> 239 frames validos @ 100.0Hz
+  OK 16/mocap/l_comf_03.c3d -> 241 frames validos @ 100.0Hz
+  OK 17/mocap/l_comf_01.c3d -> 223 frames validos @ 100.0Hz
+  OK 17/mocap/l_comf_02.c3d -> 231 frames validos @ 100.0Hz
+  OK 17/mocap/l_comf_03.c3d -> 229 frames validos @ 100.0Hz
+--- Abriendo https://zenodo.org/records/10559504/files/measurement_data_18_to_34.zip?download=1 para sujetos [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34] ---
+  OK 18/mocap/l_comf_01.c3d -> 291 frames validos @ 100.0Hz
+  OK 18/mocap/l_comf_03.c3d -> 293 frames validos @ 100.0Hz
+  OK 18/mocap/l_comf_04.c3d -> 272 frames validos @ 100.0Hz
+  OK 19/mocap/l_comf_01.c3d -> 431 frames validos @ 100.0Hz
+  OK 19/mocap/l_comf_02.c3d -> 429 frames validos @ 100.0Hz
+  OK 19/mocap/l_comf_03.c3d -> 414 frames validos @ 100.0Hz
+  OK 20/mocap/l_comf_01.c3d -> 263 frames validos @ 100.0Hz
+  OK 20/mocap/l_comf_02.c3d -> 264 frames validos @ 100.0Hz
+  OK 20/mocap/l_comf_03.c3d -> 276 frames validos @ 100.0Hz
+  OK 21/mocap/l_comf_01.c3d -> 326 frames validos @ 100.0Hz
+  OK 21/mocap/l_comf_02.c3d -> 325 frames validos @ 100.0Hz
+  OK 21/mocap/l_comf_03.c3d -> 335 frames validos @ 100.0Hz
+  OK 22/mocap/l_comf_01.c3d -> 309 frames validos @ 100.0Hz
+  OK 22/mocap/l_comf_02.c3d -> 344 frames validos @ 100.0Hz
+  OK 22/mocap/l_comf_03.c3d -> 344 frames validos @ 100.0Hz
+  OK 23/mocap/l_comf_01.c3d -> 336 frames validos @ 100.0Hz
+  OK 23/mocap/l_comf_02.c3d -> 342 frames validos @ 100.0Hz
+  OK 23/mocap/l_comf_03.c3d -> 348 frames validos @ 100.0Hz
+  FALLO 24/mocap/l_comf_01.c3d: 24/mocap/l_comf_01.c3d: falta el punto RTibia_RFoot_score
+  FALLO 24/mocap/l_comf_02.c3d: 24/mocap/l_comf_02.c3d: falta el punto RTibia_RFoot_score
+  FALLO 24/mocap/l_comf_03.c3d: 24/mocap/l_comf_03.c3d: falta el punto RTibia_RFoot_score
+  OK 25/mocap/l_comf_01.c3d -> 435 frames validos @ 100.0Hz
+  OK 25/mocap/l_comf_02.c3d -> 370 frames validos @ 100.0Hz
+  OK 25/mocap/l_comf_03.c3d -> 370 frames validos @ 100.0Hz
+  OK 26/mocap/l_comf_01.c3d -> 397 frames validos @ 100.0Hz
+  OK 26/mocap/l_comf_02.c3d -> 399 frames validos @ 100.0Hz
+  OK 26/mocap/l_comf_03.c3d -> 453 frames validos @ 100.0Hz
+  OK 27/mocap/l_comf_01.c3d -> 271 frames validos @ 100.0Hz
+  OK 27/mocap/l_comf_02.c3d -> 382 frames validos @ 100.0Hz
+  OK 27/mocap/l_comf_03.c3d -> 388 frames validos @ 100.0Hz
+  OK 28/mocap/l_comf_01.c3d -> 393 frames validos @ 100.0Hz
+  OK 28/mocap/l_comf_02.c3d -> 405 frames validos @ 100.0Hz
+  OK 28/mocap/l_comf_03.c3d -> 478 frames validos @ 100.0Hz
+  OK 29/mocap/l_comf_01.c3d -> 451 frames validos @ 100.0Hz
+  OK 29/mocap/l_comf_02.c3d -> 432 frames validos @ 100.0Hz
+  OK 29/mocap/l_comf_03.c3d -> 404 frames validos @ 100.0Hz
+  OK 30/mocap/l_comf_02.c3d -> 400 frames validos @ 100.0Hz
+  OK 30/mocap/l_comf_03.c3d -> 380 frames validos @ 100.0Hz
+  OK 30/mocap/l_comf_04.c3d -> 382 frames validos @ 100.0Hz
+  OK 31/mocap/l_comf_01.c3d -> 378 frames validos @ 100.0Hz
+  OK 31/mocap/l_comf_02.c3d -> 381 frames validos @ 100.0Hz
+  OK 31/mocap/l_comf_03.c3d -> 343 frames validos @ 100.0Hz
+  OK 32/mocap/l_comf_01.c3d -> 347 frames validos @ 100.0Hz
+  OK 32/mocap/l_comf_02.c3d -> 464 frames validos @ 100.0Hz
+  OK 32/mocap/l_comf_03.c3d -> 358 frames validos @ 100.0Hz
+  OK 33/mocap/l_comf_01.c3d -> 408 frames validos @ 100.0Hz
+  OK 33/mocap/l_comf_02.c3d -> 308 frames validos @ 100.0Hz
+  OK 33/mocap/l_comf_03.c3d -> 314 frames validos @ 100.0Hz
+  OK 34/mocap/l_comf_01.c3d -> 389 frames validos @ 100.0Hz
+  OK 34/mocap/l_comf_02.c3d -> 421 frames validos @ 100.0Hz
+  OK 34/mocap/l_comf_03.c3d -> 414 frames validos @ 100.0Hz
+--- Abriendo https://zenodo.org/records/10559504/files/measurement_data_35_to_51.zip?download=1 para sujetos [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51] ---
+  OK 35/mocap/l_comf_01.c3d -> 373 frames validos @ 100.0Hz
+  OK 35/mocap/l_comf_02.c3d -> 434 frames validos @ 100.0Hz
+  OK 35/mocap/l_comf_03.c3d -> 492 frames validos @ 100.0Hz
+  OK 36/mocap/l_comf_01.c3d -> 394 frames validos @ 100.0Hz
+  OK 36/mocap/l_comf_02.c3d -> 413 frames validos @ 100.0Hz
+  OK 36/mocap/l_comf_03.c3d -> 402 frames validos @ 100.0Hz
+  OK 37/mocap/l_comf_01.c3d -> 393 frames validos @ 100.0Hz
+  OK 37/mocap/l_comf_02.c3d -> 446 frames validos @ 100.0Hz
+  OK 37/mocap/l_comf_03.c3d -> 429 frames validos @ 100.0Hz
+  OK 38/mocap/l_comf_01.c3d -> 332 frames validos @ 100.0Hz
+  OK 38/mocap/l_comf_02.c3d -> 347 frames validos @ 100.0Hz
+  OK 38/mocap/l_comf_03.c3d -> 329 frames validos @ 100.0Hz
+  OK 39/mocap/l_comf_02.c3d -> 375 frames validos @ 100.0Hz
+  OK 39/mocap/l_comf_03.c3d -> 382 frames validos @ 100.0Hz
+  OK 39/mocap/l_comf_04.c3d -> 445 frames validos @ 100.0Hz
+  OK 40/mocap/l_comf_01.c3d -> 430 frames validos @ 100.0Hz
+  OK 40/mocap/l_comf_02.c3d -> 484 frames validos @ 100.0Hz
+  OK 40/mocap/l_comf_03.c3d -> 494 frames validos @ 100.0Hz
+  OK 41/mocap/l_comf_01.c3d -> 770 frames validos @ 100.0Hz
+  OK 41/mocap/l_comf_02.c3d -> 633 frames validos @ 100.0Hz
+  OK 41/mocap/l_comf_03.c3d -> 654 frames validos @ 100.0Hz
+  OK 42/mocap/l_comf_01.c3d -> 541 frames validos @ 100.0Hz
+  OK 42/mocap/l_comf_02.c3d -> 468 frames validos @ 100.0Hz
+  OK 42/mocap/l_comf_03.c3d -> 514 frames validos @ 100.0Hz
+  OK 43/mocap/l_comf_01.c3d -> 392 frames validos @ 100.0Hz
+  OK 43/mocap/l_comf_02.c3d -> 343 frames validos @ 100.0Hz
+  OK 43/mocap/l_comf_03.c3d -> 358 frames validos @ 100.0Hz
+  OK 44/mocap/l_comf_01.c3d -> 368 frames validos @ 100.0Hz
+  OK 44/mocap/l_comf_02.c3d -> 364 frames validos @ 100.0Hz
+  OK 44/mocap/l_comf_03.c3d -> 396 frames validos @ 100.0Hz
+  OK 45/mocap/l_comf_01.c3d -> 359 frames validos @ 100.0Hz
+  OK 45/mocap/l_comf_02.c3d -> 383 frames validos @ 100.0Hz
+  OK 45/mocap/l_comf_03.c3d -> 378 frames validos @ 100.0Hz
+  OK 46/mocap/l_comf_01.c3d -> 483 frames validos @ 100.0Hz
+  OK 46/mocap/l_comf_02.c3d -> 436 frames validos @ 100.0Hz
+  OK 46/mocap/l_comf_03.c3d -> 471 frames validos @ 100.0Hz
+  OK 47/mocap/l_comf_01.c3d -> 477 frames validos @ 100.0Hz
+  OK 47/mocap/l_comf_02.c3d -> 421 frames validos @ 100.0Hz
+  OK 47/mocap/l_comf_03.c3d -> 415 frames validos @ 100.0Hz
+  OK 48/mocap/l_comf_01.c3d -> 389 frames validos @ 100.0Hz
+  OK 48/mocap/l_comf_02.c3d -> 426 frames validos @ 100.0Hz
+  OK 48/mocap/l_comf_03.c3d -> 383 frames validos @ 100.0Hz
+  OK 49/mocap/l_comf_01.c3d -> 503 frames validos @ 100.0Hz
+  OK 49/mocap/l_comf_02.c3d -> 434 frames validos @ 100.0Hz
+  OK 49/mocap/l_comf_03.c3d -> 513 frames validos @ 100.0Hz
+  OK 50/mocap/l_comf_01.c3d -> 355 frames validos @ 100.0Hz
+  OK 50/mocap/l_comf_02.c3d -> 364 frames validos @ 100.0Hz
+  OK 50/mocap/l_comf_03.c3d -> 350 frames validos @ 100.0Hz
+  OK 51/mocap/l_comf_01.c3d -> 363 frames validos @ 100.0Hz
+  OK 51/mocap/l_comf_02.c3d -> 371 frames validos @ 100.0Hz
+  OK 51/mocap/l_comf_03.c3d -> 378 frames validos @ 100.0Hz
+
+=== Listo: 139 trials extraidos en C:\articuloq2\CODIGOS\GENERADOR\RODILLA\Kuopio\raw ===

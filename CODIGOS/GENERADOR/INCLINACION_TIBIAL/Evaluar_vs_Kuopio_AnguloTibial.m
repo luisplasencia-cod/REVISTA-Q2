@@ -1,9 +1,17 @@
 function [T, D] = Evaluar_vs_Kuopio_AnguloTibial(hacer_figura)
 % EVALUAR_VS_KUOPIO_ANGULOTIBIAL  25-ago-2026: valida el ANGULO de
 %                   inclinacion tibial (theta_tibia, 0=vertical) contra
-%                   Kuopio 2024 (overground real, N=15), con velocidad
-%                   REAL medida como entrada a Koopman2014_Core (misma
-%                   metodologia ya establecida en RODILLA/TOBILLO).
+%                   Kuopio 2024 (overground real, N=15).
+%
+%   REAJUSTADO 31-ago-2026 (tarde): SOLO TALLA como entrada -- velocidad
+%   estimada por Froude (Temporizacion_Core.m), no la velocidad REAL
+%   medida de cada sujeto -- igual pipeline que RODILLA/TOBILLO
+%   (Refit_CorreccionFinal_TallaSola.m) y que la app
+%   (App_Animacion_Cadera_Rodilla_Tobillo.m). La calibracion afin de este
+%   script se recalcula EN CADA CORRIDA por LOSO (lineas ~109-111 mas
+%   abajo), asi que no hace falta un reajuste aparte como en posicion:
+%   al cambiar el crudo (ahora con velocidad Froude), el propio bucle
+%   LOSO ya recalcula coeficientes consistentes con ese crudo nuevo.
 %
 %   MODELO FINAL: Koopman (angulo crudo) + CALIBRACION AFIN, LOSO.
 %   Motivo: la forma ya es casi perfecta (r=0.992) pero con un sesgo
@@ -72,9 +80,9 @@ for i = 1:n
         S = Cargar_Kuopio2024_Core(sid);
         theta_real_deg = rad2deg(atan2(-S.dx_tibia_cm, S.dy_tibia_cm));
 
-        antro_in = struct('talla_m', S.talla_cm/100, 'masa_kg', S.masa_kg, 'sexo', S.sexo(1));
-        antro = Estimar_Antropometria_Core(antro_in);
-        K = Koopman2014_Core(S.speed_ms*3.6, antro.talla_m);
+        antro = Estimar_Antropometria_Core(struct('talla_m', S.talla_cm/100));
+        tempo = Temporizacion_Core(antro, 'Koopman');
+        K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m);
         t_K = K.theta_tibia_via_rodilla_deg;
         pct_K = linspace(0,100,numel(t_K));
         theta_pred_deg = interp1(pct_K, t_K, pct, 'pchip');

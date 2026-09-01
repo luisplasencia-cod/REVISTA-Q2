@@ -228,7 +228,7 @@ T1.eventos = struct('nombre', ...
     'x_fijo_uno',     {true,  false, false, false, false, false}, ...
     'velocidad_cero', {false, true,  false, false, true,  false}, ...
     'aceleracion_cero',{false,false, true,  true,  false, true});
-T1.coef_x = [ 0        0      0      0;
+T1.coef_x = [ 1        0      0      0;    % CONFIRMADO 29-ago-2026 contra el PDF: beta0=1 (no 0) para HeelContact - x_fijo_uno=true ya lo forzaba a 1 en el calculo, esto es solo fidelidad de transcripcion
              33.360    0      0     -7.319;
              30.158   -2.038  0     11.832;
              52.727   -1.613  0      9.393;
@@ -260,7 +260,7 @@ T2.eventos = struct('nombre', ...
     'x_fijo_uno',     {true,  false, false, false, false, false}, ...
     'velocidad_cero', {false, true,  false, true,  false, true}, ...
     'aceleracion_cero',{false,false, false, false, true,  false});
-T2.coef_x = [ 0        0      0      0;
+T2.coef_x = [ 1        0      0      0;    % CONFIRMADO 29-ago-2026, mismo caso que T1/T3/T4 (ver ahi)
             -10.809    0      0     11.762;
              24.512   -2.021  0.195  5.109;
              48.879   -3.854  0.355  9.891;
@@ -292,7 +292,7 @@ T3.eventos = struct('nombre', ...
     'x_fijo_uno',     {true,  false, false, false, false, false}, ...
     'velocidad_cero', {false, true,  true,  false, true,  false}, ...
     'aceleracion_cero',{false,false, false, true,  false, true});
-T3.coef_x = [ 0        0      0      0;
+T3.coef_x = [ 1        0      0      0;    % CONFIRMADO 29-ago-2026, mismo caso que T1/T2/T4 (ver ahi)
              17.103    0      0      0;
              48.542   -0.998  0      0;
              68.947   -6.096  0.611  5.967;
@@ -309,10 +309,10 @@ T3.coef_v = [-3.581    0      0      1.977;
               0        0      0      0;
               3.276    0      0      0;
               0        0      0      0;
-             -0.446   -0.032  0     -1.696]; % beta2(v^2) ambiguo en la
-             % fuente (celda vacia en dos extracciones independientes,
-             % ver GUIA_INTERPRETACION.md #2) - tratado como 0/sin
-             % contribucion, no verificado a texto completo con mas detalle
+             -0.446    0     -0.032 -1.696]; % CONFIRMADO 29-ago-2026 contra el PDF
+             % (koomap.pdf, Tabla 3, fila MinDyDxSwing, bloque dy): el valor
+             % -0.032 es beta2(v^2), no beta1(v) - beta1(v) es 0. Antes estaba
+             % en la columna equivocada (ver GUIA_INTERPRETACION.md #2).
 T3.coef_a = [ 0.301    0.073  0      0;
              -0.094    0     -0.005  0;
               0.042    0      0.004  0;
@@ -327,11 +327,10 @@ T4.eventos = struct('nombre', ...
     'x_fijo_uno',     {true,  false, false, false, false, false}, ...
     'velocidad_cero', {false, true,  false, true,  true,  true}, ...
     'aceleracion_cero',{false,false, true,  false, false, false});
-% Fila 2 (MinStance): beta3(l) ambiguo/vacio en la fuente - celda en
-% blanco en dos extracciones independientes del PDF (texto estandar y
-% pdfplumber), ver GUIA_INTERPRETACION.md #2 - tratado como 0/sin
-% contribucion, no verificado con mas detalle.
-T4.coef_x = [ 0        0      0      0;
+% Fila 2 (MinStance), beta3(l): CONFIRMADO 29-ago-2026 contra el PDF - la
+% celda esta en blanco en la fuente (no es un dato perdido en la
+% extraccion), 0 es el valor correcto.
+T4.coef_x = [ 1        0      0      0;    % CONFIRMADO 29-ago-2026, mismo caso que T1/T2/T3 (ver ahi)
               8.145    0.331  0      0;
              12.005    0      0     13.754;
              67.686   -5.469  0.493  0;

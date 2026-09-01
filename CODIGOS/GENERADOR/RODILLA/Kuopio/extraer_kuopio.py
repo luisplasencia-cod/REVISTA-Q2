@@ -33,6 +33,18 @@ Frames invalidos (oclusion) se identifican con el residual del c3d
 
 Requiere: pip install remotezip c3d numpy openpyxl (ya instalados en esta
 sesion, 25-ago-2026).
+
+--- 28-ago-2026: agregadas las 5 plataformas de fuerza reales ---
+Confirmado por sondeo directo de un trial real (01/r_comf_01): el c3d trae
+36 canales analogicos a 1000Hz (10 muestras por cada frame de puntos a
+100Hz) - 30 son Force.Fx/Fy/Fz + Moment.Mx/My/Mz x 5 plataformas, el resto
+son sincronismo/EEG (no se extraen). Fz maximo observado en ese trial:
+~820-875N en 3 de las 5 plataformas (plausible, orden de magnitud de peso
+corporal) - confirma que son las plataformas donde el sujeto piso, no ruido.
+Sigue la misma division de trabajo: aqui solo se promedian las 10 muestras
+analogicas de cada frame de punto (downsampling numerico simple, sin
+decidir que plataforma esta activa ni calcular centro de presion - esa
+logica de deteccion de apoyo queda para MATLAB, igual que el resto).
 """
 import os
 import csv
@@ -50,6 +62,9 @@ URLS_ZIP = {
     range(35, 52): 'https://zenodo.org/records/10559504/files/measurement_data_35_to_51.zip?download=1',
 }
 PUNTOS = {'cadera': 'Pelvis_RFemur_score', 'rodilla': 'RKnee', 'tobillo': 'RTibia_RFoot_score'}
+N_PLATAFORMAS = 5
+CANALES_FUERZA = [f'{grupo}.{prefijo}{eje}{k}' for k in range(1, N_PLATAFORMAS + 1)
+                   for grupo, prefijo in (('Force', 'F'), ('Moment', 'M')) for eje in 'xyz']
 
 
 def url_zip_de(sub_id):
@@ -116,6 +131,12 @@ def extraer_trial(zf, ruta_c3d, out_csv):
             raise ValueError(f'{ruta_c3d}: falta el punto {nombre_punto}')
     fr = r.point_rate
 
+    labels_analog = [l.strip() for l in r.analog_labels]
+    idx_a = {lbl: i for i, lbl in enumerate(labels_analog)}
+    tiene_fuerza = all(c in idx_a for c in CANALES_FUERZA)
+    if tiene_fuerza:
+        idx_fuerza = [idx_a[c] for c in CANALES_FUERZA]
+
     filas = []
     for fno, points, analog in r.read_frames():
         ok = all(points[idx[p], 3] >= 0 for p in PUNTOS.values())
@@ -124,14 +145,24 @@ def extraer_trial(zf, ruta_c3d, out_csv):
         cad = points[idx[PUNTOS['cadera']], :3]
         rod = points[idx[PUNTOS['rodilla']], :3]
         tob = points[idx[PUNTOS['tobillo']], :3]
-        filas.append([fno, fno / fr, cad[1], cad[2], rod[1], rod[2], tob[1], tob[2]])
+        fila = [fno, fno / fr, cad[1], cad[2], rod[1], rod[2], tob[1], tob[2]]
+        if tiene_fuerza:
+            # promedio de las 10 muestras analogicas (1000Hz) dentro de este frame de puntos (100Hz)
+            fila += list(np.mean(analog[idx_fuerza, :], axis=1))
+        filas.append(fila)
 
     if len(filas) < 50:
         raise ValueError(f'{ruta_c3d}: muy pocos frames validos ({len(filas)})')
 
+    header = ['frame', 't_s', 'cadera_y_mm', 'cadera_z_mm', 'rodilla_y_mm', 'rodilla_z_mm', 'tobillo_y_mm', 'tobillo_z_mm']
+    if tiene_fuerza:
+        header += [c.replace('.', '_') + '_N_Nm' for c in CANALES_FUERZA]
+    else:
+        print(f'  AVISO {ruta_c3d}: sin canales de fuerza completos, CSV sin columnas de plataforma')
+
     with open(out_csv, 'w', newline='') as f:
         w = csv.writer(f)
-        w.writerow(['frame', 't_s', 'cadera_y_mm', 'cadera_z_mm', 'rodilla_y_mm', 'rodilla_z_mm', 'tobillo_y_mm', 'tobillo_z_mm'])
+        w.writerow(header)
         w.writerows(filas)
     return len(filas), fr
 
@@ -168,5 +199,9 @@ def main(ids):
 
 
 if __name__ == '__main__':
-    IDS = [1, 4, 7, 10, 13, 19, 22, 25, 28, 31, 37, 40, 43, 46, 49]
+    # AMPLIADO 28-ago-2026 (pedido del usuario: "vale la validacion con mas
+    # sujetos de Kuopio si tiene datos de fuerza") - de 15 a los 51 sujetos
+    # totales del dataset, para dar mas potencia estadistica a Evaluar_GRF_
+    # vs_Kuopio.m (hoy solo 34 pasos reales validos de 13 sujetos utiles).
+    IDS = list(range(1, 52))
     main(IDS)

@@ -88,6 +88,18 @@ if ~any(strcmpi(candidato, {'Koopman','Yun','Zhao','Combinado'}))
     error('candidato debe ser ''Koopman'', ''Yun'', ''Zhao'' o ''Combinado''. Se recibio: %s', mat2str(candidato));
 end
 if nargin < 3, opciones = struct(); end
+% CALIBRACION AFIN KOOPMAN (28-ago-2026, default ON): Koopman2014_Core.m
+% sobreestima la excursion angular ~19-24% (validado contra Kuopio 2024,
+% LOSO, ver Calibracion_Koopman_Kuopio_Core.m) - se corrige por defecto
+% para que la trayectoria EXPORTADA sea la mejor estimacion disponible, no
+% la version cruda sin corregir. Se puede apagar explicitamente
+% (opciones.calibrar_koopman=false) para reproducir el comportamiento
+% previo a esta fecha (p.ej. comparar contra resultados ya publicados en
+% docs/algoritmo/pipeline_koopman_kuopio/, que usan la version cruda).
+if ~isfield(opciones,'calibrar_koopman') || isempty(opciones.calibrar_koopman)
+    opciones.calibrar_koopman = true;
+end
+opts_cal = struct('calibrar_koopman', opciones.calibrar_koopman);
 
 % --- E3: completar antropometria ---
 antro = Estimar_Antropometria_Core(antropometria);
@@ -136,7 +148,7 @@ if strcmpi(candidato, 'Combinado')
 else
     % --- theta_tibia por fase (E2, regla ya establecida por candidato -
     % SIN CAMBIOS, ver Obtener_Theta_Tibia_Candidato.m) ---
-    [theta_apoyo, theta_balanceo, tempo] = Obtener_Theta_Tibia_Candidato(candidato, antro, tempo, n);
+    [theta_apoyo, theta_balanceo, tempo] = Obtener_Theta_Tibia_Candidato(candidato, antro, tempo, n, opts_cal);
     pct_ciclo_completo = linspace(0, 100, numel(theta_apoyo));
     pct_corte = tempo.frac_apoyo * 100;
     pct_ap  = linspace(0, pct_corte, n);
@@ -150,7 +162,7 @@ else
     % via_rodilla para Yun, que E2 marca como no confiable para ese
     % candidato) - solo se usa su theta_muslo, que no depende de esa
     % eleccion de "via".
-    [th_muslo_full, ~, ~] = Obtener_Angulos_Candidato(candidato, antro, tempo, n);
+    [th_muslo_full, ~, ~] = Obtener_Angulos_Candidato(candidato, antro, tempo, n, opts_cal);
     theta_muslo_ap_rad  = th_muslo_full.apoyo;
     theta_muslo_bal_rad = th_muslo_full.balanceo;
 
@@ -181,13 +193,29 @@ else
     % del 24-ago) porque sin ninguna traslacion la rotacion sola podia
     % hacer retroceder el X localmente - ver Test 15 y verificacion mas
     % abajo de que la monotonia se mantiene con este valor mas chico.
-    FRAC_AVANCE_APOYO = 0.079;
-    zancada_total_cm = tempo.velocidad_ms * 100 * tempo.tiempo_ciclo_s;
-    trasl_apoyo_total_cm = FRAC_AVANCE_APOYO * zancada_total_cm;
+    % REEMPLAZADO 28-ago-2026 (mismo dia, sesion de GRF): el FRAC_AVANCE_
+    % APOYO=0.079 de una sola recta era una aproximacion de UN NUMERO al
+    % avance real del tobillo. Ya existe algo mejor: el residuo de rockers
+    % completo (X Y, 101 puntos, promedio N=13 Kuopio) construido para
+    % GRF_Newton_ApoyoSimple_Core.m el mismo dia (ver Residuo_Rockers_
+    % Tobillo_Kuopio_Core.m) - reproduce tambien el rocker de ANTEPIE al
+    % final del apoyo (el tobillo SUBE unos cm antes del despegue, no solo
+    % avanza) que la recta no capturaba, y aporta el mismo eje Y que antes
+    % no tenia NINGUNA correccion en apoyo (pos_ap.y_cm era pura rotacion
+    % sobre tobillo fijo). Se usa la MISMA funcion que GRF_Newton_
+    % ApoyoSimple_Core.m para que los dos pipelines queden consistentes
+    % (chequeo de consistencia de Ver_GRF_y_Trayectoria.m, discrepancia
+    % antes de este cambio: 6.41cm, reintroducida al agregar el residuo
+    % solo del lado de GRF).
+    rockers = Residuo_Rockers_Tobillo_Kuopio_Core();
+    pct_ap_gt = linspace(0, tempo.frac_apoyo*100, n);
+    resid_x_ap = interp1(rockers.pct_ciclo, rockers.x_cm, pct_ap_gt, 'pchip');
+    resid_y_ap = interp1(rockers.pct_ciclo, rockers.y_cm, pct_ap_gt, 'pchip');
 
     cc_opts = struct('punto_seguimiento_m', punto_seguimiento_m);
     pos_ap  = Cadena_Cinematica_Core(theta_ap_rad, L_tibia_m, cc_opts);
-    pos_ap.x_cm = pos_ap.x_cm + trasl_apoyo_total_cm * (t_ap / tempo.tiempo_apoyo_s);
+    pos_ap.x_cm = pos_ap.x_cm + resid_x_ap;
+    pos_ap.y_cm = pos_ap.y_cm + resid_y_ap;
 
     % --- E5, BALANCEO: CORREGIDO 26-ago-2026 (hallazgo del usuario: la
     % rodilla "retrocedia" en X en tramos del ciclo generado por defecto,
@@ -221,8 +249,8 @@ else
     % vertical real de cadera NO se modela aqui, se declara, no se inventa).
     L_muslo_m = antro.long_muslo_m;
     rod_ap_rot = Cadena_Cinematica_Core(theta_ap_rad, L_tibia_m, struct('punto_seguimiento_m', L_tibia_m));
-    rod_ap_x = rod_ap_rot.x_cm + trasl_apoyo_total_cm * (t_ap / tempo.tiempo_apoyo_s);   % misma traslacion reducida que arriba (E6)
-    rod_ap_y = rod_ap_rot.y_cm;
+    rod_ap_x = rod_ap_rot.x_cm + resid_x_ap;   % mismo residuo de rockers que arriba (E6)
+    rod_ap_y = rod_ap_rot.y_cm + resid_y_ap;
     cad_ap_x_end = rod_ap_x(end) - L_muslo_m*100*sin(theta_muslo_ap_rad(end));
     cad_ap_y_end = rod_ap_y(end) + L_muslo_m*100*cos(theta_muslo_ap_rad(end));
 
@@ -261,6 +289,6 @@ out.balanceo.y_cm       = (pos_bal.y_cm - pos_bal.y_cm(1)) + out.apoyo.y_cm(end)
 out.balanceo.angulo_deg = rad2deg(theta_bal_rad);
 
 out.metadatos = struct('candidato', candidato, 'antropometria', antro, 'temporizacion', tempo, ...
-    'punto_seguimiento_m', punto_seguimiento_m);
+    'punto_seguimiento_m', punto_seguimiento_m, 'calibrar_koopman', opciones.calibrar_koopman);
 
 end
