@@ -27,6 +27,12 @@ docs/literatura/pdfs/Gait_Kinematics_Prediction_V1.01_Release.zip
 docs/literatura/pdfs/ScienceDirect_files_*.zip
 docs/literatura/pdfs/yun2014_supp/
 
+# Dataset crudo Fukuchi 2018 (WBDSascii) — 559MB, excede el limite de 100MB
+# de GitHub (bloqueo real de push, 03-sep-2026, historial reescrito para
+# sacarlo). Se mantiene en disco local para las funciones Cargar_Fukuchi*,
+# nunca en el repo.
+CODIGOS/GENERADOR/RODILLA/Fukuchi/raw/WBDSascii.zip
+
 # Artefactos de salida de correr Gait_Pred.m (demo de Yun 2014) — figuras
 # y .mat de una corrida de ejemplo, regenerables, no son codigo fuente.
 docs/literatura/pdfs/yun2014_toolbox/*.png
