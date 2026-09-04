@@ -82,7 +82,12 @@ for i = 1:n
 
         antro = Estimar_Antropometria_Core(struct('talla_m', S.talla_cm/100));
         tempo = Temporizacion_Core(antro, 'Koopman');
-        K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m);
+        % congelar_vl_angulo=true (02-sep-2026): mismo crudo que produccion
+        % (Obtener_Theta_Tibia_Candidato.m/la app) - esta es la cifra que
+        % llena la fila de angulo tibial del informe tecnico, debe medir el
+        % pipeline real, no el Koopman nativo. Ver GUIA_INTERPRETACION.md #10.
+        K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, ...
+            struct('nMuestras', 101, 'congelar_vl_angulo', true, 'v_ref_kph', 5.0, 'l_ref_m', 1.735));
         t_K = K.theta_tibia_via_rodilla_deg;
         pct_K = linspace(0,100,numel(t_K));
         theta_pred_deg = interp1(pct_K, t_K, pct, 'pchip');

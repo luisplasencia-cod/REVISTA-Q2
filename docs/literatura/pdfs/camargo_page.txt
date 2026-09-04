@@ -1,0 +1,185 @@
+and gastrocnemius medialis. Prior to placement, EMG locations
+were shaved and cleaned with alcohol. IMU data were collected
+from the anterior surface of the torso, thigh, shank, and foot seg-
+ments at a sampling frequency of 200 Hz and digitally processed
+with a lowpass ﬁlter (cutoff frequency 100 Hz, Butterworth order
+6). For the thigh, shank, and foot, the IMU was placed ¾ of the
+way down (distally) each segment of the right lower limb. The
+torso IMU was placed centrally between the sternum and navel.
+GON data were collected from the right-side hip, knee, and ankle
+joints at 1000 Hz and digitally conditioned with a lowpass ﬁlter
+(cutoff frequency 20 Hz, Butterworth order 4). Both sagittal and
+frontal angle data were recorded for the hip and ankle, while only
+sagittal angle data were collected for the knee.
+Motion capture data collected at 200 Hz from both lower limbs
+were manually audited to verify labeling, and gaps were ﬁlled
+using an automated iterative gap-ﬁlling method (Camargo et al.,
+2020) before being processed with a lowpass ﬁlter (cutoff fre-
+quency 6 Hz, zero-lag Butterworth order 4). Ground reaction forces
+were measured at 1000 Hz and processed with a lowpass ﬁlter
+(cutoff frequency 15 Hz, zero-lag Butterworth order 10). Ground
+reaction forces were measured in all locomotion modes during cer-
+tain representative steps, such as the transition steps to/from each
+mode and at least one steady-state step (Fig. 2).
+The motion capture data and ground reaction force data were
+further analyzed with the inverse kinematics and inverse dynamics
+tools from OpenSim (Seth et al., 2018) to determine the joint angles
+and moments in the sagittal, frontal, and transverse planes during
+the different locomotion tasks. To compute the joint powers for
+these planes, joint angles were numerically differentiated with
+MATLAB’s
+gradient
+function
+and
+multiplied
+with
+the
+joint
+moments. Gait cycles without ground reaction force data were
+excluded from moment and power analyses. The reader may refer
+to the supplemental script RUN_OSIM.m to replicate the processing
+of the inverse kinematics, inverse dynamics, and joint power.
+2.2. Data access
+The associated dataset is provided as supplemental material or
+can
+be
+accessed
+on
+http://www.epic.gatech.edu/opensource-
+biomechanics-camargo-et-al/. Data are stored as tables grouped
+by the nested directory structure of subject/date/mode/sensor
+(Fig. 3), allowing for easier access to trial information. Signals cor-
+responding to the same trial can be aligned using a header column
+containing the time (seconds). This column is present in all the
+tables. The gait phase of each data point was also calculated using
+linear interpolation between heel strikes from 0% to 100% gait
+cycle. Heel strike was determined from the motion capture data
+as the point of zero linear velocity of the heel marker.
+Table 1
+Physical characteristic information of each subject.
+Subject ID
+Age
+Gender
+Height (m)
+Mass (kg)
+Subject ID
+Age
+Gender
+Height (m)
+Mass (kg)
+AB06
+20
+M
+1.80
+74.8
+AB17
+19
+M
+1.68
+61.2
+AB07
+20
+M
+1.65
+55.3
+AB18
+19
+F
+1.80
+60.1
+AB08
+21
+M
+1.74
+72.6
+AB19
+19
+M
+1.70
+68.0
+AB09
+21
+F
+1.63
+63.5
+AB20
+21
+F
+1.71
+68.0
+AB10
+22
+M
+1.75
+83.9
+AB21
+20
+F
+1.57
+58.1
+AB11
+21
+M
+1.75
+77.1
+AB23
+20
+M
+1.80
+76.8
+AB12
+24
+M
+1.74
+86.2
+AB24
+21
+F
+1.73
+72.6
+AB13
+19
+M
+1.73
+59.0
+AB25
+20
+F
+1.63
+52.2
+AB14
+22
+F
+1.52
+58.4
+AB27
+21
+M
+1.70
+68.0
+AB15
+21
+M
+1.78
+96.2
+AB28
+33
+F
+1.69
+62.1
+AB16
+20
+F
+1.65
+55.8
+AB30
+31
+M
+1.77
+77.0
+Fig. 1. (Left) Subjects performing ambulation modes. (A) treadmill walking, (B) stair-ascent, (C) ramp-ascent, (D) level-ground walking. (Right) Sensor placement. A
+combination of EMG, IMU, and electro-goniometers targeted major muscle groups, segments of the lower limb, and each of the three joints on the right side, while motion
+capture markers were placed bilaterally.
+J. Camargo, A. Ramanathan, W. Flanagan et al.
+Journal of Biomechanics 119 (2021) 110320
+3

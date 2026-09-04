@@ -54,11 +54,30 @@ if opciones.calibrar_koopman && ~strcmpi(candidato,'koopman')
     warning('Obtener_Theta_Tibia_Candidato:calibracionNoAplicable', ...
         'opciones.calibrar_koopman=true pedido con candidato=''%s'' - la calibracion afin (Calibracion_Koopman_Kuopio_Core.m) solo se derivo para Koopman, se ignora para este candidato.', candidato);
 end
+% CONGELAR_VL_ANGULO (02-sep-2026): default TRUE aqui (esta funcion es la
+% que usa el pipeline de PRODUCCION, Generar_Trayectoria.m/la app) -
+% Koopman2014_Core.m mismo mantiene su default en false para no alterar
+% scripts de comparacion de candidatos (Evaluar_vs_Maastricht.m y
+% similares, que necesitan el comportamiento nativo del paper). Motivo:
+% verificado (Kuopio N=47 + Maastricht N=244, ver informe tecnico,
+% Limitaciones) que evaluar Koopman con la v/talla REALES de cada sujeto
+% produce una dependencia con talla que NO existe en el dato real
+% (|corr(talla,real)|<=0.08, contra |corr(talla,crudo)| hasta 0.99) - la
+% talla real sigue entrando al generador, pero solo por la via geometrica
+% ya validada (Paso 4, escalamiento de L_muslo/L_tibia), no por los
+% coeficientes de v/l de Koopman. Verificado SIN degradar ninguna metrica
+% ya publicada (Rodilla X/Y, Tobillo X/Y, Angulo tibial - clasificacion
+% RMSEnorm identica en las 5, Bueno/Excelente en todas, diferencias <0.06).
+if ~isfield(opciones,'congelar_vl_angulo'), opciones.congelar_vl_angulo = true; end
+if ~isfield(opciones,'v_ref_kph'), opciones.v_ref_kph = 5.0; end
+if ~isfield(opciones,'l_ref_m'), opciones.l_ref_m = 1.735; end
+opciones_koopman = struct('nMuestras', n, 'congelar_vl_angulo', opciones.congelar_vl_angulo, ...
+    'v_ref_kph', opciones.v_ref_kph, 'l_ref_m', opciones.l_ref_m);
 
 switch lower(candidato)
     case 'koopman'
         v_kph = tempo.velocidad_ms * 3.6;
-        K = Koopman2014_Core(v_kph, antro.talla_m, struct('nMuestras', n));
+        K = Koopman2014_Core(v_kph, antro.talla_m, opciones_koopman);
         % CORREGIDO 24-ago-2026 (Comparar_Caminos_vs_ControlLuis.m, con
         % dato PROPIO del proyecto - REFERENCIAS/Control_apoyo_Luis_V4.csv
         % + Control_balanceo_Luis_V4.csv, NO Camargo, que queda reservado

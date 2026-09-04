@@ -46,11 +46,22 @@
 % pasa de 0.96/0.98 (Excelente) a 1.10/1.17 (Bueno, sigue bien lejos de
 % Deficiente).
 
+% CORREGIDO 01-sep-2026 (el usuario senalo la inconsistencia con N=51):
+% antes la lista de sujetos se armaba con dir('*_l_comf_01.csv'), que
+% exige exactamente el trial numero 01 - 3 sujetos (02, 30, 39) SI tienen
+% datos utilizables en disco pero con otro numero de trial (su comf_01
+% nunca existio en la fuente, ver RODILLA/Kuopio/raw/
+% _extraccion_28ago_51sujetos_log.txt), y quedaban excluidos sin motivo
+% real. Se cambia a la MISMA regla que ya usan Cargar_Kuopio2024_Core.m y
+% Evaluar_vs_Kuopio_AnguloTibial.m: intentar los 51 ids de subjects_meta.csv
+% y descartar solo los que de verdad fallan al cargar. Sube N de 44 a 47 -
+% el limite real (4 sujetos, 07/09/10/24, sin el marcador RTibia_RFoot_score
+% en NINGUN trial, ver mismo log) no lo mueve ningun cambio de codigo.
 carpeta = fileparts(mfilename('fullpath'));
 carpeta_kuopio = fullfile(carpeta, 'RODILLA', 'Kuopio');
 addpath(carpeta_kuopio);
-archivos = dir(fullfile(carpeta_kuopio, 'raw', '*_l_comf_01.csv'));
-ids = sort(cellfun(@(s) str2double(s(1:2)), {archivos.name}));
+Tmeta_ids = readtable(fullfile(carpeta_kuopio, 'raw', 'subjects_meta.csv'));
+ids = Tmeta_ids.sub_id(:).';
 n = 101; pct = linspace(0,100,n); pts_norm = 2:n;
 K_WARP = 2;   % elegido por barrido LOSO real N=44 (K=2,4,6,8,10,12) -
               % RMSEnorm ya en su meseta desde K=2, ver GUIA_INTERPRETACION.md
@@ -71,7 +82,11 @@ for i = 1:numel(ids)
 
     antro = Estimar_Antropometria_Core(struct('talla_m', S.talla_cm/100));
     tempo = Temporizacion_Core(antro, 'Koopman');
-    Kd = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, struct('nMuestras', n));
+    % congelar_vl_angulo=true (02-sep-2026): mismo motivo que en
+    % Refit_CorreccionFinal_TallaSola.m - el warp se ajusta sobre el crudo
+    % que produccion realmente genera. Ver GUIA_INTERPRETACION.md #10.
+    Kd = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, ...
+        struct('nMuestras', n, 'congelar_vl_angulo', true, 'v_ref_kph', 5.0, 'l_ref_m', 1.735));
     theta1 = deg2rad(Kd.cadera_flexext.angulo_deg(:).');
     theta2 = Kd.theta_tibia_via_rodilla_rad(:).';
     theta1c = deg2rad(cal.off_muslo_deg) + cal.gan_muslo*theta1;

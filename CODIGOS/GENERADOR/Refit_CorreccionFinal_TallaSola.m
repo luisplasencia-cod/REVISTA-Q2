@@ -13,11 +13,17 @@
 % agrupado completo (N=44) para desplegar - mismo patron ya usado en
 % todo el proyecto.
 
+% CORREGIDO 01-sep-2026 (mismo motivo que Ajustar_Warp_Temporal_TallaSola.m):
+% dir('*_l_comf_01.csv') excluia 3 sujetos (02,30,39) que si tienen datos
+% utilizables con otro numero de trial - se cambia a la lista completa de
+% subjects_meta.csv, igual que Cargar_Kuopio2024_Core.m ya soporta. Sube
+% N de 44 a 47 (el limite real, 4 sujetos sin marcador RTibia_RFoot_score
+% en ningun trial, no lo mueve ningun cambio de codigo).
 carpeta = fileparts(mfilename('fullpath'));
 carpeta_kuopio = fullfile(carpeta, 'RODILLA', 'Kuopio');
 addpath(carpeta_kuopio);
-archivos = dir(fullfile(carpeta_kuopio, 'raw', '*_l_comf_01.csv'));
-ids = sort(cellfun(@(s) str2double(s(1:2)), {archivos.name}));
+Tmeta_ids = readtable(fullfile(carpeta_kuopio, 'raw', 'subjects_meta.csv'));
+ids = Tmeta_ids.sub_id(:).';
 n = 101; pct = linspace(0,100,n);
 pts_norm = 2:n;
 K = 14;
@@ -38,7 +44,12 @@ for i = 1:numel(ids)
 
     antro = Estimar_Antropometria_Core(struct('talla_m', S.talla_cm/100));
     tempo = Temporizacion_Core(antro, 'Koopman');
-    Kd = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, struct('nMuestras', n));
+    % congelar_vl_angulo=true (02-sep-2026): la correccion de posicion se
+    % ajusta SOBRE el crudo que produccion realmente genera - desde que
+    % Obtener_*_Candidato.m/la app congelan v/l, ajustarla sobre el crudo
+    % sin congelar dejaba coeficientes desactualizados. Ver GUIA_INTERPRETACION.md #10.
+    Kd = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, ...
+        struct('nMuestras', n, 'congelar_vl_angulo', true, 'v_ref_kph', 5.0, 'l_ref_m', 1.735));
     theta1 = deg2rad(Kd.cadera_flexext.angulo_deg(:).');
     theta2 = Kd.theta_tibia_via_rodilla_rad(:).';
     theta1c = deg2rad(cal.off_muslo_deg) + cal.gan_muslo*theta1;

@@ -5,9 +5,8 @@ function Ver_Resultado_Final(antro_in, candidato)
 %                   CONTINUO (sin el salto en el cambio de fase) y con el
 %                   avance sumado en ambas fases.
 %
-%   Ver_Resultado_Final()                        % Koopman, talla 1.71m
+%   Ver_Resultado_Final()                        % talla 1.71m
 %   Ver_Resultado_Final(antro_in)                % antropometria propia
-%   Ver_Resultado_Final(antro_in, 'Zhao')        % otro candidato
 %
 % ENTRADA (ambas opcionales)
 %   antro_in   struct con .talla_m (obligatorio si se pasa), .masa_kg,
@@ -15,7 +14,11 @@ function Ver_Resultado_Final(antro_in, candidato)
 %              varia con estos valores (Estimar_Antropometria_Core.m
 %              completa lo que falte con las fracciones de Winter/
 %              Drillis&Contini ya verificadas).
-%   candidato  'Koopman' (default) | 'Zhao' | 'Yun' | 'Combinado'
+%   candidato  02-sep-2026: parametro ELIMINADO - Generar_Trayectoria.m ya
+%              no acepta candidato, Koopman es el unico modelo vigente del
+%              pipeline de posicion (ver su propia cabecera). Se mantiene
+%              el argumento de entrada por compatibilidad de llamada, pero
+%              se ignora.
 %
 % NOTA: el TOBILLO aqui es el pivote del modelo de cadena cinematica
 % (Cadena_Cinematica_Core.m) mas la traslacion de avance - es decir, en
@@ -27,9 +30,10 @@ function Ver_Resultado_Final(antro_in, candidato)
 if nargin < 1 || isempty(antro_in)
     antro_in = struct('talla_m', 1.71, 'masa_kg', 68, 'sexo', 'M');
 end
-if nargin < 2 || isempty(candidato), candidato = 'Koopman'; end
+if nargin < 2, candidato = []; end %#ok<NASGU> % ignorado, ver cabecera 02-sep-2026
+candidato = 'Koopman';  % unico modelo vigente del pipeline de posicion, solo para el titulo
 
-r = Generar_Trayectoria(antro_in, candidato);
+r = Generar_Trayectoria(antro_in);
 antro = r.metadatos.antropometria;
 tempo = r.metadatos.temporizacion;
 

@@ -22,10 +22,20 @@ if opciones.calibrar_koopman && ~strcmpi(candidato,'koopman')
     warning('Obtener_Angulos_Candidato:calibracionNoAplicable', ...
         'opciones.calibrar_koopman=true pedido con candidato=''%s'' - se ignora, ver Calibracion_Koopman_Kuopio_Core.m.', candidato);
 end
+% CONGELAR_VL_ANGULO: ver nota completa en Obtener_Theta_Tibia_Candidato.m
+% (misma correccion, misma justificacion - default TRUE porque esta
+% funcion tambien es parte del pipeline de PRODUCCION, alimenta RODILLA/
+% TOBILLO via Cadena_Completa_Core.m). Verificado sin degradar ninguna
+% clasificacion RMSEnorm ya publicada (Rodilla X/Y, Tobillo X/Y).
+if ~isfield(opciones,'congelar_vl_angulo'), opciones.congelar_vl_angulo = true; end
+if ~isfield(opciones,'v_ref_kph'), opciones.v_ref_kph = 5.0; end
+if ~isfield(opciones,'l_ref_m'), opciones.l_ref_m = 1.735; end
+opciones_koopman = struct('nMuestras', n, 'congelar_vl_angulo', opciones.congelar_vl_angulo, ...
+    'v_ref_kph', opciones.v_ref_kph, 'l_ref_m', opciones.l_ref_m);
 
 switch lower(candidato)
     case 'koopman'
-        K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, struct('nMuestras', n));
+        K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, opciones_koopman);
         tempo.tiempo_ciclo_s = K.tiempo_ciclo_s;
         m_full = deg2rad(K.cadera_flexext.angulo_deg);
         t_full = K.theta_tibia_via_rodilla_rad;   % via rodilla (ver Obtener_Theta_Tibia_Candidato.m)

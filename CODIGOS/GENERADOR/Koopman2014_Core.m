@@ -52,6 +52,21 @@ function out = Koopman2014_Core(v_kph, l_m, opciones)
 
 if nargin < 3, opciones = struct(); end
 if ~isfield(opciones,'nMuestras'), opciones.nMuestras = 101; end
+if ~isfield(opciones,'margen_saturacion_kph'), opciones.margen_saturacion_kph = 1; end
+if ~isfield(opciones,'congelar_vl_angulo'), opciones.congelar_vl_angulo = false; end
+% Referencias ajustadas 02-sep-2026 por barrido (verificar_congelar_vl.m):
+% v_ref=5.0 (limite SUPERIOR validado, no el centro - un primer intento
+% con v_ref=3.0 daba buen ajuste en Kuopio pero empeoraba Maastricht,
+% RMSE 6.61->9.66 grados; con v_ref=5.0 el ajuste en Maastricht vuelve a
+% 6.74, practicamente igual al no-congelado) - consistente con que la
+% velocidad autoseleccionada real de adultos (Froude) cae cerca de ese
+% limite superior, no del centro del rango. l_ref=1.735 = media agrupada
+% de las DOS bases de validacion de este proyecto (Kuopio N=51 + Maastricht
+% N=244, N=295) - l_ref importa mucho menos que v_ref (RMSE cambia <0.5
+% grados entre 1.69 y 1.746 de l_ref), se deja en la media agrupada por
+% ser la eleccion mas neutral/reproducible.
+if ~isfield(opciones,'v_ref_kph'), opciones.v_ref_kph = 5.0; end
+if ~isfield(opciones,'l_ref_m'), opciones.l_ref_m = 1.735; end
 
 if ~(isnumeric(v_kph) && isscalar(v_kph) && v_kph > 0)
     error('v_kph debe ser un escalar positivo (velocidad en km/h). Se recibio: %s', mat2str(v_kph));
@@ -61,25 +76,71 @@ if ~(isnumeric(l_m) && isscalar(l_m) && l_m > 0)
 end
 % La advertencia de rango (0.5-5 kph) se dispara dentro de
 % Tiempo_Ciclo_Koopman2014_Core.m (23-ago-2026, E4 de
-% plan_100_generador.md) - no se duplica aqui para no generar dos
-% advertencias con distinto id por la misma condicion.
+% plan_100_generador.md), evaluada con v_kph SIN saturar (la advertencia
+% debe seguir avisando la extrapolacion real de la entrada) - no se
+% duplica aqui para no generar dos advertencias con distinto id por la
+% misma condicion.
+%
+% SATURACION DE VELOCIDAD (02-sep-2026, Saturar_Velocidad_Koopman_Core.m):
+% cada regresion de abajo es CUADRATICA en v (evaluar_regresion) - fuera
+% del rango publicado (0.5-5 kph) esto produce sensibilidad a velocidad
+% muchisimo mayor que la real (verificado contra Kuopio N=47 y Maastricht
+% N=244, ver informe tecnico, Limitaciones). Se evalua TODO lo de abajo
+% (angulos Y tiempo de ciclo) con la velocidad EFECTIVA (saturada), nunca
+% con la cruda - la cruda solo se usa para decidir si advertir.
+opciones_sat = struct('margen_kph', opciones.margen_saturacion_kph);
+if v_kph < 0.5 || v_kph > 5
+    warning('Koopman2014_Core:velocidadFueraDeRango', ...
+        'v_kph=%.2f esta fuera del rango validado por el paper (0.5-5 kph) - se satura a %.2f kph antes de evaluar la regresion (Saturar_Velocidad_Koopman_Core.m).', ...
+        v_kph, Saturar_Velocidad_Koopman_Core(v_kph, opciones_sat));
+end
+v_kph_efectivo = Saturar_Velocidad_Koopman_Core(v_kph, opciones_sat);
+
+% CONGELAR_VL_ANGULO (02-sep-2026, EN PRUEBA - default false, no cambia
+% ningun comportamiento existente): evalua las 4 curvas angulares con v y
+% l FIJOS en un valor de referencia, en vez de la v/l real del sujeto.
+% Motivo: se verifico (descomponer_v_vs_l, Kuopio N=47 + Maastricht N=244)
+% que la dependencia de theta_tibia con talla que predice este modelo NO
+% viene solo del termino de velocidad (b1*v+b2*v^2) sino tambien del
+% termino de talla DIRECTO (b3*l) de cada regresion publicada - ambos
+% terminos, usados exactamente dentro de su rango valido, producen una
+% dependencia con talla que NO aparece en el dato real (|corr(talla,real)|
+% <=0.08 en dos bases independientes, contra |corr(talla,crudo)|~0.96-0.99
+% del modelo). Con esta opcion activa, la talla real del sujeto sigue
+% entrando al generador - pero SOLO por la via ya validada geometricamente
+% (escalamiento de L_muslo/L_tibia en el paso 4, Cinematica_DoblePendulo_
+% Core.m), no por los coeficientes internos de Koopman.
+if opciones.congelar_vl_angulo
+    v_angulo = opciones.v_ref_kph;
+    l_angulo = opciones.l_ref_m;
+else
+    v_angulo = v_kph_efectivo;
+    l_angulo = l_m;
+end
 
 tablas = tablas_koopman();
 pct_ciclo = linspace(0, 100, opciones.nMuestras);
 
 out = struct();
+out.v_kph_input = v_kph;
+out.v_kph_efectivo = v_kph_efectivo;
 campos_salida = {'cadera_abaduccion','cadera_flexext','rodilla_flexext','tobillo_flexext'};
 for k = 1:numel(tablas)
     T = tablas(k);
-    angulo = reconstruir_curva(T, v_kph, l_m, pct_ciclo);
+    angulo = reconstruir_curva(T, v_angulo, l_angulo, pct_ciclo);
     out.(campos_salida{k}) = struct('pct_ciclo', pct_ciclo, 'angulo_deg', angulo);
 end
 
 % --- Tabla 5: tiempo real de ciclo (Ec. 3 del paper) ---
 % Extraido a Tiempo_Ciclo_Koopman2014_Core.m (23-ago-2026, E4) para
 % reusarlo como motor de temporizacion compartido - misma formula, sin
-% duplicar el coeficiente.
-[out.tiempo_ciclo_s, out.step_ratio] = Tiempo_Ciclo_Koopman2014_Core(v_kph, l_m);
+% duplicar el coeficiente. Evaluado con v_kph_efectivo (ver arriba) - la
+% advertencia de rango que dispara esta llamada usa v_kph_efectivo, que
+% por construccion nunca excede 5 kph, asi que esta llamada especifica ya
+% no puede disparar la advertencia (queda documentado, no se borra la
+% advertencia - sigue viva para el caso 'Zhao'/'Yun' de
+% Temporizacion_Core.m, que NO pasan por esta saturacion).
+[out.tiempo_ciclo_s, out.step_ratio] = Tiempo_Ciclo_Koopman2014_Core(v_kph_efectivo, l_m);
 
 % --- Reduccion via tobillo (Reduccion_Winter_Core.m), pie plano en apoyo ---
 theta_pie_cero = zeros(size(pct_ciclo));
@@ -149,6 +210,37 @@ end
 
 [x, orden] = sort(x);
 y = y(orden); dy = dy(orden); d2y = d2y(orden);
+
+% GUARDA NUMERICA (agregada 02-sep-2026, hallazgo real): a talla/velocidad
+% extremas (verificado: cadera flexext, talla ~98-114cm), la regresion de
+% un evento (Ec. koopman_regresion) puede cruzarse con el evento fijo
+% (x=1%, HeelContact) -- su separacion h=x(i+1)-x(i) pasa por CERO. El
+% sistema 6x6 de hermite_quintico() (Ec. hermite_quintico) usa potencias
+% de h hasta h^5 -- con h~0 el sistema queda mal condicionado y los
+% coeficientes del spline explotan (verificado: hasta 2.8e7 grados en un
+% caso real, en vez de los ~25-33 grados fisiologicos esperados). Se
+% impone una separacion minima entre nodos consecutivos (0.5% del ciclo)
+% -- si dos nodos quedan mas cerca que eso, se separan simetricamente
+% alrededor de su punto medio, preservando el orden y sin alterar nada
+% cuando los nodos ya estan bien separados (caso normal, la inmensa
+% mayoria de talla/velocidad).
+H_MIN_NODOS = 3.0;   % % del ciclo, separacion minima entre eventos consecutivos
+dx = diff(x);
+idx_colapso = find(dx < H_MIN_NODOS);
+for kk = idx_colapso
+    centro = (x(kk) + x(kk+1)) / 2;
+    x(kk)   = centro - H_MIN_NODOS/2;
+    x(kk+1) = centro + H_MIN_NODOS/2;
+end
+if ~isempty(idx_colapso) && any(diff(x) <= 0)
+    % caso extremo (varios colapsos encadenados): reforzar con un barrido
+    % simple izquierda-a-derecha hasta restablecer el orden estricto.
+    for kk = 2:numel(x)
+        if x(kk) <= x(kk-1) + H_MIN_NODOS
+            x(kk) = x(kk-1) + H_MIN_NODOS;
+        end
+    end
+end
 
 % 7mo punto: copia del 1ro, en x=100 (Fig.4 del paper: "the y, dy/dx, and
 % d2y/dx2 parameter of the 7th key-event (at 100% of the gait cycle) is

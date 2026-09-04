@@ -72,7 +72,11 @@ fprintf('=== Ver_GRF_y_Trayectoria: talla=%.3fm masa=%.1fkg sexo=%s candidato=%s
     antro_in.talla_m, antro_in.masa_kg, antro_in.sexo, candidato);
 
 % --- Paso 1: Generar_Trayectoria.m (la que se escribiria al CSV real) ---
-tr = Generar_Trayectoria(antro_in, candidato);
+% 02-sep-2026: Generar_Trayectoria.m ya no acepta `candidato` (Koopman es
+% el unico modelo vigente del pipeline de posicion) - GRF_Newton_
+% ApoyoSimple_Core.m (Paso 2, abajo) SI sigue siendo multi-candidato, no
+% se toca aqui.
+tr = Generar_Trayectoria(antro_in);
 fprintf('[1/4] Generar_Trayectoria OK - %d puntos apoyo, %d puntos balanceo\n', ...
     numel(tr.apoyo.x_cm), numel(tr.balanceo.x_cm));
 

@@ -79,6 +79,9 @@
     Xa_full = zeros(1,n); Ya_full = zeros(1,n);
     dXk_full = zeros(1,n); dYk_full = zeros(1,n);
     dXa_full = zeros(1,n); dYa_full = zeros(1,n);
+    Xm_full = nan(1,n); Ym_full = nan(1,n);
+    dXm_full = nan(1,n); dYm_full = nan(1,n);
+    hay_montaje = false;  % true cuando efMontaje.Value > 0 (ver Recalcular)
 
     tmr = [];
 
@@ -91,15 +94,25 @@
     gl.RowHeight = {60, 55, '2x', '1x'};
 
     % --- fila 1: talla / amplitud / boton reproducir ---
-    glCtrl = uigridlayout(gl, [1,7]);
+    glCtrl = uigridlayout(gl, [1,11]);
     glCtrl.Layout.Row = 1; glCtrl.Layout.Column = 1;
-    glCtrl.ColumnWidth = {80,90,190,90,205,225,110,'1x'};
+    glCtrl.ColumnWidth = {80,90,190,90,230,90,205,225,110,140,'1x'};
     glCtrl.Padding = [0 0 0 0];
 
     uilabel(glCtrl, 'Text', 'Talla (m):');
     efTalla = uieditfield(glCtrl, 'numeric', 'Value', 1.70, 'Limits', [1.30 2.10]);
     uilabel(glCtrl, 'Text', 'Amplitud vertical cadera A (cm):');
     efA = uieditfield(glCtrl, 'numeric', 'Value', A_cm, 'Limits', [0 6]);
+    % 02-sep-2026 (sesion de integracion con GAITSIM/Raspberry, pedido del
+    % usuario): punto de montaje protesico sobre el segmento tibial,
+    % distancia en cm DESDE EL TOBILLO hacia la rodilla (0 <= valor <=
+    % L2_cm, validado en Recalcular). Con 0 (default) el comportamiento es
+    % identico al de antes de este cambio (no se dibuja ningun punto
+    % nuevo) - ver Aplicar_Punto_Montaje_Core.m para la formula y la
+    % convencion de angulo/eje usada (misma que Cinematica_DoblePendulo_
+    % Core.m, NO la de Cadena_Cinematica_Core.m/el CSV del simulador).
+    uilabel(glCtrl, 'Text', 'Punto de montaje (cm desde tobillo):');
+    efMontaje = uieditfield(glCtrl, 'numeric', 'Value', 0, 'Limits', [0 Inf]);
     % 31-ago-2026 (tarde-noche, pedido del usuario): separados en DOS
     % checkboxes independientes (antes un solo "Correccion final" que los
     % ataba juntos sin poder ver el estado intermedio). La calibracion de
@@ -115,6 +128,14 @@
     cbAngulo   = uicheckbox(glCtrl, 'Text', 'Calibrar angulo (LOSO)', 'Value', false);
     cbPosicion = uicheckbox(glCtrl, 'Text', 'Corregir posicion (hibrida: warp X + Fourier Y, requiere angulo)', 'Value', false);
     btnPlay = uibutton(glCtrl, 'Text', 'Reproducir');
+    % 02-sep-2026 (sesion de integracion con GAITSIM/Raspberry, pedido
+    % explicito del usuario): exporta el CSV real (Escribir_CSV_Simulador.m,
+    % via Generar_Trayectoria.m) para la talla y el punto de montaje que
+    % esten cargados AHORA MISMO en la app - la trayectoria final exportada
+    % es la del punto de montaje si esta activo (mismo criterio que se ve en
+    % pantalla), no un barrido automatico. Control manual, uno a la vez, a
+    % pedido del usuario.
+    btnExportar = uibutton(glCtrl, 'Text', 'Exportar CSV');
     lblInfo = uilabel(glCtrl, 'Text', '', 'FontColor', [0.4 0.4 0.4]);
 
     % --- fila 2: slider de %ciclo + advertencia de rango de la correccion ---
@@ -139,12 +160,15 @@
 
     trRodilla = plot(axMapa, nan, nan, ':', 'LineWidth', 1.4, 'Color', [0.15 0.35 0.75]);
     trTobillo = plot(axMapa, nan, nan, ':', 'LineWidth', 1.4, 'Color', [0.75 0.30 0.15]);
+    trMontaje = plot(axMapa, nan, nan, ':', 'LineWidth', 1.4, 'Color', [0.20 0.60 0.25]);
     lnMuslo   = plot(axMapa, nan, nan, '-o', 'LineWidth', 2.5, ...
         'Color', [0.15 0.35 0.75], 'MarkerFaceColor', [0.15 0.35 0.75]);
     lnTibia   = plot(axMapa, nan, nan, '-o', 'LineWidth', 2.5, ...
         'Color', [0.75 0.30 0.15], 'MarkerFaceColor', [0.75 0.30 0.15]);
-    legend(axMapa, [lnMuslo lnTibia trRodilla trTobillo], ...
-        {'muslo (cadera-rodilla)','tibia (rodilla-tobillo)','trayectoria rodilla','trayectoria tobillo'}, ...
+    mkMontaje = plot(axMapa, nan, nan, 'd', 'MarkerSize', 9, ...
+        'Color', [0.20 0.60 0.25], 'MarkerFaceColor', [0.20 0.60 0.25]);
+    legend(axMapa, [lnMuslo lnTibia trRodilla trTobillo mkMontaje], ...
+        {'muslo (cadera-rodilla)','tibia (rodilla-tobillo)','trayectoria rodilla','trayectoria tobillo','punto de montaje'}, ...
         'Location', 'southoutside');
 
     pReadout = uipanel(glMedio, 'Title', 'Lectura en vivo');
@@ -162,9 +186,11 @@
     grid(axDx, 'on'); hold(axDx, 'on'); xlim(axDx, [0 100]);
     ln_dxK = plot(axDx, pct, nan(1,n), 'Color', [0.15 0.35 0.75], 'LineWidth', 1.5);
     ln_dxA = plot(axDx, pct, nan(1,n), 'Color', [0.75 0.30 0.15], 'LineWidth', 1.5);
+    ln_dxM = plot(axDx, pct, nan(1,n), 'Color', [0.20 0.60 0.25], 'LineWidth', 1.5);
     mk_dxK = plot(axDx, nan, nan, 'o', 'MarkerFaceColor', [0.15 0.35 0.75], 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
     mk_dxA = plot(axDx, nan, nan, 'o', 'MarkerFaceColor', [0.75 0.30 0.15], 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
-    legend(axDx, [ln_dxK ln_dxA], {'rodilla','tobillo'}, 'Location', 'best');
+    mk_dxM = plot(axDx, nan, nan, 'o', 'MarkerFaceColor', [0.20 0.60 0.25], 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
+    legend(axDx, [ln_dxK ln_dxA ln_dxM], {'rodilla','tobillo','punto de montaje'}, 'Location', 'best');
 
     axDy = uiaxes(glGraf); axDy.Layout.Row = 1; axDy.Layout.Column = 2;
     title(axDy, 'Desplazamiento Y (con "Corregir posicion" activo, 0% no es exactamente 0cm - ver informe)');
@@ -172,17 +198,21 @@
     grid(axDy, 'on'); hold(axDy, 'on'); xlim(axDy, [0 100]);
     ln_dyK = plot(axDy, pct, nan(1,n), 'Color', [0.15 0.35 0.75], 'LineWidth', 1.5);
     ln_dyA = plot(axDy, pct, nan(1,n), 'Color', [0.75 0.30 0.15], 'LineWidth', 1.5);
+    ln_dyM = plot(axDy, pct, nan(1,n), 'Color', [0.20 0.60 0.25], 'LineWidth', 1.5);
     mk_dyK = plot(axDy, nan, nan, 'o', 'MarkerFaceColor', [0.15 0.35 0.75], 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
     mk_dyA = plot(axDy, nan, nan, 'o', 'MarkerFaceColor', [0.75 0.30 0.15], 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
-    legend(axDy, [ln_dyK ln_dyA], {'rodilla','tobillo'}, 'Location', 'best');
+    mk_dyM = plot(axDy, nan, nan, 'o', 'MarkerFaceColor', [0.20 0.60 0.25], 'MarkerEdgeColor', 'k', 'MarkerSize', 8);
+    legend(axDy, [ln_dyK ln_dyA ln_dyM], {'rodilla','tobillo','punto de montaje'}, 'Location', 'best');
 
     % ---------- callbacks ----------
-    efTalla.ValueChangedFcn = @Recalcular;
-    efA.ValueChangedFcn     = @Recalcular;
+    efTalla.ValueChangedFcn    = @Recalcular;
+    efA.ValueChangedFcn        = @Recalcular;
+    efMontaje.ValueChangedFcn  = @Recalcular;
     cbAngulo.ValueChangedFcn   = @OnCambioAngulo;
     cbPosicion.ValueChangedFcn = @OnCambioPosicion;
     sldPct.ValueChangingFcn = @OnSlider;
     btnPlay.ButtonPushedFcn = @OnPlayPause;
+    btnExportar.ButtonPushedFcn = @OnExportarCSV;
 
     tmr = timer('ExecutionMode', 'fixedRate', 'Period', PERIODO_TICK, 'TimerFcn', @OnTick);
 
@@ -218,7 +248,14 @@
         try
             antro = Estimar_Antropometria_Core(struct('talla_m', talla_m));
             tempo = Temporizacion_Core(antro, 'Koopman');
-            K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, struct('nMuestras', n));
+            % congelar_vl_angulo=true (02-sep-2026): MISMA correccion que
+            % Obtener_Theta_Tibia_Candidato.m/Obtener_Angulos_Candidato.m
+            % (produccion) - sin esto, la app quedaba desincronizada del
+            % pipeline real (llamaba a Koopman2014_Core directo, que
+            % mantiene su propio default sin congelar por diseno, ver
+            % cabecera de Koopman2014_Core.m). Detalle: GUIA_INTERPRETACION.md #10.
+            K = Koopman2014_Core(tempo.velocidad_ms*3.6, antro.talla_m, ...
+                struct('nMuestras', n, 'congelar_vl_angulo', true, 'v_ref_kph', 5.0, 'l_ref_m', 1.735));
         catch ME
             uialert(fig, ME.message, 'Error al calcular');
             return;
@@ -278,11 +315,12 @@
         if cbPosicion.Value
             Xk_n = Xk_full - Xk_full(1); Yk_n = Yk_full - Yk_full(1);
             Xa_n = Xa_full - Xa_full(1); Ya_n = Ya_full - Ya_full(1);
-            % 31-ago-2026/01-sep-2026 (tarde-noche): correccion HIBRIDA -
-            % warp temporal + afin CONSTANTE para X (garantiza sin
-            % retrocesos Y monotono en talla), Fourier sin cambio para Y
-            % - ver cabecera de Correccion_Hibrida_PenduloDoble_Core.m.
-            % Reemplaza a Correccion_
+            % 31-ago-2026/01-sep-2026/02-sep-2026: correccion HIBRIDA -
+            % warp temporal + PAVA (Proyeccion_Isotonica_Core.m) + afin
+            % CONSTANTE para X (garantiza 0 retrocesos SIEMPRE, para
+            % cualquier talla, y monotono en talla), Fourier sin cambio
+            % para Y - ver cabecera de Correccion_Hibrida_PenduloDoble_
+            % Core.m. Reemplaza a Correccion_
             % Posicion_Suave_PenduloDoble_Core.m como correccion de
             % produccion (esa funcion sigue existiendo, la usa Y por
             % dentro de la hibrida).
@@ -318,16 +356,58 @@
             dXa_full = Xa_full - Xa_full(1); dYa_full = Ya_full - Ya_full(1);
         end
 
+        % 02-sep-2026: punto de montaje protesico (Aplicar_Punto_Montaje_
+        % Core.m), calculado DESPUES de ambas correcciones (angulo LOSO y/o
+        % posicion hibrida, lo que este activo) - usa rodilla Y tobillo
+        % (Xk_full/Yk_full, Xa_full/Ya_full) YA finales de esta llamada.
+        %
+        % REESCRITO 03-sep-2026 (firma nueva de Aplicar_Punto_Montaje_
+        % Core.m): el punto ya NO se calcula con theta_tibia (el angulo del
+        % MODELO) - se calcula sobre el SEGMENTO que forman los dos puntos
+        % ya generados. Motivo: con la correccion de posicion activa, el
+        % segmento rodilla-tobillo corregido ya no mide L_tibia ni apunta
+        % en direccion theta_tibia (se desvia hasta 5.2% / 7.6 grados,
+        % informe tecnico Seccion Limitaciones) - usar theta_tibia dejaba
+        % el punto hasta 2.5 cm fuera del segmento visible en pantalla.
+        % Con la definicion nueva, el punto SIEMPRE cae sobre el segmento
+        % que se esta dibujando, y la validacion de rango usa la longitud
+        % REAL del segmento en cada instante, no L2_cm nominal.
+        d_montaje_cm = efMontaje.Value;
+        hay_montaje = d_montaje_cm > 0;
+        if hay_montaje
+            L_seg_min = min(hypot(Xk_full - Xa_full, Yk_full - Ya_full));
+            if d_montaje_cm > L_seg_min
+                uialert(fig, sprintf(['Punto de montaje (%.1f cm) mayor que el segmento tobillo-rodilla ' ...
+                    'generado (minimo del ciclo: %.1f cm) - no puede estar mas alla de la rodilla. ' ...
+                    'Se ignora hasta que ajustes el valor.'], d_montaje_cm, L_seg_min), 'Punto de montaje fuera de rango');
+                hay_montaje = false;
+                Xm_full = nan(1,n); Ym_full = nan(1,n);
+            else
+                pm = Aplicar_Punto_Montaje_Core(Xa_full, Ya_full, Xk_full, Yk_full, d_montaje_cm);
+                Xm_full = pm.Xm_cm; Ym_full = pm.Ym_cm;
+            end
+        else
+            Xm_full = nan(1,n); Ym_full = nan(1,n);
+        end
+        dXm_full = Xm_full - Xm_full(1);
+        dYm_full = Ym_full - Ym_full(1);
+
         margen = 15;
         xTodos = [Xk_full, Xa_full, Xh_full];
         yTodos = [Yk_full, Ya_full, Yh_full];
+        if hay_montaje
+            xTodos = [xTodos, Xm_full]; %#ok<AGROW>
+            yTodos = [yTodos, Ym_full]; %#ok<AGROW>
+        end
         xlim(axMapa, [min(xTodos)-margen, max(xTodos)+margen]);
         ylim(axMapa, [min(yTodos)-margen, max(yTodos)+margen]);
 
         set(ln_dxK, 'YData', dXk_full);
         set(ln_dxA, 'YData', dXa_full);
+        set(ln_dxM, 'YData', dXm_full);
         set(ln_dyK, 'YData', dYk_full);
         set(ln_dyA, 'YData', dYa_full);
+        set(ln_dyM, 'YData', dYm_full);
         ylim(axDx, 'auto'); ylim(axDy, 'auto');
 
         lblInfo.Text = sprintf('v=%.2f m/s | T_ciclo=%.2f s | zancada=%.1f cm | L1=%.1f cm | L2=%.1f cm', ...
@@ -358,14 +438,30 @@
         set(mk_dyK, 'XData', pct(idx), 'YData', dYk_full(idx));
         set(mk_dyA, 'XData', pct(idx), 'YData', dYa_full(idx));
 
+        if hay_montaje
+            Xm_i = Xm_full(idx); Ym_i = Ym_full(idx);
+            set(mkMontaje, 'XData', Xm_i, 'YData', Ym_i);
+            set(trMontaje, 'XData', Xm_full(1:idx), 'YData', Ym_full(1:idx));
+            set(mk_dxM, 'XData', pct(idx), 'YData', dXm_full(idx));
+            set(mk_dyM, 'XData', pct(idx), 'YData', dYm_full(idx));
+            txtMontaje = sprintf('\n\nPunto de montaje (%.1f cm desde tobillo):\n  X = %.2f cm\n  Y = %.2f cm', ...
+                efMontaje.Value, Xm_i, Ym_i);
+        else
+            set(mkMontaje, 'XData', nan, 'YData', nan);
+            set(trMontaje, 'XData', nan, 'YData', nan);
+            set(mk_dxM, 'XData', nan, 'YData', nan);
+            set(mk_dyM, 'XData', nan, 'YData', nan);
+            txtMontaje = '';
+        end
+
         lblReadout.Text = sprintf([...
             '%% ciclo: %.1f\n\n' ...
             'theta1 (muslo): %.1f grados\n' ...
             'theta2 (tibia): %.1f grados\n\n' ...
             'Rodilla:\n  X = %.2f cm\n  Y = %.2f cm\n\n' ...
-            'Tobillo:\n  X = %.2f cm\n  Y = %.2f cm'], ...
+            'Tobillo:\n  X = %.2f cm\n  Y = %.2f cm%s'], ...
             pct(idx), rad2deg(theta1_full(idx)), rad2deg(theta2_full(idx)), ...
-            Xk_i, Yk_i, Xa_i, Ya_i);
+            Xk_i, Yk_i, Xa_i, Ya_i, txtMontaje);
     end
 
     % ====================================================================
@@ -389,6 +485,67 @@
             btnPlay.Text = 'Reproducir';
             stop(tmr);
         end
+    end
+
+    % ====================================================================
+    function OnExportarCSV(~, ~)
+        % 02-sep-2026: exporta el CSV real para la talla/punto de montaje
+        % EXACTOS que estan cargados en la app en este momento - usa
+        % Generar_Trayectoria.m + Escribir_CSV_Simulador.m tal cual, sin
+        % duplicar ninguna logica de calculo aqui.
+        %
+        % CAMBIO 03-sep-2026 (pedido explicito del usuario, tras leer el
+        % paper de conferencia aceptado y encontrar una protesis real de
+        % 42cm de eje, distinta de los ~0.38m que este proyecto tenia
+        % documentados sin verificar, y saber que el usuario tiene AL MENOS
+        % otro eje real de referencia ~0.21m): la distancia de montaje NO
+        % tiene un valor por defecto para exportacion a hardware real -
+        % depende de que protesis este montada en cada ensayo, y usar
+        % cualquier numero como default silencioso arriesga exportar una
+        % trayectoria para una protesis distinta de la que en realidad esta
+        % en el banco. Se EXIGE un valor explicito (>0) en efMontaje antes
+        % de exportar - si esta vacio/0, se rechaza el export con un
+        % mensaje claro, sin generar ningun archivo. Esto es DISTINTO del
+        % default de Generar_Trayectoria.m (rodilla anatomica), que sigue
+        % siendo correcto para trayectorias de VALIDACION (Kuopio/Ferber/
+        % Camargo) - ese default no se toca, esta funcion solo se vuelve
+        % mas estricta para el camino de exportacion a hardware real.
+        talla_m = efTalla.Value;
+        talla_cm_id = round(talla_m * 100);
+        d_montaje_cm = efMontaje.Value;
+
+        if isempty(d_montaje_cm) || ~(isnumeric(d_montaje_cm) && isscalar(d_montaje_cm)) || d_montaje_cm <= 0
+            uialert(fig, ['Ingresa la distancia de montaje (cm desde el tobillo) de LA PROTESIS ' ...
+                'que esta realmente montada en el banco antes de exportar - no hay un valor por ' ...
+                'defecto para hardware real (distintas protesis tienen distinto eje: p.ej. ~42cm o ' ...
+                '~21cm segun el modelo, no se puede asumir uno).'], 'Falta distancia de montaje');
+            return;
+        end
+
+        opciones_gt = struct('punto_seguimiento_m', d_montaje_cm / 100);
+        id_sujeto = sprintf('talla%d_montaje%d', talla_cm_id, round(d_montaje_cm));
+
+        try
+            traj = Generar_Trayectoria(struct('talla_m', talla_m), opciones_gt);
+        catch ME
+            uialert(fig, ME.message, 'Error al generar trayectoria');
+            return;
+        end
+
+        carpeta_salida = fullfile(fileparts(mfilename('fullpath')), 'EXPORT_RASPBERRY');
+        if ~isfolder(carpeta_salida)
+            mkdir(carpeta_salida);
+        end
+
+        try
+            [archivo_apoyo, archivo_balanceo] = Escribir_CSV_Simulador(traj, id_sujeto, carpeta_salida);
+        catch ME
+            uialert(fig, ME.message, 'Error al escribir CSV');
+            return;
+        end
+
+        uialert(fig, sprintf('Exportado:\n%s\n%s', archivo_apoyo, archivo_balanceo), ...
+            'Exportacion completa', 'Icon', 'success');
     end
 
     % ====================================================================

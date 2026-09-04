@@ -260,3 +260,101 @@ Ante el fracaso de las 3 variantes de §8-ter, se buscó en un campo distinto: l
 **Conclusión de toda la línea de GRF de esta sesión, de principio a fin:** 6 intentos basados en ángulos articulares/dinámica teórica (0.002 a 0.53) → 1 intento con fuerza directa sin ángulos pero de ingeniería estructural (0.53) → **usar datos reales medidos como plantilla, sin ningún modelo teórico de por medio (0.84) → personalizar esa plantilla con velocidad+talla y el subgrupo etario correcto (0.866)**. El salto grande de la sesión fue dejar de derivar y empezar a medir; la personalización fue la mejora fina al final, exactamente en ese orden de importancia.
 
 **Archivos de esta sección:** `RODILLA/Fukuchi/Cargar_Fukuchi2018_GRF_Core.m`, `Construir_Plantilla_Fukuchi_GRF.m` (paso 1, plantilla plana, se mantiene como referencia/baseline), `Personalizar_Plantilla_Fukuchi_GRF_Core.m` (paso 3, el modelo vigente — construye `Modelo_Personalizado_Fukuchi_GRF.mat`), `Predecir_GRF_Personalizado_Core.m` (función de uso final), `Comparar_Variantes_Plantilla_Fukuchi.m` (las 8 variantes, evidencia documentada).
+
+## 9. Punto de montaje protésico en la app de animación — `Aplicar_Punto_Montaje_Core.m` (02-sep-2026)
+
+**No confundir con `opciones.punto_seguimiento_m` de `Cadena_Cinematica_Core.m`/`Generar_Trayectoria.m` (§3-quinquies) — mismo concepto físico (distancia desde el tobillo, a lo largo del segmento tibial, hasta un punto de montaje/marcador), pero DOS implementaciones separadas a propósito, cada una para su propio pipeline:**
+
+- `Cadena_Cinematica_Core.m` → pipeline de exportación a CSV (`Generar_Trayectoria.m`), con la inversión de signo en X ya verificada contra el cableado real del banco (G7, §4).
+- `Aplicar_Punto_Montaje_Core.m` (nueva) → pipeline de la app interactiva (`App_Animacion_Cadera_Rodilla_Tobillo.m`, que usa `Cinematica_DoblePendulo_Core.m` y es deliberadamente independiente del CSV, ver su propia cabecera del 30-ago-2026) — SIN esa inversión de X, convención "de libro de texto" (Y hacia arriba positivo), confirmada por el usuario (sesión de integración con GAITSIM/Raspberry, 02-sep-2026) como coincidente con la convención real de la máquina física.
+
+Sesión que originó esto: se pidió poder ingresar en la app, como referencia visual antes de tocar la Raspberry, la distancia tobillo→punto de montaje de una prótesis transtibial real (dato del eje/longitud de la prótesis, no antropométrico — distinto de talla/masa). Input opcional (`efMontaje`, default 0 = comportamiento idéntico a antes de este cambio, sin punto nuevo dibujado). 6/6 pruebas nuevas (`Test_Punto_Montaje.m`, incluye consistencia cruzada con `Cinematica_DoblePendulo_Core.m`: a distancia=L_tibia reproduce EXACTAMENTE la rodilla), `Test_Generador.m` (22/22) y `Test_Generador_Trayectoria.m` (18/18) sin regresión.
+
+**Pendiente, no bloqueante:** esta función no está conectada a `Generar_Trayectoria.m`/al CSV — es solo para la app de visualización. Si se decide que el punto de montaje debe salir también en el CSV real, hay que decidir con cuál de las dos convenciones (y probablemente reconciliar ambas funciones) antes de exportar nada a la Raspberry.
+
+## 10. Ángulo tibial dependía de talla/velocidad más de lo real — `Saturar_Velocidad_Koopman_Core.m` + `congelar_vl_angulo` (02-sep-2026)
+
+**Hallazgo (usuario, revisando la app):** el ángulo tibial daba un resultado parecido para cualquier talla — sospecha correcta. Verificado con Kuopio (N=47) y, para descartar que fuera un artefacto de una sola muestra, con una segunda base independiente descargada esta sesión — **Maastricht Normative 3D Gait Dataset, datos POR SUJETO (no solo agrupados), N=244**, `RODILLA/Maastricht/02_Overview_comf.xlsx` (OSF t72cw, carpeta raíz — el archivo `05_AgeGenderGroup_comf.xlsx` que ya estaba en el repo es solo el resumen agrupado por edad/sexo, no sirve para correlacionar con talla individual). Mismo patrón en las dos bases: SD entre sujetos real ≈5-7° en todo el ciclo (no solo a 70%) vs. SD del modelo ≈0.4°, y `|corr(talla,real)|≤0.08` siempre vs. `|corr(talla,crudo)|` hasta 0.99, con signo alternante según el tramo.
+
+**Primer intento (velocidad Froude fuera del rango 0.5-5 kph que Koopman 2014 validó) fue INCOMPLETO** — verificado con `descomponer_v_vs_l.m` (congela cada variable por turno): el término de talla directo (`b3*l`) de cada regresión de Koopman contribuye tanto o más que el de velocidad, según el tramo. Saturar solo la velocidad (`Saturar_Velocidad_Koopman_Core.m`, saturación suave C¹ anclada en 5 kph, sin costo dentro del rango ya validado — sí se deja en el repo, es buena práctica igual) no bajó `corr(talla,crudo)` de 0.96-0.99 con ningún margen probado.
+
+**Corrección real:** opción `congelar_vl_angulo` en `Koopman2014_Core.m` — evalúa las 4 curvas angulares con `v_ref=5 kph` (límite superior publicado) y `l_ref=1.735 m` (media agrupada Kuopio+Maastricht) fijos, en vez de la v/talla real del sujeto. La talla real sigue entrando al generador, pero SOLO por el escalamiento geométrico de L_muslo/L_tibia (Paso 4) — no por los coeficientes de Koopman. `v_ref` importa mucho más que `l_ref` (un primer intento con `v_ref=3.0`, centro del rango, empeoraba el ajuste contra Maastricht de 6.61° a 9.66° RMSE — con `v_ref=5.0` vuelve a 6.74°, sin costo real).
+
+**Activado por defecto en `Obtener_Theta_Tibia_Candidato.m`/`Obtener_Angulos_Candidato.m`** (el pipeline de producción) — `Koopman2014_Core.m` en sí mantiene su propio default sin congelar, para no alterar los scripts de comparación de candidatos (`Evaluar_vs_Maastricht.m` y similares) que necesitan el comportamiento nativo del paper, no el de producción.
+
+**Verificado sin degradar ninguna métrica ya publicada** (Kuopio N=47, antes→después, misma clasificación RMSEnorm en las 5): Rodilla X 1.15→1.15, Rodilla Y 0.85→0.91, Tobillo X 1.17→1.17, Tobillo Y 0.88→0.90, Ángulo tibial calibrado 1.007→**0.992** (mejora) — todas las diferencias <0.06. `Test_Generador.m` 22/22, `Test_Generador_Trayectoria.m` 18/18, sin regresión.
+
+**Lo que NO arregla (límite estructural, no bug):** la magnitud de variabilidad entre sujetos que un generador de una sola entrada real (talla) puede producir sigue muy por debajo de la real (décimos de grado vs. 5-7° real) — esa brecha viene de estilo de marcha individual, no de talla ni velocidad, y ningún ajuste de Koopman la puede cerrar con talla como único dato de entrada. Documentado en el informe técnico, Limitaciones, como límite estructural abierto — no se inventó una corrección sin respaldo de dato real para taparlo.
+
+### 10-bis. Congelar OBLIGA a refittear toda la cadena — no es un cambio aislado (02-sep-2026, misma sesión)
+
+Al verificar consistencia app/informe/flujo apareció que **congelar cambia el crudo, y todo lo que se había ajustado SOBRE ese crudo queda desactualizado**. Hay que rehacer, en este orden:
+
+1. `Calibracion_Koopman_Kuopio_Core.m` — vía `Recalibrar_Koopman_Kuopio_Core.m` (hereda el nuevo default automáticamente). Muslo 0.7926→**0.6827**, tibia 0.8516→**0.7630**.
+2. `Coeficientes_Warp_Temporal.mat` — vía `Ajustar_Warp_Temporal_TallaSola.m` (X).
+3. `Coeficientes_CorreccionFinal.mat` — vía `Refit_CorreccionFinal_TallaSola.m` (Y).
+4. Recién entonces, las cifras/figuras oficiales: `Evaluar_CorreccionFinal_vs_Kuopio.m` e `INCLINACION_TIBIAL/Evaluar_vs_Kuopio_AnguloTibial.m`.
+
+**Hacer solo una parte deja la cadena PEOR que antes:** crudo congelado + coeficientes viejos degradaba Rodilla Y de 0.85 (Excelente) a **1.60 (Aceptable)**. Con la cadena completa refitteada: Rodilla X 1.18, Rodilla Y **0.83**, Tobillo X 1.30, Tobillo Y 0.88, Ángulo tibial **0.99** — ninguna baja de categoría y dos mejoran. Garantías re-verificadas con los coeficientes nuevos (barrido 100-230cm, 66 tallas): 0 retrocesos, 0 violaciones de monotonía en talla.
+
+**Consumidores que hay que mantener sincronizados** (todos llaman a `Koopman2014_Core` directo, no por los wrappers): la app, `Evaluar_CorreccionFinal_vs_Kuopio.m`, `Refit_CorreccionFinal_TallaSola.m`, `Ajustar_Warp_Temporal_TallaSola.m`, `INCLINACION_TIBIAL/Evaluar_vs_Kuopio_AnguloTibial.m`. Los scripts de COMPARACIÓN de candidatos (`Evaluar_vs_Maastricht.m`, `Evaluar_vs_Winter.m`, `Evaluar_vs_Ferber.m`, `Evaluar_Mejor_Modelo_Rodilla.m`, los `_Zhao`/`_Yun`) **NO** se tocan — necesitan el Koopman nativo del paper para que la comparación sea justa.
+
+## 11-bis. Punto de montaje: FIRMA CAMBIADA 03-sep-2026 — arreglo del "cuerpo rígido" (más simple de lo que parecía)
+
+`Aplicar_Punto_Montaje_Core.m` (ver §9 para su relación con `Cadena_Cinematica_Core.m`) convierte la distancia tobillo→montaje `d` (dato del **hardware**: longitud del eje de la prótesis — real: **15-24 cm**, NO hay ninguna longitud fija de referencia) en la trayectoria del punto que el banco realmente ejecuta.
+
+**El límite de cuerpo rígido de más abajo (§11, historial) NO necesitaba una corrección de cuerpo rígido — necesitaba una definición distinta, más simple.** Versión vieja: caminaba `d` desde el tobillo en dirección **theta_tibia (el ángulo del MODELO)**. Como la corrección híbrida mueve rodilla y tobillo por separado, esa dirección ya no coincidía con hacia-dónde-quedó-la-rodilla-generada — el punto salía hasta 2.5 cm fuera del segmento visible. **Arreglo (el usuario lo señaló directo):** caminar `d` en dirección **al punto rodilla YA generado**, no al ángulo:
+
+```
+u  = (Pk - Pa) / |Pk - Pa|      % vector unitario tobillo->rodilla, con los DOS puntos reales
+Pm = Pa + d*u
+```
+
+Con esto, distancia exacta Y sobre el segmento se cumplen **las dos a la vez, siempre**, sin importar que el segmento ya no sea rígido — verificado con error de precisión de máquina (`Test_Punto_Montaje.m` Test 7, deliberadamente con un segmento deformado). **Firma nueva:** `Aplicar_Punto_Montaje_Core(Xa_cm, Ya_cm, Xk_cm, Yk_cm, d_montaje_cm)` — recibe la rodilla en vez del ángulo. La validación de rango (`d` no puede exceder el segmento) ahora usa la longitud **real** del segmento en cada instante, no `L_tibia` nominal.
+
+**Consumidores que había que actualizar a la firma nueva (los dos, hechos el mismo día):**
+- `App_Animacion_Cadera_Rodilla_Tobillo.m` línea ~375 (ya usaba `Xk_full`/`Yk_full`, estaban en scope).
+- `Generar_Trayectoria.m` línea ~140 (integrado por otra sesión en paralelo esa misma tarde, con la firma vieja — se corrigió apenas se detectó). **Caso especial encontrado ahí:** el default `punto_seguimiento_m = L_tibia_m` ("rodilla anatómica") pedía d=L_tibia como *distancia*, pero el segmento corregido a veces mide *menos* que L_tibia nominal — fallaba la validación de rango aunque "la rodilla" siempre existe trivialmente. Se resolvió a nivel de semántica (`usar_rodilla_directa`: si se pide exactamente L_tibia_m, usar `Xk_full`/`Yk_full` directo, sin pasar por la distancia) — no relajando la validación.
+
+Firma vieja detectada y rechazada con error explícito (no falla en silencio) si algo todavía la usa — `Aplicar_Punto_Montaje_Core.m`, Test 8.
+
+Figura del informe: `Figura_Punto_Montaje_Trayectoria.m` → `docs/.../figuras/27_punto_montaje_trayectoria.png` (Figura del §Paso 4-bis). Verificado end-to-end, talla 130-210cm, d=20cm: error de distancia y de desviación del segmento ambos ~1e-14 cm en todo el rango. `Test_Punto_Montaje.m` 8/8, `Test_Generador_Trayectoria.m` 18/18.
+
+## 11. (historial, arreglado por §11-bis) Punto de montaje: el límite de cuerpo rígido — 02-sep-2026
+
+`Aplicar_Punto_Montaje_Core.m` (ver §9 para su relación con `Cadena_Cinematica_Core.m`) convierte la distancia tobillo→montaje `d` (dato del **hardware**: longitud del eje de la prótesis, NO antropométrico) en la trayectoria del punto que el banco realmente ejecuta:
+
+```
+Xm = Xa - d*sin(theta_tibia)
+Ym = Ya + d*cos(theta_tibia)
+```
+
+**Límite cuantificado, verificado — resuelto en §11-bis, no hacía falta cuerpo rígido:** la corrección híbrida corrige rodilla y tobillo **por separado**, así que **no preserva el segmento tibial como cuerpo rígido**. Medido (talla 1.71m, restaurando los offsets que la normalización a cero quita — misma trampa de `INCLINACION_TIBIAL/CIERRE_INCLINACION_TIBIAL.md` §3): la longitud tibial implícita entre rodilla y tobillo corregidos se desvía hasta **5.2%** de L_tibia (2.2-5.4 cm según talla), y la dirección de ese segmento se aparta hasta **7.6°** de theta_tibia. La distancia `d` al tobillo **sí** se respetaba exacta (error 1e-14 cm), pero el punto no caía exactamente sobre la recta rodilla-tobillo corregida.
+
+## 11. `Generar_Trayectoria.m` reemplazado por completo — ya usa el pipeline validado (02-sep-2026)
+
+**Pedido explícito del usuario:** "la exportación del CSV debe ser el último pipeline que tengo actual en mi MATLAB, nada más, lo anterior ya no me interesa". Reemplazo total, no coexistencia con flag de elegir enfoque.
+
+**Qué se quitó:** el motor de posición anterior (`Cadena_Cinematica_Core.m` como fuente de posición + soporte multi-candidato `'Koopman'/'Yun'/'Zhao'/'Combinado'` + residuo de "rockers" en apoyo + reconstrucción manual de cadera en balanceo). Ninguna de esas piezas se borró del repo (`Cadena_Cinematica_Core.m`, `Residuo_Rockers_Tobillo_Kuopio_Core.m`, `Obtener_Theta_Tibia_Candidato.m`, `Combinar_Candidatos_Core.m` siguen existiendo — las usan otros scripts: `GRF_Newton_ApoyoSimple_Core.m`, validaciones de RODILLA/TOBILLO, `Test_Combinar_Candidatos.m`), solo dejaron de ser el motor de `Generar_Trayectoria.m`. Se borró `Test_Generador_Combinado.m` (probaba exclusivamente la integración `'Combinado'` ya removida — no queda nada que probar de eso). Se actualizaron `Ver_GRF_y_Trayectoria.m`/`Ver_Resultado_Final.m` (ya no pasan `candidato` a `Generar_Trayectoria.m`; `GRF_Newton_ApoyoSimple_Core.m` sigue siendo multi-candidato, no se tocó).
+
+**Qué lo reemplaza:** el pipeline ya validado contra Kuopio LOSO (r=0.999/0.953/0.989 etc., ver informe técnico) — el mismo que usa `App_Animacion_Cadera_Rodilla_Tobillo.m`: `Koopman2014_Core.m` (calibrado LOSO + `congelar_vl_angulo`, §10) → `Cinematica_DoblePendulo_Core.m` + `Trayectoria_Cadera_Core.m` → `Correccion_Hibrida_PenduloDoble_Core.m`. Ya no hay parámetro `candidato` — Koopman es el único modelo vigente. `opciones.punto_seguimiento_m` se conserva con la misma semántica de siempre (G7-bis, §3-quinquies), ahora calculado con `Aplicar_Punto_Montaje_Core.m` (§9) sobre el tobillo/ángulo tibial del péndulo doble en vez de con `Cadena_Cinematica_Core.m`.
+
+**⚠️ Corrección real durante la implementación, atrapada ANTES de aplicarse (no una regresión ya cometida) — importante para no repetir el error:** el plan original era "invertir X al final, igual que hacía `Cadena_Cinematica_Core.m` (G7)". Eso hubiera sido un error: la inversión de G7 se verificó sobre una fórmula de **rotación pura alrededor de un tobillo fijo** (sin avance de cadera mezclado en el número) — el pipeline nuevo **suma el avance de cadera (siempre creciente) dentro de la misma coordenada X** (`Cinematica_DoblePendulo_Core.m`: `Xa = Xh + L1·sin(θ1) + L2·sin(θ2)`), así que la regla de G7 no se traspasa por analogía. Se verificó de nuevo con el MISMO método (`Verificar_Signo_X_PenduloDoble.m`, correlación ángulo-vs-posición contra `Control_apoyo_Luis_V4.csv` real, 95 filas): **ni X ni Y necesitan inversión con este pipeline** — corr(ang,X) real=-0.993 vs. generado=-0.998 (mismo signo), corr(ang,Y) real=+0.529 vs. generado=+0.928 (mismo signo), y el avance neto en apoyo coincide en magnitud (real=44.27cm, generado=42.97cm, error 2.9%). Moraleja explícita: una convención de signo verificada para un modelo no se hereda automáticamente a otro modelo con distinta composición geométrica — hay que re-verificar contra el dato real cada vez, no razonar por analogía.
+
+**Tests:** `Test_Generador_Trayectoria.m` (18/18 PASS) reescrito completo desde el Test 10 (los Tests 1-9, de antropometría/velocidad/temporización/`Cadena_Cinematica_Core.m` en sí, no cambiaron) — ahora valida el pipeline nuevo: forma de salida, formato de CSV, sin recorte de amplitud (D1), monotonía de X en el ciclo completo (garantía PAVA sobrevive el recorte de fase), signo X/Y contra el CSV real (ver arriba), orden de magnitud del avance neto (tolerancia 20%, no exacto), y los 3 casos de `punto_seguimiento_m` (0/fuera de rango/rodilla exacta). `Test_Generador.m` (22/22) sin cambios ni regresión.
+
+**Visualización pedida por el usuario:** `Ver_Trayectoria_CSV_Exportada.m` (nuevo) — grafica X/Y/ángulo/mapa sagital exactamente como saldrían en el CSV (apoyo+balanceo, con el corte de fase marcado), para comparar contra la vista de `App_Animacion_Cadera_Rodilla_Tobillo.m`.
+
+**Pendiente, no bloqueante, encontrado en el camino (no es de esta tarea, no se tocó):** `Test_Combinar_Candidatos.m` tiene un error de sintaxis preexistente (`Illegal use of reserved keyword "end"`, línea 55, commit del 25-ago-2026 — nunca corrió, no es una regresión de esta sesión) — `Combinar_Candidatos_Core.m` en sí no se tocó ni se probó en esta tarea.
+
+## 12. Botón "Exportar CSV" en `App_Animacion_Cadera_Rodilla_Tobillo.m` (02-sep-2026, endurecido 03-sep-2026)
+
+**Pedido explícito del usuario:** poder generar, uno a la vez y desde la misma app interactiva (sin script de barrido aparte), el CSV real que se sube a la Raspberry — para la talla y el punto de montaje EXACTOS que estén cargados en pantalla en ese momento. "La trayectoria final es la de ese punto" — si el punto de montaje está activo, el CSV exportado es el de ese punto, no el del tobillo.
+
+**Implementación:** nuevo botón "Exportar CSV" junto a "Reproducir" (mismo `glCtrl`, grid ampliado de 10 a 11 columnas). Al presionarlo, `OnExportarCSV` arma `antropometria.talla_m` (el campo de talla YA está en metros, sin conversión) y `opciones.punto_seguimiento_m` (convertido de cm a m) — llama a `Generar_Trayectoria.m` + `Escribir_CSV_Simulador.m` tal cual, sin duplicar ningún cálculo. Errores de `Generar_Trayectoria.m`/`Aplicar_Punto_Montaje_Core.m` (p.ej. talla o punto de montaje fuera de rango) se capturan y se muestran con `uialert` (mismo patrón ya usado en `Recalcular`), en vez de dejar que la app se caiga.
+
+**CAMBIO 03-sep-2026: la distancia de montaje ya NO tiene default para este botón (sí lo sigue teniendo `Generar_Trayectoria.m` en general, para trayectorias de validación).** Motivo: al leer el paper de conferencia ya aceptado se encontró que la prótesis real usada ahí tiene 42cm de eje — distinto de los ~0.38m que este proyecto tenía documentados sin verificar (§3-quinquies) — y el usuario confirmó tener al menos otro eje real de referencia (~0.21m). Como distintas prótesis tienen distinto eje, cualquier valor por defecto arriesgaría exportar la trayectoria de una prótesis distinta de la que de verdad está montada en el banco. Si `efMontaje.Value` está vacío o `<=0`, el botón rechaza la exportación con un `uialert` explicando por qué, sin generar ningún archivo — el operador tiene que ingresar el eje real de la prótesis en cada ensayo.
+
+**Nombre de archivo (id_sujeto):** siempre `talla<N>_montaje<M>` (`N` = talla en cm, `M` = distancia de montaje en cm, ambos redondeados) — ya no existe la variante sin montaje para este botón. Carpeta de salida: `CODIGOS/GENERADOR/EXPORT_RASPBERRY/` (se crea automáticamente si no existe).
+
+**Verificado (no con la GUI en sí — es una app interactiva, no corre en `-batch`; se verificó la lógica de exportación que el botón invoca, idéntica, con un script temporal desechado después de la prueba):** 2 casos, talla=1.72m sin punto de montaje y talla=1.72m con punto de montaje=30cm — los 4 CSV resultantes (2 casos × 2 fases) tienen tiempo estrictamente creciente, sin NaN, y el caso con punto de montaje da una posición claramente distinta del caso por defecto (9.7cm de diferencia máxima en X, esperado — 30cm desde el tobillo no es la rodilla anatómica para esa talla). `checkcode` sobre el archivo modificado: sin errores (2 avisos preexistentes de líneas 388-389, sin relación con este cambio).

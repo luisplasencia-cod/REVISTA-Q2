@@ -86,8 +86,11 @@
     \item El generador convierte talla, masa y sexo en la trayectoria de referencia del simulador de 3 GDL (LIBRA-PUCP), sin depender de una captura pregrabada de un sujeto.
     \item Se probaron 3 modelos publicados (Koopman 2014, Zhao 2026, Yun 2014), sin reentrenar, contra 5 bases de datos independientes (1 a 246 sujetos).
     \item \textbf{Koopman 2014 ganó en los tres segmentos} (rodilla, tobillo, ángulo tibial). El ángulo tibial tiene su propia calibración (LOSO) que corrige una sobreestimación de 20--23\,\% en amplitud angular. Para la posición final de rodilla/tobillo (péndulo doble + cadera oscilatoria, Sección~\ref{sec:paso4}) se corrige la posición ya generada (Sección~\ref{sec:retrocesos_x}), un método distinto por eje: deformación de tiempo (\emph{warp}) en $X$, serie de Fourier en $Y$.
-    \item \textbf{Resultado final, con la ÚNICA entrada que la app realmente pide (talla --- masa/muslo/tibia/velocidad se estiman, nunca se miden):} rodilla y tobillo quedan en RMSEnorm 0.89--1.17 ($r$=0.949--0.999, $N$=44), ángulo tibial en RMSEnorm 1.01 ($r$=0.989, $N$=47) --- Excelente/Bueno en las 5 curvas (Tabla~\ref{tab:resultados_finales}). Además, el avance ($X$) queda \textbf{garantizado monótono en talla} (a mayor talla, igual o mayor avance, siempre --- Sección~\ref{sec:retrocesos_x}), una propiedad matemática del método, no un ajuste casual. Es más pobre que una primera versión de esta validación que sí usaba antropometría/velocidad reales de \emph{Kuopio} (RMSEnorm 0.52--0.92) --- ese primer número no representaba lo que un usuario real de la app obtiene, así que se reajustó por completo (\texttt{Refit\_CorreccionFinal\_TallaSola.m}, 31-ago-2026, y \texttt{Ajustar\_Warp\_Temporal\_TallaSola.m}, 01-sep-2026) y se reemplazó en este informe.
+    \item \textbf{Resultado final, con la ÚNICA entrada que la app realmente pide (talla --- masa/muslo/tibia/velocidad se estiman, nunca se miden), recalculado 01-sep-2026 con los 47 de 51 sujetos de \emph{Kuopio} que sí tienen dato utilizable (antes N=44 por un patrón de archivo que excluía 3 sin motivo real, ver Sección~\ref{sec:limitaciones}):} rodilla y tobillo quedan en RMSEnorm 0.83--1.30 ($r$=0.954--0.999, $N$=47), ángulo tibial en RMSEnorm 0.99 ($r$=0.990, $N$=47) --- Excelente/Bueno en las 5 curvas (Tabla~\ref{tab:resultados_finales}, recalculada 02-sep-2026 con la cadena ya consistente tras \texttt{congelar\_vl\_angulo}, ver Sección~\ref{sec:limitaciones}). Además, el avance ($X$) queda \textbf{garantizado monótono en talla} (a mayor talla, igual o mayor avance, siempre --- Sección~\ref{sec:retrocesos_x}), una propiedad matemática del método, no un ajuste casual. Es más pobre que una primera versión de esta validación que sí usaba antropometría/velocidad reales de \emph{Kuopio} (RMSEnorm 0.52--0.92) --- ese primer número no representaba lo que un usuario real de la app obtiene, así que se reajustó por completo (\texttt{Refit\_CorreccionFinal\_TallaSola.m}, 31-ago-2026, y \texttt{Ajustar\_Warp\_Temporal\_TallaSola.m}, 01-sep-2026) y se reemplazó en este informe.
+    \item \textbf{Cadena conectada de extremo a extremo (02-sep-2026):} talla $\to$ \texttt{Generar\_Trayectoria.m} $\to$ \texttt{Escribir\_CSV\_Simulador.m} ya usa el pipeline validado de arriba (Sección~\ref{sec:limitaciones}), con un punto de montaje protésico opcional sobre el segmento tibial real (Sección~\ref{sec:punto_montaje}, distancia $d\in[15,24]$\,cm) --- lo mismo que ejecuta \texttt{App\_Animacion\_Cadera\_Rodilla\_Tobillo.m}. Falta únicamente la validación del banco físico (último ítem de esta sección).
     \item Hallazgo propio adicional: Zhao y Yun tienen un defecto de fase de 50\,\% del ciclo en su parámetro de lateralidad --- explica por qué parecían competitivos en algunas bases y no en otras.
+    \item \textbf{Garantía universal (02-sep-2026), Sección~\ref{sec:robustez_warp}:} el warp por sí solo solo garantizaba "sin retrocesos nuevos" (condicional a que el crudo geométrico ya fuera monótono). Se agregó una proyección isotónica (PAVA) como último paso --- garantiza 0 retrocesos \emph{siempre}, para cualquier talla, por construcción matemática, verificado en un barrido 100--230\,cm. En el camino se encontró y corrigió un bug numérico real en \texttt{Koopman2014\_Core.m} (colisión de nodos del spline a talla $\approx$98--114\,cm, ángulos que explotaban a valores absurdos) --- \textbf{lectura honesta:} esto es robustez \emph{numérica} (el código ya no explota con ninguna entrada), no una extensión de la validez \emph{anatómica} del modelo a esas tallas --- Koopman et al.\ (2014) validó su modelo con adultos de mediana edad (talla 1.69\,m$\pm$0.10, N=15), y 98--114\,cm cae a más de 7 desviaciones estándar de esa población. El arreglo evita basura numérica; no valida la marcha infantil.
+    \item \textbf{Comparación exploratoria (NO validación cerrada) con Ferber et al.\ 2024} (Sección~\ref{sec:validacion_ferber}, dataset nunca usado para calibrar/corregir): el primer intento dio un resultado débil en $X$ ($r_X\approx0.36$--0.39) que resultó ser un desajuste de comparación, no un defecto del modelo --- Ferber es un dataset de \emph{treadmill}, y la primera comparación le sumaba la rampa de avance overground de producción (más la corrección que depende de ella) antes de comparar. Corregido (sin rampa, sin esa corrección, solo convención relativa-a-cadera): $r_X\approx0.94$, $r_Y\approx0.78$, N=40, prácticamente igual dentro y fuera del rango de talla.
     \item Camargo et al.\ queda reservada, sin usar, como examen final de no-circularidad --- pendiente de ejecutar.
 \end{itemize}
 
@@ -109,6 +112,9 @@ Cadena cinemática de péndulo doble (cadera--rodilla--tobillo, una sola fórmul
 Exportación en el formato exacto que el simulador ya lee & \ref{sec:paso5} & Ingeniería de integración, no un dato de literatura \\
 Calibración afín LOSO del ángulo (corrige sobreestimación de 20--23\,\%) & \ref{sec:calibracion} & Koopman et al.\ no reporta este defecto ni esta corrección \\
 Corrección de posición por deformación de tiempo (warp) en $X$, con ecuación diferencial que garantiza monotonía en tiempo Y en talla & \ref{sec:retrocesos_x} & Construcción propia; ninguna fuente combina warp temporal con un afín restringido para garantizar orden físico, ni aplica un método distinto por eje según su naturaleza \\
+Proyección isotónica (PAVA) como red de seguridad universal, sobre el warp & \ref{sec:robustez_warp} & Warp aplicado, técnica de orden restringido ya publicada; combinarlo con el warp para cerrar su límite condicional es decisión propia \\
+Hallazgo y corrección de bug de colisión de nodos en \texttt{Koopman2014\_Core.m} & \ref{sec:robustez_warp} & Diagnóstico y arreglo numérico propio sobre la implementación del modelo publicado --- robustez de código, no validación anatómica nueva (Koopman validó con adultos, no niños) \\
+Comparación exploratoria con Ferber et al.\ 2024, sin circularidad --- incluido el diagnóstico de que Ferber es \emph{treadmill} y la primera comparación arrastraba la rampa de avance overground & \ref{sec:validacion_ferber} & Diseño de examen propio (dataset ya usado solo en selección, nunca en calibración) --- preliminar, no es una validación cerrada \\
 Hallazgo: desfase de fase de 50\,\% en Zhao/Yun & \ref{sec:comparacion_candidatos} & Encontrado y verificado numéricamente en este proyecto \\
 \bottomrule
 \end{tabular}
@@ -282,13 +288,16 @@ Registro propio del proyecto & 1 & --- & --- & Primer cribado rápido \\
 Winter~\cite{Winter2009} & 1 & marcadores de laboratorio & no documentada & Chequeo de forma \\
 \emph{Maastricht}~\cite{Senden2024} & 246 & cinta, realidad virtual & de grupo (H, 18--29) & Selección, población grande \\
 Ferber et al.~\cite{Ferber2024} & 40 & cinta & individual, medida & Selección, posición 3D real \\
-\emph{Kuopio}~\cite{Lavikainen2024} & 15 (de 51) & overground real & individual, medida & Validación final y calibración \\
+\emph{Kuopio}~\cite{Lavikainen2024} & 47\textsuperscript{c} (de 51) & overground real & individual, medida & Validación final y calibración \\
 Camargo et al.~\cite{Camargo2021} & reservada & overground, escaleras & individual, medida & Examen final (no ejecutado) \\
 \bottomrule
 \end{tabular}
+
+\vspace{0.1cm}
+\footnotesize\textsuperscript{c}~\resuelto{unificado el 01-sep-2026: 47 de 51 en todos los análisis de este informe (calibración de ángulo, validación de posición, validación de ángulo tibial). Antes la validación de posición usaba N=44 por un patrón de nombre de archivo (\texttt{*\_l\_comf\_01.csv}) que excluía 3 sujetos (02, 30, 39) con datos utilizables bajo otro número de trial --- corregido. El techo real es 47, no 51: los 4 sujetos restantes (07, 09, 10, 24) no tienen NINGÚN trial utilizable en ningún análisis --- falta el marcador \texttt{RTibia\_RFoot\_score} en su \texttt{.c3d} fuente (verificado en el log real de extracción, \texttt{RODILLA/Kuopio/raw/\_extraccion\_28ago\_51sujetos\_log.txt}), un hueco del dataset publicado, no de este pipeline.}
 \end{table}
 
-Solo \emph{Kuopio}~\cite{Lavikainen2024} combina marcha overground real y antropometría individual medida --- la única usada para validación final (Sección~\ref{sec:resultados}) y calibración LOSO (Sección~\ref{sec:calibracion}). 15 de 51 sujetos, 3 ensayos c/u.
+Solo \emph{Kuopio}~\cite{Lavikainen2024} combina marcha overground real y antropometría individual medida --- la única usada para validación final (Sección~\ref{sec:resultados}) y calibración LOSO (Sección~\ref{sec:calibracion}). 3 ensayos c/u, N=47 en todos los análisis, ver nota c arriba.
 
 \fuente{Contacto de talón detectado con el método cinemático de Zeni et al.~\cite{Zeni2008} (Kuopio no trae eventos precalculados).}
 
@@ -302,14 +311,14 @@ Solo \emph{Kuopio}~\cite{Lavikainen2024} combina marcha overground real y antrop
 \subsection{El hallazgo}
 \label{sec:hallazgo_calibracion}
 
-Examinando sujeto por sujeto, la rodilla vertical predicha era más plana que la real: solo 51\,\% de la excursión real (el RMSE crudo no lo delataba porque la señal misma es pequeña). Causa: el ángulo de muslo de Koopman acierta la \emph{forma} ($r=0.971$) pero sobreestima la \emph{amplitud} 21\,\% ($32.5^\circ$ real vs.\ $39.2^\circ$ generado). El ángulo tibial, medido de forma independiente, dio una ganancia similar (0.811 vs.\ 0.769 del muslo) --- confirma un único defecto de amplitud (20--23\,\%), no uno distinto por eje.
+Examinando sujeto por sujeto, la rodilla vertical predicha era más plana que la real (hallazgo original, con el pool de N=15 disponible en ese momento --- el RMSE crudo no lo delataba porque la señal misma es pequeña). Causa: el ángulo de muslo de Koopman acierta la \emph{forma} pero sobreestima la \emph{amplitud}. El ángulo tibial, medido de forma independiente, dio una ganancia similar a la del muslo --- confirma un único defecto de amplitud, no uno distinto por eje. \resuelto{recalculado 01-sep-2026 con el pool completo disponible hoy (N=47, antes N=13--15): ganancia muslo=0.7926, tibia=0.8516 (Tabla~\ref{tab:coeficientes_calibracion}) --- 20--21\,\% de sobreestimación, mismo orden de magnitud que el hallazgo original, confirma que no era un artefacto de la muestra chica.}
 
 \subsection{El método}
 \label{sec:metodo_loso}
 
-LOSO: para corregir un sujeto, los coeficientes se calculan solo con los otros 14, nunca con sus propios datos --- se repite por cada uno de los 15, evitando calibrar y evaluar con la misma observación.
+LOSO: para corregir un sujeto, los coeficientes se calculan solo con los otros N$-$1, nunca con sus propios datos --- se repite por cada uno de los N=47, evitando calibrar y evaluar con la misma observación.
 
-\matlabtitle{el bucle de 15 pliegues (uno por sujeto):}
+\matlabtitle{el bucle de 47 pliegues (uno por sujeto):}
 \begin{lstlisting}
 for k = 1:numel(idx_ok)
     i = idx_ok(k);  otros = idx_ok(idx_ok ~= i);       % nunca el propio sujeto
@@ -333,15 +342,15 @@ Esto sirve para \emph{validar} (reportar los números de este informe: cada suje
 
 \begin{table}[H]
 \centering
-\caption{Coeficientes de la calibración afín, promedio de los 15 pliegues LOSO.}
+\caption{Coeficientes de la calibración afín, promedio de los 47 pliegues LOSO (\textbf{recalculado 02-sep-2026} sobre el crudo con $v$/$l$ congelados, \texttt{Recalibrar\_Koopman\_Kuopio\_Core.m} --- valores anteriores, sobre el crudo sin congelar: muslo 0.7926/$-2.60^\circ$, tibia 0.8516/$-11.84^\circ$; ver Sección~\ref{sec:limitaciones}). El ajuste agrupado que usa producción (\texttt{Calibracion\_Koopman\_Kuopio\_Core.m}) coincide con estos promedios LOSO a 4 decimales.}
 \label{tab:coeficientes_calibracion}
 \small
-\begin{tabular}{@{}lrr@{}}
+\begin{tabular}{@{}lrrr@{}}
 \toprule
-Ángulo & Ganancia $b$ & Offset $a$ \\
+Ángulo & Ganancia $b$ & Offset $a$ & SD entre folds ($b$ / $a$) \\
 \midrule
-Muslo (rodilla) & 0.769 & $-2.69^\circ$ \\
-Tibia (tobillo, ángulo tibial) & 0.811 & $-11.33^\circ$ \\
+Muslo (rodilla) & 0.6827 & $-1.48^\circ$ & 0.0035 / $0.07^\circ$ \\
+Tibia (tobillo, ángulo tibial) & 0.7630 & $-11.70^\circ$ & 0.0034 / $0.06^\circ$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -352,6 +361,27 @@ Se aplica sobre el ángulo, \emph{antes} de convertirlo en posición por geometr
 \label{sec:pipeline}
 
 \aporte{Encadenar estos 5 pasos en una sola cadena reproducible, a partir de solo 3 datos de entrada (talla, masa, sexo) y combinando 4 fuentes independientes, es la construcción propia de este trabajo --- ninguna fuente define este pipeline completo.}
+
+\textbf{Mapa del flujo (los bloques, en orden, con lo que entra y sale de cada uno):}
+\begin{center}
+\small
+\begin{tabular}{@{}rlll@{}}
+\toprule
+\# & Bloque & Entra & Sale \\
+\midrule
+1 & Antropometría segmentaria (§\ref{sec:paso1}) & talla $H$ & $L_{muslo}$, $L_{tibia}$ \\
+2 & Velocidad y temporización (§\ref{sec:paso2}) & talla $H$ & $v$, $T_{ciclo}$ \\
+3 & Ángulos articulares (§\ref{sec:paso3}) & $v_{ref}$, $l_{ref}$ \emph{fijos} & $\theta_{muslo}(t)$, $\theta_{tibia}(t)$ \\
+3b & Calibración afín LOSO (§\ref{sec:calibracion}) & los 2 ángulos & los 2 ángulos calibrados \\
+4 & Péndulo doble + cadera (§\ref{sec:paso4}) & ángulos, $L_{muslo}$, $L_{tibia}$, $v$ & $(x,y)$ rodilla y tobillo \\
+4b & Corrección híbrida (§\ref{sec:retrocesos_x}) & $(x,y)$ crudos & $(x,y)$ corregidos \\
+4c & \textbf{Punto de montaje} (§\ref{sec:punto_montaje}) & $(x,y)$ tobillo Y rodilla, \textbf{$d$} & $(x_m,y_m)$ del montaje \\
+5 & Exportación CSV (§\ref{sec:paso5}) & la trayectoria elegida & CSV del simulador \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Dos entradas, no una:} la \textbf{talla} (dato de la persona) recorre los bloques 1, 2 y 4; la \textbf{distancia tobillo--montaje $d$} (dato del \emph{hardware}: la longitud del eje de la prótesis) entra solo en el bloque 4c. Son independientes: cambiar la prótesis no cambia la cinemática, cambia dónde se lee el punto sobre el mismo segmento tibial.
 
 \textbf{Trazabilidad de las 3 entradas, resumen honesto antes de entrar al detalle paso a paso:} de las 3, solo la \textbf{talla} llega hasta el final de la trayectoria (Pasos 1, 2 y 4). La \textbf{masa} y el \textbf{sexo} entran a la función de contrato (\texttt{Generar\_Trayectoria.m} acepta ambos campos) pero \textbf{ningún paso de este pipeline los usa todavía} para calcular posición o ángulo --- la masa solo importa en el módulo aparte de predicción de fuerza (GRF --- fuera del alcance de este informe, documentado en \texttt{informe\_generador\_Luis.txt} Sección 9), y ahí una prueba explícita encontró que agregarla como tercera variable empeoraba la predicción con los datos disponibles (N=48) por sobreajuste, así que tampoco se usa ahí. El sexo no distingue ninguna de las fórmulas de los 4 candidatos evaluados --- limitación declarada, no un dato que "se perdió" en el camino.
 
@@ -378,7 +408,7 @@ Paso & Talla & Masa & Sexo \\
 
 \entradasalida{talla $H$ --- único dato de entrada real de este paso.}{$L_{muslo}$, $L_{tibia}$ (y $L_{pie}$, usado solo por el candidato Yun) --- las \textbf{longitudes} de segmento. $H$ se reutiliza tal cual en el \textbf{Paso 2}; $L_{muslo}$ y $L_{tibia}$ se usan en el \textbf{Paso 4} para la geometría. Las \emph{alturas} de cadera/rodilla/tobillo de más abajo son solo álgebra intermedia (de dónde salen las restas) --- el código no las calcula ni las guarda como variable; no son una salida real de este paso.}
 
-\fuente{Drillis \& Contini 1966, fracciones de talla $H$, verificadas contra la Fig.\ 4.1 de Winter~\cite{Winter2009}.}
+\fuente{Drillis \& Contini 1966~\cite{DrillisContini1966}, fracciones de talla $H$, verificadas contra la Fig.\ 4.1 de Winter~\cite{Winter2009}.}
 
 \begin{align*}
 \text{cadera} &= 0.530\,H, &
@@ -410,7 +440,7 @@ end
 \subsection{Paso 2: velocidad de marcha y temporización del ciclo}
 \label{sec:paso2}
 
-\entradasalida{talla $H$ --- del \textbf{Paso 1}, reutilizada tal cual (este paso no recibe ninguna salida numérica \emph{nueva} del Paso 1, solo el mismo dato de entrada).}{velocidad $v$ y duración de ciclo $T_{ciclo}$. Las dos las necesita el \textbf{Paso 3}: las regresiones de Koopman (y de los otros candidatos) piden $v$ y talla como entrada.}
+\entradasalida{talla $H$ --- del \textbf{Paso 1}, reutilizada tal cual (este paso no recibe ninguna salida numérica \emph{nueva} del Paso 1, solo el mismo dato de entrada).}{velocidad $v$ y duración de ciclo $T_{ciclo}$. $T_{ciclo}$ fija el reloj del ciclo; $v$ alimenta la zancada del \textbf{Paso 4} (traslación de cadera). \textbf{Corrección 02-sep-2026:} $v$ ya \emph{no} entra a la regresión angular del \textbf{Paso 3} --- ese paso usa un $v_{ref}$ fijo (Sección~\ref{sec:paso3}); antes de esa fecha sí se le pasaba la $v$ estimada por Froude de cada sujeto.}
 
 \fuente{$Fr=v^2/(gL)=0.25$ (velocidad "autoseleccionada"), Leurs et al.\ 2011~\cite{Leurs2011} --- verificado a texto completo y, además, la atribución de autor fue re-verificada contra Crossref el 28-ago-2026 (una referencia anterior lo atribuía a "Raichlen \& Pontzer 2011"; el hallazgo es correcto, el autor original estaba mal).}
 
@@ -460,9 +490,11 @@ Dispara una advertencia automática si $v$ cae fuera de 0.5--5\,km/h (rango vali
 \subsection{Paso 3: ángulos articulares por fase}
 \label{sec:paso3}
 
-\entradasalida{$v$ y $T_{ciclo}$ --- del \textbf{Paso 2}. Talla $H$ --- del \textbf{Paso 1}, para la regresión de Koopman.}{las 4 curvas de ángulo de Koopman y, por reducción geométrica, $\theta_{muslo}(t)$ y $\theta_{tibia}(t)$ --- los dos ángulos que necesita el \textbf{Paso 4} para calcular posición.}
+\entradasalida{$v_{ref}$=5\,km/h y $l_{ref}$=1.735\,m --- valores de REFERENCIA fijos, \textbf{no} la $v$ ni la talla del sujeto (ver el aviso de abajo); $T_{ciclo}$ --- del \textbf{Paso 2}, ese sí con la $v$ real.}{las 4 curvas de ángulo de Koopman y, por reducción geométrica, $\theta_{muslo}(t)$ y $\theta_{tibia}(t)$ --- los dos ángulos que necesita el \textbf{Paso 4} para calcular posición.}
 
-Con velocidad y talla ya fijas (Pasos 1 y 2), se reconstruyen las 4 curvas (Sección~\ref{sec:koopman}) y se obtiene el ángulo tibial con la Ec.~\ref{eq:reduccion_via_rodilla}. La Figura~\ref{fig:koopman_4curvas} muestra exactamente cuáles son esas 4 curvas, para un caso concreto (no un esquema).
+\aporte{\textbf{Aviso de trazabilidad (vigente desde 02-sep-2026): este paso ya NO recibe la talla ni la velocidad del sujeto.} La regresión de Koopman se evalúa siempre en un punto de referencia fijo (\texttt{congelar\_vl\_angulo}), porque se verificó contra dos bases independientes (\emph{Kuopio} $N$=47 y \emph{Maastricht} $N$=244) que la dependencia con talla que predicen sus coeficientes no existe en el dato real ($|corr(talla,real)|\le0.08$ frente a $|corr(talla,modelo)|$ hasta 0.99) --- ver Sección~\ref{sec:limitaciones}. \textbf{La talla del sujeto sigue entrando al generador, pero solo en el Paso 4}, por el escalamiento geométrico de $L_{muslo}$/$L_{tibia}$ (Paso 1) y por la zancada. Consecuencia práctica: la \emph{forma angular} es la misma para cualquier usuario; lo que cambia con la talla es la \emph{escala geométrica} de la trayectoria.}
+
+Con esos valores de referencia se reconstruyen las 4 curvas (Sección~\ref{sec:koopman}) y se obtiene el ángulo tibial con la Ec.~\ref{eq:reduccion_via_rodilla}. La Figura~\ref{fig:koopman_4curvas} muestra exactamente cuáles son esas 4 curvas, para un caso concreto (no un esquema).
 
 \begin{figure}[H]
 \centering
@@ -523,13 +555,39 @@ Xa = Xk    + L2*sin(theta2);   Ya = Yk    - L2*cos(theta2);
 
 Se construyó además una app interactiva (\texttt{App\_Animacion\_Cadera\_Rodilla\_Tobillo.m}) para explorar el modelo en vivo: talla editable, slider manual de \%ciclo, botón reproducir/pausar, mapa con la cadena + trayectoria punteada revelada progresivamente, y gráficas de desplazamiento normalizadas al punto inicial.
 
-\textbf{Verificación:} (1) comportamiento físico correcto --- el tobillo despega y se levanta $\sim$7\,cm durante el balanceo, sin necesidad de imponer ninguna curva de elevación (Figura~\ref{fig:salida_generador}, Paso 5); (2) comparación DIRECTA, sin ninguna calibración, contra los 44 sujetos disponibles del \emph{Kuopio Gait Dataset} --- resultados completos en la Sección~\ref{sec:resultados_finales}.
+\textbf{Verificación:} (1) comportamiento físico correcto --- el tobillo despega y se levanta $\sim$7\,cm durante el balanceo, sin necesidad de imponer ninguna curva de elevación (Figura~\ref{fig:salida_generador}, Paso 5); (2) comparación DIRECTA, sin ninguna calibración, contra los 47 sujetos disponibles del \emph{Kuopio Gait Dataset} --- resultados completos en la Sección~\ref{sec:resultados_finales}.
 
 \aporte{\textbf{Regla metodológica, fijada 31-ago-2026:} tanto la app como toda comparación contra \emph{Kuopio} en este informe reciben \textbf{solo la talla} como entrada --- masa/muslo/tibia/velocidad se ESTIMAN (Pasos 1--2), nunca se usa el valor real medido de cada sujeto, aunque \emph{Kuopio} lo tenga disponible. Es la única forma de que los números de esta sección sean comparables 1:1 con lo que la app le entrega a un usuario real, que solo mide la talla con una cinta métrica. Una primera pasada de esta validación (30--31-ago) sí usó antropometría/velocidad reales de \emph{Kuopio} para ajustar la corrección de posición --- eso hacía que el resultado no representara la app; se reajustó por completo con esta regla (\texttt{Refit\_CorreccionFinal\_TallaSola.m}, y luego \texttt{Ajustar\_Warp\_Temporal\_TallaSola.m} para el warp) antes de reportar los números de la Sección~\ref{sec:resultados_finales}.}
 
 \aporte{\textbf{Bug de consistencia app--informe, encontrado y corregido 31-ago-2026:} la gráfica de desplazamiento de la app, con la corrección final activa, mostraba un valor final hasta \textbf{2.4--2.5\,cm distinto} del que reportan las Figuras~\ref{fig:rodilla_individual_pendulo_cal}/\ref{fig:tobillo_individual_pendulo_cal} para la MISMA talla. Causa: la corrección de posición (Ec.~\ref{eq:fourier_correccion}) es un ajuste afín $a(t)+b(t)\cdot crudo(t)$ que \emph{no} está forzado a pasar por 0 en $t{=}0$ --- forzarlo ya se había probado y revertido por empeorar el RMSEnorm (nota en \texttt{Correccion\_Posicion\_Suave\_PenduloDoble\_Core.m}). La gráfica de la app, sin embargo, SÍ re-normalizaba la curva corregida a 0 en $t{=}0$ antes de dibujarla --- cancelando exactamente ese término $a(0)$ que la corrección aprendió, y desalineándola de lo que valida este informe. \textbf{Corregido} en \texttt{App\_Animacion\_Cadera\_Rodilla\_Tobillo.m}: la gráfica de desplazamiento ahora usa la salida de la corrección \emph{tal cual}, sin renormalizar --- verificado numéricamente que, para la misma talla, la app y \texttt{Evaluar\_CorreccionFinal\_vs\_Kuopio.m} producen ahora la curva IDÉNTICA punto a punto (diferencia $<10^{-9}$\,cm). Las Figuras~\ref{fig:rodilla_individual_pendulo_cal}/\ref{fig:tobillo_individual_pendulo_cal} ya marcan el valor numérico del punto máximo de cada curva --- para verificar contra la app, ingresar la misma talla, activar ``Corrección final'', y comparar ese número con el valor final que muestra la gráfica de Desplazamiento X/Y de la app.}
 
 Para un punto a distancia $d\leq L_{tibia}$ del tobillo (el sensor real de referencia no está en la rodilla anatómica sino a mitad de la tibia): misma geometría, reemplazando $L_{tibia}$ por $d$ en la Ec.~\ref{eq:cadena_tobillo}.
+
+\subsection{Paso 4-bis: del tobillo al punto de montaje protésico}
+\label{sec:punto_montaje}
+
+\entradasalida{$(x_a,y_a)$ del tobillo y $(x_k,y_k)$ de la rodilla --- del \textbf{Paso 4}, ya con la corrección de posición aplicada; y \textbf{un dato de entrada nuevo, no antropométrico}: la distancia $d$ desde el tobillo hasta el punto de montaje, medida a lo largo del eje de la prótesis (en la aplicación real, $d\in[15,24]$\,cm --- no hay ninguna longitud fija de eje, es un dato de la prótesis de cada ensayo).}{la trayectoria $(x_m,y_m)$ de ese punto de montaje --- que es, en la práctica, el punto que el banco tiene que ejecutar cuando se ensaya una prótesis real.}
+
+El simulador no mueve el tobillo anatómico: mueve el punto donde la prótesis se acopla al banco. Ese punto está sobre el segmento tobillo--rodilla, a una distancia $d$ del tobillo, y $d$ es un dato del \emph{hardware} (longitud del eje de la prótesis), no de la persona --- por eso entra como campo aparte en la app (\texttt{App\_Animacion\_Cadera\_Rodilla\_Tobillo.m}, campo ``Punto de montaje (cm desde tobillo)''), independiente de la talla.
+
+\aporte{\textbf{Definición geométrica (corregida 03-sep-2026):} el punto se calcula sobre el segmento que forman los DOS puntos ya generados (tobillo y rodilla), no con el ángulo $\theta_{tibia}$ del modelo:}
+\begin{equation}
+\vec{u} = \frac{(x_k,y_k)-(x_a,y_a)}{\lVert(x_k,y_k)-(x_a,y_a)\rVert}, \qquad (x_m,y_m) = (x_a,y_a) + d\,\vec{u}
+\label{eq:punto_montaje}
+\end{equation}
+
+Un primer intento usaba $\theta_{tibia}$ directamente (Ec. análoga a la Ec.~\ref{eq:cadena_rodilla}). Mientras la geometría es rígida las dos formas coinciden exactamente --- pero \emph{después} de la corrección híbrida (Sección~\ref{sec:retrocesos_x}) ya no: esa corrección mueve rodilla y tobillo por separado, así que el segmento corregido ya no mide $L_{tibia}$ ni apunta en la dirección $\theta_{tibia}$ (se desvía hasta 5.2\,\% en longitud y $\approx$7.6\textdegree\ en dirección, medido en el rango de la app) --- con la fórmula vieja, el punto de montaje quedaba hasta 2.5\,cm fuera del segmento visible en pantalla para $d$=20\,cm. \textbf{Con la Ec.~\ref{eq:punto_montaje}, las dos propiedades físicas se cumplen SIEMPRE, incluso con el segmento ya no rígido:} $\lVert(x_m,y_m)-(x_a,y_a)\rVert=d$ exacto (la prótesis es un tubo rígido, su longitud no cambia en el ciclo), y $(x_m,y_m)$ cae exactamente sobre la recta tobillo--rodilla --- verificado con error de precisión de máquina ($10^{-14}$\,cm) incluso con un segmento deliberadamente deformado en la prueba (\texttt{Test\_Punto\_Montaje.m}, Test 7, 8/8 pruebas). La restricción es simplemente $d<$ longitud del segmento \emph{real} en cada instante (no $L_{tibia}$ nominal) --- amplio margen frente al rango real del eje (15--24\,cm) contra un segmento generado de $\gtrsim$28\,cm en todo el rango de talla de la app.
+
+Con $d=0$ el punto es el tobillo mismo (la app se comporta igual que antes de existir este campo); con $d=\lVert(x_k,y_k)-(x_a,y_a)\rVert$ es exactamente la rodilla. La Figura~\ref{fig:punto_montaje} muestra el resultado completo: la cadena en varios instantes con el punto marcado sobre el segmento, la trayectoria resultante (queda entre la del tobillo y la de la rodilla, tanto más cerca de la rodilla cuanto mayor es $d$), y el desplazamiento $X$/$Y$ final de ese punto, que es la señal que el banco ejecutaría.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figuras/27_punto_montaje_trayectoria.png}
+\caption{Generación de la trayectoria del punto de montaje protésico (talla 1.71\,m, $d$=20\,cm), con el pipeline completo de producción (Koopman con $v$/$l$ congelados $\to$ calibración LOSO $\to$ péndulo doble $\to$ corrección híbrida $\to$ Ec.~\ref{eq:punto_montaje}). (a) cadena sagital en 7 instantes del ciclo, con el punto de montaje sobre el segmento; (b) las tres trayectorias comparadas --- el montaje describe una curva intermedia entre tobillo y rodilla; (c) desplazamiento $X$/$Y$ del punto de montaje contra \%ciclo (avance 94.7\,cm, ROM vertical 7.4\,cm), sin retrocesos (0/100 pasos). Verificado: distancia al tobillo exacta (error $10^{-14}$\,cm) y punto exactamente sobre el segmento (error $10^{-14}$\,cm), pese a que el segmento real mide 41.0--44.2\,cm (no un $L_{tibia}$=42.1\,cm constante). Generada por \texttt{Figura\_Punto\_Montaje\_Trayectoria.m}.}
+\label{fig:punto_montaje}
+\end{figure}
+
+\aporte{\textbf{Nota de diseño (resuelta 03-sep-2026, historial de la Ec.~\ref{eq:punto_montaje}):} la corrección híbrida del Paso 4 corrige rodilla y tobillo \emph{por separado} (warp en $X$, Fourier en $Y$), así que el segmento entre ellos ya no es rígido después de corregir (se desvía hasta 5.2\,\% en longitud y $\approx$7.6\textdegree\ en dirección respecto al $\theta_{tibia}$ del modelo). Una primera versión de esta ecuación usaba $\theta_{tibia}$ como dirección --- eso respetaba la distancia $d$ exacta pero dejaba el punto hasta 2.5\,cm fuera del segmento visible. \textbf{No hacía falta ninguna corrección de cuerpo rígido para arreglarlo}: al definir la dirección con el vector tobillo$\to$rodilla \emph{ya generado} (Ec.~\ref{eq:punto_montaje}) en vez del ángulo del modelo, las dos propiedades (distancia exacta y sobre el segmento) se cumplen a la vez, sin importar que el segmento ya no sea rígido --- la solución no era corregir la rigidez, era dejar de depender de un ángulo que la corrección ya había desalineado.}
 
 \subsection{Paso 5: exportación}
 \label{sec:paso5}
@@ -595,7 +653,7 @@ Esta corrección se aplica DESPUÉS de generar la posición por péndulo doble c
 
 \begin{enumerate}
 \item \textbf{Qué se necesita:} una función $corregido(t)$ tal que $\frac{d(corregido)}{dt}\geq0$ siempre --- eso es, literalmente, la definición de "no retrocede".
-\item \textbf{Por qué corregir la \emph{amplitud} (como Fourier, Ec.~\ref{eq:fourier_correccion}) no sirve para esto:} en $corregido(t)=a(t)+b(t)\cdot crudo(t)$, la derivada es $a'(t)+b'(t)\cdot crudo(t)+b(t)\cdot crudo'(t)$ --- una suma de 3 términos con signos independientes. Nada obliga a que esa suma sea $\geq0$ en todo $t$, y de hecho no lo es: se probó Fourier también en $X$ (misma Ec.~\ref{eq:fourier_correccion} que usa $Y$, coeficientes de producción con los 44 sujetos) y produjo retrocesos donde el crudo no los tenía --- verificado para talla=1.70\,m: rodilla, de 0/100 a 4/100 pasos negativos; tobillo, de 11/100 a 22/100 --- el mismo defecto que motivó cambiar de familia de corrección para $X$.
+\item \textbf{Por qué corregir la \emph{amplitud} (como Fourier, Ec.~\ref{eq:fourier_correccion}) no sirve para esto:} en $corregido(t)=a(t)+b(t)\cdot crudo(t)$, la derivada es $a'(t)+b'(t)\cdot crudo(t)+b(t)\cdot crudo'(t)$ --- una suma de 3 términos con signos independientes. Nada obliga a que esa suma sea $\geq0$ en todo $t$, y de hecho no lo es: se probó Fourier también en $X$ (misma Ec.~\ref{eq:fourier_correccion} que usa $Y$, coeficientes de producción ajustados en ese momento con N=44) y produjo retrocesos donde el crudo no los tenía --- verificado para talla=1.70\,m: rodilla, de 0/100 a 4/100 pasos negativos; tobillo, de 11/100 a 22/100 --- el mismo defecto que motivó cambiar de familia de corrección para $X$ (comparación de método, no repetida con el N=47 actual --- la conclusión cualitativa no depende de esa diferencia de muestra).
 \item \textbf{La idea: corregir \emph{cuándo} ocurre cada valor, no \emph{cuánto} vale.} Si en vez de tocar la amplitud se define $corregido(t)=crudo(\tau(t))$ para alguna función de tiempo $\tau$, la derivada es $crudo'(\tau(t))\cdot\tau'(t)$ (regla de la cadena) --- un producto de 2 términos, no una suma de 3. Si $crudo$ ya es monótono ($crudo'\geq0$, cierto para rodilla/tobillo X dentro del rango validado, Sección~\ref{sec:robustez_warp}) y se logra que $\tau'(t)\geq0$ \textbf{siempre}, el producto completo queda $\geq0$ siempre --- monotonía garantizada por construcción, no por casualidad del ajuste.
 \item \textbf{Cómo garantizar $\tau'(t)\geq0$ siempre, para cualquier coeficiente que salga del ajuste:} en vez de pedirle al optimizador que respete una restricción de desigualdad (que puede fallar numéricamente o quedar justo en el borde), se parametriza $\tau'(t)$ como una \textbf{exponencial} de una función libre $g(t)$:
 \begin{equation}
@@ -621,9 +679,9 @@ corregido(t) = a_0 + b_0\cdot crudo(\tau(t))
 \end{equation}
 $a_0,b_0$ son constantes \emph{globales} (no dependen de \%ciclo ni de talla/velocidad). Con $b_0>0$ (verificado, Sección~\ref{sec:resultados_finales}) no pueden introducir retrocesos locales, y --- como $crudo(100\,\%)$ es monótono en talla por geometría pura ($r=1.000$, la talla determina $L_{muslo}$, $L_{tibia}$ y la zancada) --- la composición $a_0+b_0\cdot crudo$ queda \textbf{garantizada monótona en talla también}: a mayor talla, igual o mayor avance, siempre.
 
-\aporte{\textbf{¿Por qué no depende de velocidad, si se pidió explícitamente que dependiera de otra entrada derivada de la talla?} Se probó (Sección~\ref{sec:resultados_finales}): un afín $\alpha(v)=a_0+a_1v$, $\beta(v)=b_0+b_1v$ SÍ reduce el RMSEnorm (de 1.10/1.17 a 0.96/0.98) --- pero a costa de la monotonía: el avance real al 100\,\% del ciclo no correlaciona con la talla dentro de los 44 sujetos de \emph{Kuopio} ($r=-0.01$), así que el ajuste de mínimos cuadrados aprendía una $\beta(v)$ que \emph{cancelaba} la escala natural con talla del crudo --- el resultado quedaba casi constante entre tallas, y en algún caso un sujeto más bajo terminaba con más avance que uno más alto. Se probó también talla como covariable de $\alpha$ con la restricción $a_1\geq0$ (que hubiera preservado la monotonía) --- el ajuste convergió exactamente a $a_1=0$: \textbf{no existe ninguna covariable derivada de la talla que mejore el ajuste sin romper el orden físico}. Se prefirió la versión constante: el costo en RMSE (en cm) es despreciable (11.4 vs 11.5\,cm rodilla, 9.5 vs 9.5\,cm tobillo) y a cambio se gana una garantía física, no solo estadística.
+\aporte{\textbf{¿Por qué no depende de velocidad, si se pidió explícitamente que dependiera de otra entrada derivada de la talla?} Se probó (Sección~\ref{sec:resultados_finales}): un afín $\alpha(v)=a_0+a_1v$, $\beta(v)=b_0+b_1v$ SÍ reduce el RMSEnorm --- pero a costa de la monotonía: el avance real al 100\,\% del ciclo no correlaciona con la talla dentro de los sujetos de \emph{Kuopio} ($r=-0.01$, medido con el pool de N=44 disponible cuando se probó esta alternativa; no repetido con el N=47 actual, ver Sección~\ref{sec:limitaciones}), así que el ajuste de mínimos cuadrados aprendía una $\beta(v)$ que \emph{cancelaba} la escala natural con talla del crudo --- el resultado quedaba casi constante entre tallas, y en algún caso un sujeto más bajo terminaba con más avance que uno más alto. Se probó también talla como covariable de $\alpha$ con la restricción $a_1\geq0$ (que hubiera preservado la monotonía) --- el ajuste convergió exactamente a $a_1=0$: \textbf{no existe ninguna covariable derivada de la talla que mejore el ajuste sin romper el orden físico}. Se prefirió la versión constante: el costo en RMSE (en cm) es despreciable (11.4 vs 11.5\,cm rodilla, 9.5 vs 9.5\,cm tobillo) y a cambio se gana una garantía física, no solo estadística.
 
-\textbf{Por qué es válido imponer esta restricción aunque los 44 sujetos individuales de \emph{Kuopio} no la cumplan siempre:} que el avance real no correlacione con la talla en esta muestra es \emph{ruido individual esperado} --- cada persona elige su velocidad de marcha cómoda por razones propias (condición física, hábito, preferencia), no solo por su estatura. El generador no busca replicar el ruido de un sujeto específico; busca producir, para un usuario nuevo, una trayectoria que respete el principio biomecánico general de que una pierna más larga permite --- a igual esfuerzo relativo --- una zancada más larga (el mismo principio que ya sostiene la Ec.~\ref{eq:froude}, Froude). Imponer esa restricción como prior de diseño, en vez de dejar que el ajuste absorba el ruido de la muestra, es una decisión metodológica defendible, no una que se esconda.}
+\textbf{Por qué es válido imponer esta restricción aunque los sujetos individuales de \emph{Kuopio} no la cumplan siempre:} que el avance real no correlacione con la talla en esta muestra es \emph{ruido individual esperado} --- cada persona elige su velocidad de marcha cómoda por razones propias (condición física, hábito, preferencia), no solo por su estatura. El generador no busca replicar el ruido de un sujeto específico; busca producir, para un usuario nuevo, una trayectoria que respete el principio biomecánico general de que una pierna más larga permite --- a igual esfuerzo relativo --- una zancada más larga (el mismo principio que ya sostiene la Ec.~\ref{eq:froude}, Froude). Imponer esa restricción como prior de diseño, en vez de dejar que el ajuste absorba el ruido de la muestra, es una decisión metodológica defendible, no una que se esconda.}
 
 \textbf{La corrección de $Y$ (Fourier):}
 \begin{equation}
@@ -634,52 +692,82 @@ lineal en sus coeficientes --- se resuelve por mínimos cuadrados ordinarios. $K
 
 \aporte{\textbf{¿Es el warp un aporte propio, o una técnica ya publicada?} El principio general --- deformar el \emph{tiempo} de una curva en vez de su \emph{amplitud} para alinearla con una referencia --- es un área establecida de estadística funcional (\emph{curve registration}/\emph{dynamic time warping}, ver p.\,ej.\ Ramsay \& Silverman, \emph{Functional Data Analysis}). No se inventó la idea desde cero. Lo propio de este trabajo: (1) la formulación específica $d\tau/dt=e^{g(t)}$ con $g$ en base de Fourier; (2) el diagnóstico que motivó buscar esta familia --- que el problema de $X$ es de \emph{monotonía}, no solo de precisión; (3) verificar explícitamente, probando y descartando alternativas con covariables, que ninguna entrada derivada de la talla mejora el ajuste sin romper la monotonía --- así que el afín se deja constante a propósito, no por omisión; y (4) aplicar métodos \emph{distintos} a $X$ y a $Y$ según cada uno necesite o no la garantía de monotonía.}
 
-\textbf{Número de armónicos del warp ($K_w$):} barrido LOSO real, $N$=44 --- meseta plana desde $K_w$=2 hasta $K_w$=12, verificado con el afín dependiente de velocidad (etapa de búsqueda, antes de fijar la versión constante) --- $K_w$ gobierna la suavidad de $\tau(t)$ (Ec.~\ref{eq:warp_ode}), un parámetro independiente de si el afín depende o no de una covariable, así que la elección se mantiene. \textbf{Se fija $K_w$=2} (el más simple que ya alcanza la meseta).
+\textbf{Número de armónicos del warp ($K_w$):} barrido LOSO real, $N$=44 (etapa de búsqueda original, no repetido con el N=47 actual) --- meseta plana desde $K_w$=2 hasta $K_w$=12, verificado con el afín dependiente de velocidad (antes de fijar la versión constante) --- $K_w$ gobierna la suavidad de $\tau(t)$ (Ec.~\ref{eq:warp_ode}), un parámetro independiente de si el afín depende o no de una covariable, así que la elección se mantiene. \textbf{Se fija $K_w$=2} (el más simple que ya alcanza la meseta).
 
-\textbf{Resultado (LOSO real, $N$=44, solo talla):} Rodilla X $r$=0.999/RMSEnorm=1.10/\textbf{0 retrocesos}; Tobillo X $r$=0.999/RMSEnorm=1.17/\textbf{0 retrocesos} --- ambos Bueno, sin retrocesos garantizados por construcción matemática (Ec.~\ref{eq:warp_ode}) Y monótonos en talla garantizados (Ec.~\ref{eq:warp_afin}, $b_0>0$), no por casualidad de un ajuste.
+\textbf{Resultado (LOSO real, $N$=47, solo talla, recalculado 02-sep-2026 con la cadena ya consistente):} Rodilla X $r$=0.999/RMSEnorm=1.18/\textbf{0/47 sujetos con algún retroceso}; Tobillo X $r$=0.999/RMSEnorm=1.30/\textbf{0/47 sujetos con algún retroceso} --- ver Sección~\ref{sec:robustez_warp} para la garantía universal (warp+PAVA) que hace que esto sea 0/47 y no 3/47 como en una versión anterior de este informe.
 
-\subsubsection{Robustez: qué pasa dentro y fuera del rango validado}
+\subsubsection{Robustez universal: warp + proyección isotónica (PAVA)}
 \label{sec:robustez_warp}
 
-\aporte{La garantía de "cero retrocesos" de la Ec.~\ref{eq:warp_ode} es matemática, pero \textbf{tiene una condición implícita que hay que verificar, no asumir}: la composición $a_0+b_0\cdot crudo(\tau(t))$ solo hereda la monotonía de $\tau(t)$ si (a) $b_0>0$ (verificado: $b_0$=0.664 rodilla, 0.636 tobillo, Sección~\ref{sec:resultados_finales}) y (b) $crudo(\cdot)$ en sí mismo ya era monótono \emph{antes} de aplicar el warp --- el warp reordena \emph{cuándo} ocurre cada valor de $crudo$, pero no puede eliminar una bajada que el propio $crudo$ ya tenía. Como $a_0,b_0$ son constantes fijas (no dependen de talla ni velocidad), la garantía de monotonía --- tanto en el tiempo (Ec.~\ref{eq:warp_ode}) como en la talla (por $b_0>0$ y $crudo(100\,\%)$ monótono en talla, $r$=1.000) --- aplica para \textbf{cualquier} talla que la app permita, no solo dentro de un rango de velocidad. Se verificó igual con un barrido de talla, no se dio por sentado.}
+\aporte{\textbf{El warp por sí solo da una garantía CONDICIONAL, no universal.} La composición $a_0+b_0\cdot crudo(\tau(t))$ solo hereda la monotonía de $\tau(t)$ si $crudo(\cdot)$ \emph{ya era monótono antes} del warp --- el warp reordena \emph{cuándo} ocurre cada valor de $crudo$, pero no puede eliminar una bajada que el propio crudo ya tenía. Verificado con datos reales: 3 de 47 sujetos de Kuopio (talla 161--165\,cm, borde del rango) seguían con 1--2 pasos negativos de 100 en tobillo X después del warp, en una versión anterior de este informe.}
 
-\textbf{Dentro del rango validado (161--186.6\,cm, mismo rango de los 44 sujetos de \emph{Kuopio}):} barrido fino cada $\approx$5\,mm (52 tallas) --- \textbf{0 fallos, 0 retrocesos en las 52} (rodilla y tobillo X). La garantía matemática se cumple exactamente donde se necesita.
+\textbf{Solución: proyección isotónica (PAVA) como último paso, agregada 02-sep-2026.} \fuente{Pool Adjacent Violators Algorithm --- resultado estándar de estadística de orden restringido (Barlow, Bartholomew, Bremner \& Brunk 1972, \emph{Statistical Inference under Order Restrictions}; el método en sí es de Ayer et al.\ 1955).} Encuentra, para cualquier curva de entrada, la curva no decreciente más cercana en mínimos cuadrados --- garantiza 0 retrocesos \textbf{siempre}, para \textbf{cualquier} talla, por construcción matemática (no una heurística), y es idempotente sobre curvas ya monótonas (no cambia nada donde no hace falta). \texttt{Proyeccion\_Isotonica\_Core.m} (implementación propia del algoritmo estándar).
 
-\textbf{Fuera del rango (extremos permitidos por la app, 130--210\,cm):}
+\aporte{\textbf{Segundo hallazgo, y por qué se necesitó una versión PONDERADA del PAVA:} el PAVA sin ponderar, aplicado por separado a cada sujeto, rompía la monotonía \emph{en talla} del avance final (a mayor talla, igual o mayor avance) que sí tenía el warp+afín solo --- se encontraron 4--5 violaciones en un barrido sintético 100--230\,cm. Diagnosticado a fondo (no se aceptó la primera explicación): \textbf{no era el PAVA moviendo el último punto} --- era un bug numérico real en \texttt{Koopman2014\_Core.m}, ver más abajo, que hacía que el propio ángulo crudo (antes de cualquier corrección) explotara a valores absurdos (hasta $2.8\times10^7$ grados) en talla 98--114\,cm. Una vez corregido ese bug, se reintentó sin ponderar y las violaciones desaparecieron solas. Se dejó de todos modos el PAVA ponderado (\texttt{Proyeccion\_Isotonica\_Core.m} acepta un vector de pesos; el último punto --- el avance final, que ya tenía su propia garantía geométrica de monotonía en talla, $r=1.000$ --- se fija con un peso muy grande) como protección adicional, sin costo: sigue siendo exactamente la misma solución de mínimos cuadrados ponderados sujeta a monotonía, no una regla nueva agregada por fuera.}
+
+\aporte{\textbf{Hallazgo separado, más serio: colisión de nodos en \texttt{Koopman2014\_Core.m}.} El spline quíntico de Hermite (Sección~\ref{sec:koopman}) se arma entre 6 eventos clave, uno de ellos fijo en $x{=}1\,\%$ del ciclo y los demás calculados por regresión (Ec.~\ref{eq:koopman_regresion}). A talla/velocidad extrema (cadera flexo-extensión, talla $\approx$98--114\,cm) la posición regresionada de un evento \textbf{cruza} al evento fijo --- su separación $h$ pasa por cero, y el sistema $6\times6$ que arma cada tramo (Ec.~\ref{eq:hermite_quintico}, con potencias de $h$ hasta $h^5$) queda mal condicionado. \textbf{Corregido} con una separación mínima entre nodos consecutivos (3\,\% del ciclo; si dos eventos regresionados quedan más cerca, se separan simétricamente alrededor de su punto medio, preservando el orden) --- técnica estándar de construcción de splines, no una excepción ad-hoc. Verificado: el ángulo de cadera en talla=100\,cm pasó de 166--$2.8{\times}10^7$° (según el evento) a 28--30°, consistente con talla vecinas y con el rango fisiológico esperado. \textbf{Alcance real de esta corrección --- no confundir con validez anatómica:} Koopman et al.\ (2014) validó su modelo con 15 adultos de mediana edad (47--68 años, talla 1.69\,m$\pm$0.10) --- 98--114\,cm cae a más de 7 SD de esa población, y la marcha infantil es biomecánicamente distinta (proporciones de segmento, madurez neuromuscular), no solo "la misma curva a escala menor". Este arreglo es \textbf{robustez numérica} (el código ya no devuelve valores absurdos con ninguna talla) --- \textbf{no} es evidencia de que el modelo sea válido para población pediátrica. Ningún coeficiente publicado de Koopman se modificó.}
+
+\textbf{Verificación final, con las dos correcciones juntas (guarda de Koopman + warp + PAVA ponderado), barrido sintético $100$--$230$\,cm (66 tallas, mucho más amplio que el rango 130--210\,cm de la app):}
 
 \begin{table}[H]
 \centering
-\caption{Retrocesos en tobillo X, dentro y fuera del rango validado --- CRUDO (antes de cualquier corrección) vs.\ HÍBRIDO (warp + afín constante).}
-\label{tab:robustez_fuera_rango}
+\caption{Retrocesos en el tiempo y violaciones de monotonía en talla, barrido 100--230\,cm --- antes (warp solo) y después (warp + PAVA + guarda de Koopman) de esta sesión.}
+\label{tab:robustez_universal}
 \small
-\begin{tabular}{@{}rrrr@{}}
+\begin{tabular}{@{}lrr@{}}
 \toprule
-Talla (cm) & $v$ (m/s) & Retrocesos CRUDO & Retrocesos HÍBRIDO \\
+& Antes (warp solo) & Después (warp + PAVA + guarda) \\
 \midrule
-130 (fuera, corto) & 1.30 & 9/100 & 4/100 \\
-140 (fuera, corto) & 1.35 & 7/100 & 3/100 \\
-150 (fuera, corto) & 1.40 & 6/100 & 2/100 \\
-155 (fuera, corto) & 1.42 & 5/100 & 2/100 \\
-161 (borde validado) & 1.45 & 1/100 & 0/100 \\
-165 (dentro) & 1.46 & 0/100 & 0/100 \\
-186.6 (borde validado) & 1.56 & 0/100 & 0/100 \\
-190--210 (fuera, alto) & 1.57--1.65 & 0/100 & 0/100 \\
+Retrocesos en tiempo (total, 66 tallas $\times$ 100 pasos) & hasta 236 (tobillo) & \textbf{0} \\
+Violaciones de monotonía en talla (de 65 pasos de talla) & 4--5 (rodilla y tobillo) & \textbf{0} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Diagnóstico:} para tallas por debajo del rango validado ($<$161\,cm, velocidad estimada $<$1.45\,m/s), el geométrico CRUDO del tobillo (péndulo doble + Koopman, \emph{antes} de cualquier corrección) empieza a tener retrocesos propios (hasta 9/100 en el extremo de 130\,cm) --- es un defecto del \textbf{modelo geométrico}, no de la corrección. El warp \textbf{nunca lo empeora} (consistente con la Ec.~\ref{eq:warp_ode}: no puede introducir retrocesos nuevos) y en la práctica lo \textbf{reduce ligeramente}, pero no lo elimina del todo porque no puede eliminar algo que ya estaba en el crudo. Para tallas por encima del rango (hasta 210\,cm, el máximo de la app) no aparece ningún retroceso, ni en crudo ni corregido.
+\textbf{Costo de distorsión del PAVA} (RMSE agregado sobre el warp, dentro del ROM de cada curva): despreciable dentro del rango de la app (130--210\,cm: 0.00--0.27\,\% del ROM) --- solo se vuelve apreciable en talla=100\,cm (4.26\,\% del ROM en tobillo), muy por debajo del mínimo de la app (130\,cm).
 
-\textbf{Conclusión práctica:} la corrección híbrida es segura para cualquier talla que la app permita --- \emph{nunca empeora} el retroceso frente al crudo --- pero la garantía de \emph{cero} retrocesos absoluto solo está demostrada y confirmada dentro de 161--186.6\,cm. La app ya avisa cuando la talla ingresada cae fuera del rango validado (Sección~\ref{sec:paso4}).
+\textbf{Conclusión práctica:} la corrección híbrida (warp + PAVA, sobre una salida de Koopman ya sin la colisión de nodos) da 0 retrocesos y monotonía en talla \textbf{garantizados matemáticamente, para cualquier talla}, no solo dentro de 161--186.6\,cm. La app sigue avisando fuera del rango validado con datos reales (161--186.6\,cm) porque la \emph{precisión} (qué tan cerca está del sujeto real) sigue sin verificarse ahí con dato real de posición --- ver la comparación exploratoria con Ferber más abajo (Sección~\ref{sec:validacion_ferber}), que no alcanza a resolver esto todavía.
+
+\subsubsection{Comparación exploratoria con Ferber et al.\ 2024 (preliminar, NO una validación cerrada)}
+\label{sec:validacion_ferber}
+
+\revisar{\textbf{Encuadre de esta sección, sin cambio:} esto sigue siendo una \emph{comparación exploratoria}, no una validación externa cerrada --- se calcula sobre los 40 sujetos disponibles del dataset, con un pipeline reducido (sin la rampa de avance ni la corrección final de producción, ver más abajo), no con el pipeline completo que sí se valida contra Kuopio. El objetivo de esta sección es confirmar que la \emph{forma angular} del modelo generaliza fuera de Kuopio, no repetir la validación de posición completa --- eso queda para Camargo (examen final, reservado, sin tocar).}
+
+\aporte{Pedido explícito del usuario, 02-sep-2026: probar contra datos reales que \textbf{no sean Kuopio} (que ya ajustó calibración y corrección --- seguir probando ahí no es un examen independiente) para tener una primera señal de si el modelo generaliza, dentro y fuera del rango de talla validado. Ferber et al.\ 2024 (Scientific Data, ya usado en este informe solo para \emph{elegir} el modelo, Tabla~\ref{tab:comparacion_rodilla} --- nunca para ajustar calibración ni corrección) da posición 3D real de rodilla, con antropometría individual medida, N=40, talla 150--195\,cm. Camargo et al.\ sigue reservado aparte, sin tocar (examen final, ese sí pensado como validación cerrada).}
+
+\resuelto{\textbf{Causa raíz del resultado débil en $X$, diagnosticada y corregida 02-sep-2026 (investigación dedicada, \texttt{RODILLA/Diag\_Ferber\_Fase.m}, \texttt{Diag\_Ferber\_Descomponer.m}, \texttt{Diag\_Ferber\_Variantes\_XY.m}):} \textbf{Ferber et al.\ 2024 es un dataset de \emph{treadmill}} (\texttt{Ferber/README\_Ferber2024\_original.txt}, líneas 18 y 48--49: ``walking on a treadmill''), a diferencia de \emph{Kuopio} (overground, confirmado en su propio docstring). En treadmill el sujeto no se traslada en el marco de laboratorio --- el rango real de $X$ en Ferber es de solo $\sim$28--35\,cm, prácticamente idéntico entre las convenciones global y relativa-a-cadera (confirma que la cadera casi no avanza), dominado enteramente por el balanceo rodilla-relativo-a-cadera. La primera versión de esta comparación usaba el pipeline de producción completo, que suma \texttt{Trayectoria\_Cadera\_Core} (una rampa de avance \emph{overground}, estimada por Froude en $\sim$135--160\,cm, 4--5$\times$ más grande que el rango real) \textbf{antes} de aplicar \texttt{Correccion\_Hibrida\_PenduloDoble\_Core} (que mezcla no linealmente rampa+balanceo vía deformación temporal + afín, calibrada contra el $X_k$ \emph{completo} de Kuopio) --- esa mezcla no es separable después: restar la misma rampa del resultado ya corregido seguía dando $r_X=0.36$. Verificado con un barrido de variantes (N=40): sin rampa y sin la corrección híbrida (solo geometría + calibración LOSO del ángulo), $r_X=0.945$; aplicando la corrección híbrida a esa misma señal sin rampa, $r_X$ cae a $0.594$ y $r_Y$ se vuelve \emph{negativo} ($-0.259$) --- confirma que la corrección, ajustada para la curva completa de Kuopio, no es aplicable a un balanceo puro sin la rampa que la acompaña en producción. \textbf{No es un defecto del modelo}: la cinemática angular (Koopman calibrado LOSO) generaliza muy bien a Ferber cuando se compara la cantidad físicamente correcta.}
+
+\texttt{Validar\_Externo\_Ferber\_Core.m} (corregido el mismo día) --- mismo pipeline de producción hasta el ángulo calibrado (SOLO TALLA como entrada), pero \textbf{sin} \texttt{Trayectoria\_Cadera\_Core} (Xh=Yh=0, no aplica a treadmill) y \textbf{sin} \texttt{Correccion\_Hibrida\_PenduloDoble\_Core} (calibrada para la curva rampa+balanceo de Kuopio, no para un balanceo puro). Se compara \textbf{solo} contra la convención relativa-a-cadera de Ferber --- la convención global/lab dejó de reportarse porque no es físicamente comparable en un dataset de treadmill (el propio \texttt{Cargar\_Ferber2024\_Core.m} ya advertía esto para el modelo viejo de tobillo fijo; con el diagnóstico queda confirmado que la razón real es la naturaleza del dataset, no cómo se modela el tobillo):
+
+\begin{table}[H]
+\centering
+\caption{Rodilla vs.\ Ferber et al.\ 2024 (convención relativa-a-cadera, N=40), comparación exploratoria --- antes (pipeline completo con rampa+corrección de producción) y después (fix: sin rampa, sin corrección híbrida) del diagnóstico del 02-sep-2026.}
+\label{tab:validacion_ferber}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{Antes (pipeline completo)} & \multicolumn{2}{c}{Después (fix, relativa-cadera)} \\
+& $r_X$ & $r_Y$ & $r_X$ & $r_Y$ \\
+\midrule
+Todos (N=40) & 0.382 & 0.558 & \textbf{0.945} & \textbf{0.777} \\
+Dentro de rango (N=32) & 0.380 & 0.551 & \textbf{0.946} & \textbf{0.780} \\
+Fuera de rango (N=8) & 0.388 & 0.582 & \textbf{0.941} & \textbf{0.765} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\revisar{\textbf{Lectura del resultado corregido:} $r_X\approx0.94$--$0.95$ y $r_Y\approx0.77$--$0.78$, prácticamente idéntico dentro y fuera del rango de talla validado (igual que antes del fix) --- confirma que la generalización de la \emph{forma angular} no depende de la talla. El RMSE en $X$ (4.1--4.4\,cm) es del orden del rango real de esta señal en treadmill ($\sim$30\,cm), consistente con una comparación de forma razonable, no perfecta. Sigue siendo una comparación \emph{parcial} (sin rampa de avance ni corrección final): confirma que la cinemática angular generaliza bien fuera de Kuopio, pero \textbf{no} sustituye una validación del pipeline completo de posición (rampa+corrección incluidas) contra un dataset overground real --- eso sigue pendiente de Camargo.}
 
 \subsubsection{¿Cuánto pesa la corrección frente a la geometría?}
 \label{sec:peso_correccion_posicion}
 
-\aporte{Si la corrección pesara más que la geometría que corrige, el resultado ya no sería ``péndulo doble corregido'' sino, en la práctica, ``\emph{Kuopio} con un poco de péndulo encima''. Se midió, dentro del rango de talla validado (161--186.6\,cm, $N$=44) --- descomponiendo la curva final en geometría sola (crudo) y corrección sola (delta = corregido $-$ crudo), Figura~\ref{fig:peso_correccion_posicion}.}
+\aporte{Si la corrección pesara más que la geometría que corrige, el resultado ya no sería ``péndulo doble corregido'' sino, en la práctica, ``\emph{Kuopio} con un poco de péndulo encima''. Se midió, dentro del rango de talla validado (161--186.6\,cm, $N$=44 en el momento de este análisis) --- descomponiendo la curva final en geometría sola (crudo) y corrección sola (delta = corregido $-$ crudo), Figura~\ref{fig:peso_correccion_posicion}.}
+
+\revisar{esta descomposición (tabla y figura) no se recalculó con el pool ampliado a N=47 el 01-sep-2026 --- el script que la generó no quedó guardado en el repo. La conclusión cualitativa (geometría domina en X, corrección domina en Y) es estable y no debería cambiar con 3 sujetos más, pero los números exactos de la tabla siguen siendo de N=44 --- pendiente de reconstruir el script y recalcular antes de la versión final.}
 
 \begin{table}[H]
 \centering
-\caption{Rango de movimiento (ROM) aportado por la geometría (crudo) frente a la corrección (delta), medias $N$=44.}
+\caption{Rango de movimiento (ROM) aportado por la geometría (crudo) frente a la corrección (delta), medias $N$=44 (pendiente de actualizar a N=47, ver nota arriba).}
 \label{tab:peso_correccion_posicion}
 \small
 \begin{tabular}{@{}lrrr@{}}
@@ -724,29 +812,31 @@ Tobillo Y & 15.9 & 9.9 & \textbf{62\,\%} \\
 
 \begin{table}[H]
 \centering
-\caption{Resultado final, SOLO TALLA como entrada (LOSO real, $N$=44 para rodilla/tobillo, $N$=47 para ángulo tibial --- mismo pipeline que la app). $X$: warp temporal + afín CONSTANTE (garantiza monotonía en talla), $K_w$=2. $Y$: Fourier, $K$=14. Escala RMSEnorm del proyecto: $<$1 Excelente, $<$1.5 Bueno, $<$2 Aceptable, $>$2 Deficiente (Sección~\ref{sec:metricas}).}
+\caption{Resultado final, SOLO TALLA como entrada (LOSO real, $N$=47 --- mismo pipeline que la app, \textbf{recalculado 02-sep-2026 con la cadena completa ya consistente}: crudo con $v$/$l$ congelados (\texttt{congelar\_vl\_angulo}, Limitaciones), calibración de ángulo refitteada sobre ese crudo, y corrección de posición (warp+PAVA en $X$, Fourier en $Y$) refitteada a su vez sobre el resultado). $X$: warp temporal + afín CONSTANTE (garantiza monotonía en talla), $K_w$=2. $Y$: Fourier, $K$=14. Escala RMSEnorm del proyecto: $<$1 Excelente, $<$1.5 Bueno, $<$2 Aceptable, $>$2 Deficiente (Sección~\ref{sec:metricas}).}
 \label{tab:resultados_finales}
 \small
 \begin{tabular}{@{}llrrl@{}}
 \toprule
 Segmento & Eje & $r$ & RMSEnorm & Clasificación \\
 \midrule
-Rodilla ($N=44$) & X & \textbf{0.999} & 1.10 & Bueno \\
-Rodilla ($N=44$) & Y & 0.949 & \textbf{0.89} & Excelente \\
-Tobillo ($N=44$) & X & \textbf{0.999} & 1.17 & Bueno \\
-Tobillo ($N=44$) & Y & \textbf{0.988} & \textbf{0.92} & Excelente \\
+Rodilla ($N=47$) & X & \textbf{0.999} & 1.18 & Bueno \\
+Rodilla ($N=47$) & Y & 0.954 & \textbf{0.83} & Excelente \\
+Tobillo ($N=47$) & X & \textbf{0.999} & 1.30 & Bueno \\
+Tobillo ($N=47$) & Y & \textbf{0.989} & \textbf{0.88} & Excelente \\
 \midrule
-Ángulo tibial, calibrado ($N=47$) & --- & 0.989 & 1.01 & Bueno \\
+Ángulo tibial, calibrado ($N=47$) & --- & \textbf{0.990} & \textbf{0.99} & Excelente \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Las 5 curvas quedan en Excelente o Bueno} --- partiendo de un crudo que, con esta misma métrica, estaba en Deficiente en la mayoría. Las curvas de posición son además continuas, sin escalones ni saltos de velocidad, sin retrocesos, y \textbf{monótonas en talla garantizado} para $X$ (a mayor talla, igual o mayor avance, siempre --- Sección~\ref{sec:retrocesos_x}).
+\textit{Comparación con la versión anterior de esta tabla (01-sep-2026, cadena todavía inconsistente: crudo sin congelar): Rodilla X 1.15, Rodilla Y 0.85, Tobillo X 1.17, Tobillo Y 0.88, Ángulo tibial 1.01/Bueno. Ninguna clasificación baja de categoría con la cadena ya consistente, y el ángulo tibial sube de Bueno a Excelente. La verificación intermedia importante: aplicar el crudo congelado con los coeficientes viejos (sin refittear) SÍ degradaba Rodilla Y a 1.60 (Aceptable) --- es decir, congelar y refittear son un solo cambio, no dos independientes; hacer solo uno de los dos deja la cadena peor que antes.}
+
+\textbf{Las 5 curvas quedan en Excelente o Bueno} --- partiendo de un crudo que, con esta misma métrica, estaba en Deficiente en la mayoría. Las curvas de posición son además continuas, sin escalones ni saltos de velocidad, y \textbf{monótonas en talla garantizado} para $X$ (a mayor talla, igual o mayor avance, siempre --- Sección~\ref{sec:retrocesos_x}). \textbf{Sobre "sin retrocesos":} con la proyección isotónica (PAVA) ya incorporada, son 0 de 47 sujetos reales en rodilla \emph{y} en tobillo (la versión de este informe anterior al PAVA reportaba 3 de 47 en tobillo, talla 161--165\,cm --- ver Sección~\ref{sec:robustez_warp}). Re-verificado el 02-sep-2026 con los coeficientes refitteados: barrido sintético 100--230\,cm (66 tallas) $\to$ \textbf{0 retrocesos en tiempo y 0 violaciones de monotonía en talla}, en rodilla y tobillo.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{figuras/06_rodilla_vs_kuopio_grupo.png}
-\caption{Desplazamiento final de rodilla: crudo (gris) vs.\ corrección final --- ángulo LOSO + posición híbrida (color) --- vs.\ real (negro) --- 44 sujetos de \emph{Kuopio}, curvas media, SOLO TALLA como entrada.}
+\caption{Desplazamiento final de rodilla: crudo (gris) vs.\ corrección final --- ángulo LOSO + posición híbrida (color) --- vs.\ real (negro) --- 47 sujetos de \emph{Kuopio}, curvas media, SOLO TALLA como entrada.}
 \label{fig:rodilla_grupo}
 \end{figure}
 
@@ -785,7 +875,7 @@ Tobillo ($N=44$) & Y & \textbf{0.988} & \textbf{0.92} & Excelente \\
 \label{fig:tobillo_individual_pendulo_cal}
 \end{figure}
 
-\paragraph{Desglose: qué aporta cada corrección por separado.} Las figuras anteriores solo muestran crudo total vs.\ resultado final --- se agregan las curvas intermedias (SOLO ángulo LOSO, SIN corrección de posición) para ver qué aporta cada paso, media de los 44 sujetos:
+\paragraph{Desglose: qué aporta cada corrección por separado.} Las figuras anteriores solo muestran crudo total vs.\ resultado final --- se agregan las curvas intermedias (SOLO ángulo LOSO, SIN corrección de posición) para ver qué aporta cada paso, media de los 47 sujetos:
 
 \begin{figure}[H]
 \centering
@@ -951,22 +1041,30 @@ Figuras~\ref{fig:seleccion_control}--\ref{fig:cuatro_candidatos}: selección pro
 \label{sec:limitaciones}
 
 \begin{itemize}
-    \item \textbf{Los coeficientes de la corrección final (ángulo LOSO + posición híbrida: warp en $X$, Fourier en $Y$) se ajustaron con los 44 sujetos de \emph{Kuopio}} (sanos, sin prótesis, talla 161--186.6\,cm) --- aplicarlos a un usuario protésico o fuera de ese rango de talla/velocidad es extrapolación, misma limitación ya declarada para la calibración de ángulo (Sección~\ref{sec:calibracion}). Probado explícitamente en los extremos permitidos por la app (130 y 210\,cm, 31-ago-2026): no produce valores absurdos, pero el comportamiento fuera del rango validado no tiene respaldo de dato real --- la app muestra una advertencia visible cuando la talla ingresada cae fuera de 161--186.6\,cm.
-    \item \textbf{Nota de consistencia interna (encontrada al preparar esta versión):} los coeficientes de la Tabla~\ref{tab:coeficientes_calibracion} (0.769/$-2.69^\circ$; 0.811/$-11.33^\circ$) son el \emph{promedio de los 15 pliegues LOSO}, usados para \emph{validar} --- los números de este informe. La calibración usada para \emph{producción} (28-ago-2026) usa en cambio un ajuste agrupado sobre $N=13$ sujetos (2 de los 15 no tienen el marcador de tibia completo en el archivo crudo), dando 0.7609/$-2.00^\circ$ y 0.8123/$-11.35^\circ$ --- cercano pero no idéntico. No cambia ninguna conclusión (mismo orden de magnitud, misma dirección de corrección), pero conviene que el artículo final declare cuál de los dos conjuntos de coeficientes usa.
+    \item \textbf{Los coeficientes de la corrección final (ángulo LOSO + posición híbrida: warp en $X$, Fourier en $Y$) se ajustaron con los 47 sujetos de \emph{Kuopio}} (sanos, sin prótesis, talla 161--186.6\,cm) --- aplicarlos a un usuario protésico o fuera de ese rango de talla/velocidad es extrapolación, misma limitación ya declarada para la calibración de ángulo (Sección~\ref{sec:calibracion}). Probado explícitamente en los extremos permitidos por la app (130 y 210\,cm, 31-ago-2026, con los coeficientes de N=44 vigentes en ese momento): no produce valores absurdos, pero el comportamiento fuera del rango validado no tiene respaldo de dato real --- la app muestra una advertencia visible cuando la talla ingresada cae fuera de 161--186.6\,cm.
+    \item \textbf{RESUELTO 01-sep-2026 (era ``Nota de consistencia interna''):} hasta esta versión, los coeficientes de la Tabla~\ref{tab:coeficientes_calibracion} eran el promedio de 15 pliegues LOSO (\emph{validar}), mientras que la calibración de \emph{producción} usaba un ajuste agrupado distinto sobre $N=13$ (28-ago-2026, 0.7609/$-2.00^\circ$ muslo, 0.8123/$-11.35^\circ$ tibia) --- cercano pero no idéntico, y ambos calculados contra el pool viejo de 15 sujetos, no el de 47 ya disponible en disco desde ese mismo 28-ago. \texttt{Recalibrar\_Koopman\_Kuopio\_Core.m} (nuevo, se deja en el repo) recalculó ambos con $N$=47: el ajuste LOSO promedio y el ajuste agrupado de producción coinciden ahora a 4 decimales (0.7926/$-2.60^\circ$ muslo, 0.8516/$-11.84^\circ$ tibia) --- con una muestra más grande, LOSO y agrupado convergen, y la inconsistencia desaparece por sí sola, no por una corrección ad-hoc.
 
     \item Velocidad estimada por Froude (Ec.~\ref{eq:froude}) supera el rango validado por Koopman (0.5--5\,km/h) para la mayoría de tallas adultas --- extrapolación declarada. Camargo sigue siendo el examen final de no-circularidad, no ejecutado todavía.
 
-    \item Signo de la componente vertical del generador (Ec.~\ref{eq:cadera_y}) no se ha contrastado todavía contra el sentido real del eje vertical del CSV que lee el simulador --- pendiente antes de conectar el Paso 4 nuevo al exportador (\texttt{Escribir\_CSV\_Simulador.m} sigue leyendo del enfoque anterior, Sección~\ref{sec:paso5}).
+    \item \textbf{RESUELTO 02-sep-2026: \texttt{Generar\_Trayectoria.m} y \texttt{Escribir\_CSV\_Simulador.m} ya usan el Paso 4 nuevo.} \texttt{Generar\_Trayectoria.m} fue reemplazado por completo (ya no hay parámetro \texttt{candidato}, Koopman con \texttt{congelar\_vl\_angulo} es el único modelo vigente) --- motor: \texttt{Koopman2014\_Core.m} (calibrado LOSO) $\to$ \texttt{Cinematica\_DoblePendulo\_Core.m} + \texttt{Trayectoria\_Cadera\_Core.m} $\to$ \texttt{Correccion\_Hibrida\_PenduloDoble\_Core.m}, el mismo pipeline que \texttt{App\_Animacion\_Cadera\_Rodilla\_Tobillo.m}. El signo de $X$ y de $Y$ se verificó empíricamente contra \texttt{Control\_apoyo\_Luis\_V4.csv} real (\texttt{Verificar\_Signo\_X\_PenduloDoble.m}, 95 filas): $corr(\text{ángulo},X)$ real$=-0.993$ vs.\ generado$=-0.998$; $corr(\text{ángulo},Y)$ real$=+0.529$/$+0.528$ vs.\ generado$=+0.928$/$+0.616$ (dos verificaciones independientes, mismo signo en ambas) --- \textbf{ni $X$ ni $Y$ necesitan inversión con este pipeline} (distinto del péndulo de tobillo fijo de \texttt{Cadena\_Cinematica\_Core.m}, que sí la necesitaba --- no se heredó esa convención por analogía, se re-verificó). \texttt{Test\_Generador\_Trayectoria.m} reescrito completo (18/18): formato de CSV, header idéntico byte a byte al archivo real, monotonía de $X$ tras el recorte de fase, y los 3 casos de \texttt{punto\_seguimiento\_m} (tobillo/rango excedido/rodilla).
 
-    \item \texttt{Escribir\_CSV\_Simulador.m} y \texttt{Generar\_Trayectoria.m} todavía leen del enfoque de posición ANTERIOR al Paso 4 nuevo --- conectarlos es trabajo pendiente, no hecho en esta sesión.
+    \item \textbf{Retrocesos en X: RESUELTO de forma universal, 02-sep-2026} (Sección~\ref{sec:robustez_warp}) --- se agregó una proyección isotónica (PAVA) como último paso, y se corrigió por separado un bug real de colisión de nodos en \texttt{Koopman2014\_Core.m} que afectaba talla $\approx$98--114\,cm. Con las dos correcciones juntas: 0 retrocesos y 0 violaciones de monotonía en talla, verificado en un barrido 100--230\,cm (66 tallas) --- ya no depende de que el crudo geométrico sea monótono de antemano. Limitación que queda, ahora más acotada: los coeficientes de calibración/corrección se ajustaron con los 47 sujetos de \emph{Kuopio} (talla 161--186.6\,cm) --- fuera de ese rango la \emph{forma} sigue siendo correcta (sin retrocesos, monótona en talla) pero la \emph{precisión} no tiene respaldo de dato real todavía, salvo la comparación exploratoria con Ferber (Sección~\ref{sec:validacion_ferber}, sin cerrar).
 
-    \item \textbf{Retrocesos en X: RESUELTO} (Sección~\ref{sec:retrocesos_x}) --- la corrección híbrida (warp temporal + afín constante en X, Fourier sin cambio en Y) elimina los retrocesos por construcción matemática (0/100 en rodilla y tobillo, LOSO $N$=44), no solo empíricamente, y garantiza además que el avance final sea monótono en talla. Limitación que queda: el warp se ajustó con los mismos 44 sujetos de \emph{Kuopio} (talla 161--186.6\,cm) --- misma extrapolación fuera de ese rango ya declarada para el resto de las correcciones.
+    \item \textbf{Comparación exploratoria con Ferber (Sección~\ref{sec:validacion_ferber}): diagnóstico cerrado 02-sep-2026, sigue sin ser una validación cerrada.} El resultado débil inicial en $X$ ($r_X\approx0.36$--$0.39$) era un desajuste de comparación --- Ferber es \emph{treadmill}, y la primera versión le sumaba la rampa de avance \emph{overground} de producción (más la corrección que depende de ella) antes de comparar. Corregido (sin rampa, sin esa corrección, solo convención relativa-a-cadera): $r_X\approx0.94$--$0.95$, $r_Y\approx0.77$--$0.78$, igual dentro y fuera del rango de talla validado. \textbf{Sigue siendo parcial}: solo compara la forma angular (geometría + calibración LOSO), no el pipeline completo de posición con rampa y corrección de producción incluidas --- esa comparación completa, contra un dataset overground real, sigue pendiente de Camargo.
 
     \item Comparación completa contra Camargo et al.~\cite{Camargo2021}, examen final de no-circularidad, todavía no ejecutada --- prioridad más alta pendiente.
 
     \item Zhao~\cite{Zhao2026} y Yun~\cite{Yun2014} tienen el defecto de fase de rodilla (Sección~\ref{sec:comparacion_candidatos}), no corregible sin reajustar coeficientes originales --- quedan como candidatos de comparación, no como modelo principal.
 
-    \item \textbf{Ángulo tibial: la variabilidad entre sujetos que predice el modelo es mucho menor que la real, y en el punto de mayor variabilidad real (${\sim}$70\,\% del ciclo) tiene el signo cambiado respecto a talla.} Verificado numéricamente (01-sep-2026): a 70\,\% del ciclo, SD entre sujetos real = 8.78\textdegree\ vs.\ SD predicha (crudo o calibrado) = 0.33--0.35\textdegree\ (${\sim}$25 veces menor); $corr(talla, real)=+0.27$ (débil) vs.\ $corr(talla, crudo)=-0.97$ (fuerte, signo opuesto). Causa mecánica identificada: $corr(v_{froude}, crudo)=-0.996$ en ese punto, y la velocidad Froude-estimada para estos sujetos (5.21--5.61\,km/h) cae fuera del rango que Koopman 2014 validó (0.5--5\,km/h) --- la extrapolación, aunque pequeña, produce una sensibilidad a velocidad artificialmente fuerte justo ahí. Mismo mecanismo general que la extrapolación de Froude ya declarada arriba, pero aquí cuantificado y con el efecto de signo invertido, no solo de magnitud. Sin corregir en esta versión --- candidato a revisar antes del artículo final (¿acotar/suavizar la sensibilidad a velocidad de Koopman en ese tramo del ciclo?).
+    \item \textbf{Ángulo tibial, dependencia espuria con talla: SIGNO/CAUSA CORREGIDOS 02-sep-2026 (persiste solo la parte estructural, ver abajo).} Diagnóstico original (01-sep-2026): a 70\,\% del ciclo, SD entre sujetos real = 8.78\textdegree\ vs.\ SD predicha (crudo o calibrado) = 0.33--0.35\textdegree\ (${\sim}$25 veces menor); $corr(talla,real)=+0.27$ (débil) vs.\ $corr(talla,crudo)=-0.97$ (fuerte, signo opuesto) --- atribuido entonces solo a que la velocidad Froude-estimada cae fuera del rango que Koopman 2014 validó (0.5--5\,km/h). \textbf{Verificación más profunda (02-sep-2026, con una segunda base independiente, \emph{Maastricht Normative 3D Gait Dataset}~\cite{Senden2024}, datos POR SUJETO --- no solo agrupados --- descargados de OSF t72cw, $N=244$, talla 153--197\,cm, \texttt{RODILLA/Maastricht/02\_Overview\_comf.xlsx}) mostró que el diagnóstico original era incompleto:} el mismo patrón ($|corr(talla,real)|\le0.08$ en ambas bases, contra $|corr(talla,crudo)|$ hasta 0.99 en el modelo) se repite en Maastricht, con un rango de talla que no se solapa en los extremos con Kuopio --- descarta que fuera un artefacto de una sola muestra. Descomponiendo el efecto (\texttt{descomponer\_v\_vs\_l.m}, congelando cada variable por turno): la dependencia con talla del modelo NO viene solo del término de velocidad ($b_1v+b_2v^2$) de cada regresión de Koopman --- el término de talla directo ($b_3\cdot l$) contribuye tanto o más, según el tramo del ciclo. Barrer solo el margen de saturación de velocidad (\texttt{Saturar\_Velocidad\_Koopman\_Core.m}, saturación suave $C^1$ anclada en el límite superior publicado, sin costo en el rango ya validado) no bastó por sí solo: $|corr(talla,crudo)|$ se mantuvo en 0.96--0.99 con cualquier margen probado (0.02--1\,km/h).
+
+    \textbf{Corrección aplicada:} las 4 curvas de Koopman (\texttt{Koopman2014\_Core.m}, opción \texttt{congelar\_vl\_angulo}) se evalúan con $v$ y $l$ fijos en un valor de referencia ($v_{ref}=5$\,km/h, el límite superior publicado; $l_{ref}=1.735$\,m, media agrupada de Kuopio+Maastricht, $N=295$) en vez de la $v$/talla real de cada sujeto --- la talla real sigue entrando al generador, pero solo por la vía geométrica ya validada (escalamiento de $L_{muslo}$/$L_{tibia}$ en el Paso 4), no por los coeficientes internos de la regresión. Activado por defecto en el pipeline de producción (\texttt{Obtener\_Theta\_Tibia\_Candidato.m}, \texttt{Obtener\_Angulos\_Candidato.m}) --- \texttt{Koopman2014\_Core.m} en sí mantiene su default sin congelar, para no alterar los scripts de comparación entre candidatos (Zhao/Yun) que necesitan el comportamiento nativo del paper.
+
+    \textbf{La corrección obliga a refittear TODA la cadena aguas abajo --- no es un cambio aislado.} Congelar $v$/$l$ cambia el crudo, y todo lo ajustado \emph{sobre} ese crudo queda desactualizado: (i) la calibración afín de ángulo (\texttt{Calibracion\_Koopman\_Kuopio\_Core.m}: muslo $0.7926\to0.6827$, tibia $0.8516\to0.7630$), y (ii) los coeficientes de la corrección de posición (\texttt{Coeficientes\_Warp\_Temporal.mat} y \texttt{Coeficientes\_CorreccionFinal.mat}, refitteados con \texttt{Ajustar\_Warp\_Temporal\_TallaSola.m} y \texttt{Refit\_CorreccionFinal\_TallaSola.m}). \textbf{Verificado explícitamente que hacer solo una parte deja la cadena PEOR que antes}: crudo congelado con los coeficientes viejos degradaba Rodilla Y de 0.85 (Excelente) a 1.60 (Aceptable) --- congelar y refittear son un solo cambio indivisible.
+
+    \textbf{Resultado con la cadena completa ya consistente} (Tabla~\ref{tab:resultados_finales}): ninguna de las 5 curvas baja de clasificación y el ángulo tibial sube de Bueno a Excelente ($1.01\to0.99$); Rodilla Y incluso mejora ($0.85\to0.83$). Las dos garantías publicadas se re-verificaron con los coeficientes nuevos (barrido 100--230\,cm, 66 tallas): 0 retrocesos y 0 violaciones de monotonía en talla. \texttt{Test\_Generador.m} (22/22), \texttt{Test\_Generador\_Trayectoria.m} (18/18) y \texttt{Test\_Punto\_Montaje.m} (6/6) sin regresión. La cadena quedó sincronizada en los cuatro consumidores: la app (\texttt{App\_Animacion\_Cadera\_Rodilla\_Tobillo.m}), los wrappers de producción, los scripts de refit, y los scripts que generan las cifras/figuras de este informe.
+
+    \textbf{Lo que esto NO arregla (límite estructural, no un bug):} la magnitud de variabilidad entre sujetos que el modelo puede producir sigue siendo la que permite un generador de una sola entrada real (talla) --- del orden de unos pocos décimos de grado, lejos de los 5--7\textdegree\ de SD real observados en ambas bases. Esa brecha no es atribuible a talla ni a velocidad (el dato real casi no correlaciona con ninguna de las dos) sino a variabilidad de estilo de marcha individual, que ningún ajuste de Koopman puede reproducir con talla como único dato de entrada --- se documenta como limitación estructural, no se inventa una corrección sin respaldo de dato real para cerrarla.
 
     \item Este informe valida cinemática predicha vs.\ medida en bases públicas; no valida que el simulador físico ejecute esa trayectoria con fidelidad (de CSV a posición real de motores) --- pendiente de la integración Raspberry Pi--ESP32 y de la calibración del cero físico del banco (equipo de mecatrónica).
 \end{itemize}
